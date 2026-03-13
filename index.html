@@ -533,7 +533,7 @@
         <h1 style="color: var(--danger);"><span class="uk">🛡️ Панель Адміністратора</span><span class="ru">🛡️ Панель Администратора</span></h1>
         <p><span class="uk">Модерація та керування всіма оголошеннями</span><span class="ru">Модерация и управление всеми объявлениями</span></p>
         <div style="display: flex; gap: 10px; justify-content: center; margin-top: 15px;">
-            <button class="btn btn-primary" onclick="switchView('cabinet')">
+            <button class="btn btn-primary" onclick="openCabinet()">
                 <span class="uk">← Назад у кабінет</span><span class="ru">← Назад в кабинет</span>
             </button>
         </div>
@@ -942,8 +942,7 @@
         currentView = viewName;
         localStorage.setItem('nik-current-view', viewName); // Зберігаємо вкладку при оновленні сторінки
         
-        // ВАЖЛИВО: Замість closeAdDetails(true) просто перемикаємо видимість контейнерів,
-        // щоб уникнути помилки "Maximum call stack size exceeded" (нескінченної рекурсії)
+        // ВАЖЛИВО: Замість closeAdDetails(true) просто перемикаємо видимість контейнерів
         document.getElementById('mainView').style.display = 'block';
         document.getElementById('detailsView').style.display = 'none';
         
@@ -1061,7 +1060,6 @@
         }).catch(error => console.log("Failed to send email", error));
     }
 
-
     function toggleLang() {
         currentLang = currentLang === 'uk' ? 'ru' : 'uk';
         localStorage.setItem('nik-lang', currentLang);
@@ -1138,7 +1136,7 @@
         const adId = params.get('id');
         
         if (adId && ads.length > 0) {
-            const foundAd = ads.find(a => a.id.toString() === adId.toString());
+            const foundAd = ads.find(a => String(a.id) === String(adId));
             if (foundAd) {
                 openAdDetails(foundAd.id, true); 
             } else {
@@ -1197,13 +1195,15 @@
 
         const query = document.getElementById('searchInput').value.toLowerCase().trim();
         if (query.length > 0) {
-            filtered = filtered.filter(ad => 
-                ad.title.toLowerCase().includes(query) || 
-                ad.location.toLowerCase().includes(query) ||
-                (ad.desc && ad.desc.toLowerCase().includes(query)) ||
-                (ad.category && ad.category.toLowerCase().includes(query)) ||
-                (ad.subcategory && ad.subcategory.toLowerCase().includes(query))
-            );
+            filtered = filtered.filter(ad => {
+                try {
+                    return (ad.title && ad.title.toLowerCase().includes(query)) || 
+                           (ad.location && ad.location.toLowerCase().includes(query)) ||
+                           (ad.desc && ad.desc.toLowerCase().includes(query)) ||
+                           (ad.category && ad.category.toLowerCase().includes(query)) ||
+                           (ad.subcategory && ad.subcategory.toLowerCase().includes(query));
+                } catch(e) { return false; }
+            });
         }
         if (currentCategoryFilter && currentCategoryFilter !== 'Свіжі') {
             filtered = filtered.filter(ad => ad.category === currentCategoryFilter);
@@ -1221,164 +1221,174 @@
         const listToRender = currentView === 'admin' ? filtered : [...filtered].reverse();
 
         listToRender.forEach(ad => {
-            const card = document.createElement('div');
-            card.className = 'ad-card';
-            
-            let imageHTML = '';
-            if (ad.image && (ad.image.startsWith('data:image') || ad.image.startsWith('http'))) {
-                imageHTML = `<img src="${ad.image}" class="ad-image" alt="${ad.title}" onerror="this.src='data:image/svg+xml;utf8,<svg xmlns=\\'http://www.w3.org/2000/svg\\' width=\\'100%\\' height=\\'100%\\'><rect width=\\'100%\\' height=\\'100%\\' fill=\\'%23e0e0e0\\'/><text x=\\'50%\\' y=\\'50%\\' font-size=\\'40\\' text-anchor=\\'middle\\' dy=\\'.3em\\'>📦</text></svg>'">`;
-            } else {
-                let icon = CATEGORIES[ad.category] ? CATEGORIES[ad.category].icon : '📦';
-                imageHTML = `<div class="ad-image" style="font-size: 60px;">${icon}</div>`;
-            }
-
-            // Статуси
-            let statusHTML = '';
-            if (currentUser && !currentUser.isAnonymous && (ad.userId === currentUser.uid || isAdmin())) {
-                if (ad.status === 'pending') statusHTML = `<div class="status-badge status-pending">Очікує модерації</div>`;
-                else if (ad.status === 'rejected') statusHTML = `<div class="status-badge status-rejected">Відхилено</div>`;
-                else statusHTML = `<div class="status-badge status-approved">Опубліковано</div>`;
-            }
-
-            // БЕЗПЕКА: Кнопки з'являються ТІЛЬКИ для авторизованих власників або адміна
-            let actionsHTML = '';
-            if (currentUser && !currentUser.isAnonymous && (ad.userId === currentUser.uid || isAdmin())) {
-                actionsHTML += `<div class="card-actions" onclick="event.preventDefault(); event.stopPropagation();">`;
-                if (isAdmin() && ad.status === 'pending') {
-                    actionsHTML += `<button class="btn-appr" onclick="approveAd('${ad.id}')">✅ Схвалити</button>`;
-                    actionsHTML += `<button class="btn-warning" onclick="rejectAd('${ad.id}')">❌ Відхилити</button>`;
+            try {
+                const card = document.createElement('div');
+                card.className = 'ad-card';
+                
+                let imageHTML = '';
+                if (ad.image && (ad.image.startsWith('data:image') || ad.image.startsWith('http'))) {
+                    imageHTML = `<img src="${ad.image}" class="ad-image" alt="${ad.title || 'Image'}" onerror="this.src='data:image/svg+xml;utf8,<svg xmlns=\\'http://www.w3.org/2000/svg\\' width=\\'100%\\' height=\\'100%\\'><rect width=\\'100%\\' height=\\'100%\\' fill=\\'%23e0e0e0\\'/><text x=\\'50%\\' y=\\'50%\\' font-size=\\'40\\' text-anchor=\\'middle\\' dy=\\'.3em\\'>📦</text></svg>'">`;
+                } else {
+                    let icon = (ad.category && CATEGORIES[ad.category]) ? CATEGORIES[ad.category].icon : '📦';
+                    imageHTML = `<div class="ad-image" style="font-size: 60px;">${icon}</div>`;
                 }
-                actionsHTML += `<button class="btn-edit" onclick="editAd('${ad.id}')">✏️ Редаг.</button>`;
-                actionsHTML += `<button class="btn-del" onclick="deleteAd('${ad.id}')">🗑️ Видалити</button>`;
-                actionsHTML += `</div>`;
-            }
 
-            const catName = CATEGORIES[ad.category] ? CATEGORIES[ad.category][currentLang] : ad.category;
-            const subName = ad.subcategory ? ` › ${ad.subcategory}` : '';
+                // Статуси
+                let statusHTML = '';
+                if (currentUser && !currentUser.isAnonymous && (ad.userId === currentUser.uid || isAdmin())) {
+                    if (ad.status === 'pending') statusHTML = `<div class="status-badge status-pending">Очікує модерації</div>`;
+                    else if (ad.status === 'rejected') statusHTML = `<div class="status-badge status-rejected">Відхилено</div>`;
+                    else statusHTML = `<div class="status-badge status-approved">Опубліковано</div>`;
+                }
 
-            // Кількість переглядів (Тільки для власника/адміна)
-            let viewsHTML = '';
-            if (currentUser && !currentUser.isAnonymous && (ad.userId === currentUser.uid || isAdmin())) {
-                viewsHTML = `<span style="margin-left: 10px;" title="Перегляди">👁️ ${ad.views || 0}</span>`;
-            }
+                // БЕЗПЕКА: Кнопки з'являються ТІЛЬКИ для авторизованих власників або адміна
+                let actionsHTML = '';
+                if (currentUser && !currentUser.isAnonymous && (ad.userId === currentUser.uid || isAdmin())) {
+                    actionsHTML += `<div class="card-actions" onclick="event.preventDefault(); event.stopPropagation();">`;
+                    if (isAdmin() && ad.status === 'pending') {
+                        actionsHTML += `<button class="btn-appr" onclick="approveAd('${ad.id}')">✅ Схвалити</button>`;
+                        actionsHTML += `<button class="btn-warning" onclick="rejectAd('${ad.id}')">❌ Відхилити</button>`;
+                    }
+                    actionsHTML += `<button class="btn-edit" onclick="editAd('${ad.id}')">✏️ Редаг.</button>`;
+                    actionsHTML += `<button class="btn-del" onclick="deleteAd('${ad.id}')">🗑️ Видалити</button>`;
+                    actionsHTML += `</div>`;
+                }
 
-            // БЕЗПЕЧНИЙ ВИКЛИК openAdDetails з рядковим ID
-            card.innerHTML = `
-                ${statusHTML}
-                <a href="?id=${ad.id}" onclick="event.preventDefault(); openAdDetails('${ad.id}');" style="flex:1; display:flex; flex-direction:column; text-decoration:none; color:inherit;">
-                    ${imageHTML}
-                    <div class="ad-content">
-                        <div style="margin-bottom: 5px;"><span class="category-badge">${catName}${subName}</span></div>
-                        <div class="ad-title">${ad.title}</div>
-                        <div class="ad-price">${ad.price}</div>
-                        <div class="ad-desc">${ad.desc || ''}</div>
-                        <div class="ad-meta">
-                            <div><span>📍 ${ad.location}</span><span style="margin-left: 10px;">⏱ ${ad.date ? ad.date.split(',')[0] : ''}</span>${viewsHTML}</div>
+                const catName = (ad.category && CATEGORIES[ad.category]) ? CATEGORIES[ad.category][currentLang] : (ad.category || '');
+                const subName = ad.subcategory ? ` › ${ad.subcategory}` : '';
+
+                // Кількість переглядів (Тільки для власника/адміна)
+                let viewsHTML = '';
+                if (currentUser && !currentUser.isAnonymous && (ad.userId === currentUser.uid || isAdmin())) {
+                    viewsHTML = `<span style="margin-left: 10px;" title="Перегляди">👁️ ${ad.views || 0}</span>`;
+                }
+
+                // БЕЗПЕЧНИЙ ВИКЛИК openAdDetails з рядковим ID
+                card.innerHTML = `
+                    ${statusHTML}
+                    <a href="?id=${ad.id}" onclick="openAdDetails('${ad.id}'); return false;" style="flex:1; display:flex; flex-direction:column; text-decoration:none; color:inherit;">
+                        ${imageHTML}
+                        <div class="ad-content">
+                            <div style="margin-bottom: 5px;"><span class="category-badge">${catName}${subName}</span></div>
+                            <div class="ad-title">${ad.title || ''}</div>
+                            <div class="ad-price">${ad.price || ''}</div>
+                            <div class="ad-desc">${ad.desc || ''}</div>
+                            <div class="ad-meta">
+                                <div><span>📍 ${ad.location || ''}</span><span style="margin-left: 10px;">⏱ ${ad.date ? String(ad.date).split(',')[0] : ''}</span>${viewsHTML}</div>
+                            </div>
                         </div>
-                    </div>
-                </a>
-                ${actionsHTML ? `<div style="padding: 0 15px 15px;">${actionsHTML}</div>` : ''}
-            `;
-            container.appendChild(card);
+                    </a>
+                    ${actionsHTML ? `<div style="padding: 0 15px 15px;">${actionsHTML}</div>` : ''}
+                `;
+                container.appendChild(card);
+            } catch (err) {
+                console.error("Помилка рендеру одного з оголошень", err);
+            }
         });
 
         checkUrlParams(); 
     }
 
     function openAdDetails(id, skipPushState = false) {
-        // Завжди порівнюємо ID як рядок, щоб уникнути помилок типізації
-        const ad = ads.find(a => a.id.toString() === id.toString());
-        if (!ad) return;
+        try {
+            // Завжди порівнюємо ID як рядок, щоб уникнути помилок типізації
+            const ad = ads.find(a => String(a.id) === String(id));
+            if (!ad) return;
 
-        // Збільшуємо кількість переглядів (якщо це відкриває не сам власник і не адмін)
-        if (useFirebase && (!currentUser || currentUser.uid !== ad.userId) && !isAdmin()) {
-            const adRef = doc(db, 'artifacts', appId, 'public', 'data', 'nikolaev_ads', ad.id.toString());
-            updateDoc(adRef, { views: (ad.views || 0) + 1 }).catch(e => console.log(e));
-            ad.views = (ad.views || 0) + 1; // Оновлюємо локально для миттєвого відображення
-        }
+            // Збільшуємо кількість переглядів (якщо це відкриває не сам власник і не адмін)
+            try {
+                if (useFirebase && (!currentUser || currentUser.uid !== ad.userId) && !isAdmin()) {
+                    const adRef = doc(db, 'artifacts', appId, 'public', 'data', 'nikolaev_ads', String(ad.id));
+                    updateDoc(adRef, { views: (ad.views || 0) + 1 }).catch(e => console.log(e));
+                    ad.views = (ad.views || 0) + 1; // Оновлюємо локально для миттєвого відображення
+                }
+            } catch (err) { console.error("Помилка оновлення переглядів:", err); }
 
-        document.getElementById('mainView').style.display = 'none';
-        document.getElementById('detailsView').style.display = 'block';
-        window.scrollTo(0, 0);
+            document.getElementById('mainView').style.display = 'none';
+            document.getElementById('detailsView').style.display = 'block';
+            window.scrollTo(0, 0);
 
-        document.title = `${ad.title} | Оголошення м. Миколаїв`;
+            document.title = `${ad.title || 'Оголошення'} | Оголошення м. Миколаїв`;
 
-        if (!skipPushState) {
-            history.pushState({view: 'details', id: id}, '', '?id=' + id);
-        }
-
-        const catName = CATEGORIES[ad.category] ? CATEGORIES[ad.category][currentLang] : ad.category;
-        const subName = ad.subcategory ? ` › ${ad.subcategory}` : '';
-        const descLabel = currentLang === 'uk' ? 'Опис:' : 'Описание:';
-        const contactsLabel = currentLang === 'uk' ? 'Контакти:' : 'Контакты:';
-        const enlargeHint = currentLang === 'uk' ? '🔍 Збільшити' : '🔍 Увеличить';
-
-        const hasImage = ad.image && (ad.image.startsWith('data:image') || ad.image.startsWith('http'));
-        
-        let imageHTML = '';
-        if (hasImage) {
-            imageHTML = `<img src="${ad.image}" alt="${ad.title}">
-                         <div style="position: absolute; bottom: 15px; right: 15px; background: rgba(0,0,0,0.6); color: white; padding: 8px 15px; border-radius: 20px; font-size: 13px; pointer-events: none; backdrop-filter: blur(4px); box-shadow: 0 4px 10px rgba(0,0,0,0.3);">${enlargeHint}</div>`;
-        } else {
-            let icon = CATEGORIES[ad.category] ? CATEGORIES[ad.category].icon : '📦';
-            imageHTML = `<div style="font-size: 120px;">${icon}</div>`;
-        }
-
-        const clickAction = hasImage ? `onclick="openLightbox('${ad.image}')"` : '';
-        const cursorStyle = hasImage ? 'cursor: zoom-in;' : 'cursor: default;';
-
-        // БЕЗПЕКА: Додаємо кнопки керування ТІЛЬКИ для авторизованих власників або адміна
-        let actionsHTML = '';
-        if (currentUser && !currentUser.isAnonymous && (ad.userId === currentUser.uid || isAdmin())) {
-            actionsHTML = `<div style="margin-top: 20px; display: flex; gap: 10px; border-top: 1px solid var(--border); padding-top: 20px; flex-wrap: wrap;">`;
-            if (isAdmin() && ad.status === 'pending') {
-                actionsHTML += `<button class="btn btn-success" style="flex:1; min-width: 120px;" onclick="approveAd('${ad.id}'); closeAdDetails(true);">✅ Схвалити</button>`;
-                actionsHTML += `<button class="btn btn-warning" style="flex:1; min-width: 120px;" onclick="rejectAd('${ad.id}'); closeAdDetails(true);">❌ Відхилити</button>`;
+            if (!skipPushState) {
+                history.pushState({view: 'details', id: id}, '', '?id=' + id);
             }
-            actionsHTML += `<button class="btn btn-primary" style="flex:1; min-width: 120px;" onclick="editAd('${ad.id}')">✏️ Редагувати</button>`;
-            actionsHTML += `<button class="btn btn-danger" style="flex:1; min-width: 120px;" onclick="deleteAd('${ad.id}'); closeAdDetails(true);">🗑️ Видалити</button>`;
-            actionsHTML += `</div>`;
-        }
 
-        // Відображення переглядів у повному екрані
-        let viewsHTML = '';
-        if (currentUser && !currentUser.isAnonymous && (ad.userId === currentUser.uid || isAdmin())) {
-            viewsHTML = `<span style="margin-left: 15px; font-weight: bold; color: var(--primary);">👁️ ${ad.views || 0} ${currentLang === 'uk' ? 'переглядів' : 'просмотров'}</span>`;
-        }
+            const catName = (ad.category && CATEGORIES[ad.category]) ? CATEGORIES[ad.category][currentLang] : (ad.category || '');
+            const subName = ad.subcategory ? ` › ${ad.subcategory}` : '';
+            const descLabel = currentLang === 'uk' ? 'Опис:' : 'Описание:';
+            const contactsLabel = currentLang === 'uk' ? 'Контакти:' : 'Контакты:';
+            const enlargeHint = currentLang === 'uk' ? '🔍 Збільшити' : '🔍 Увеличить';
 
-        const detailsHTML = `
-            <div class="ad-details-container">
-                <div class="ad-details-image-wrapper" ${clickAction} style="${cursorStyle}">
-                    ${imageHTML}
-                </div>
-                
-                <div class="ad-details-info">
-                    <div style="margin-bottom: 15px;"><span class="category-badge" style="font-size: 13px; padding: 6px 12px;">${catName}${subName}</span></div>
-                    <h2 style="margin-bottom: 15px; font-size: 26px; line-height: 1.3;">${ad.title}</h2>
-                    <div class="ad-price" style="font-size: 32px; margin-bottom: 25px;">${ad.price}</div>
+            const hasImage = ad.image && (ad.image.startsWith('data:image') || ad.image.startsWith('http'));
+            
+            let imageHTML = '';
+            if (hasImage) {
+                imageHTML = `<img src="${ad.image}" alt="${ad.title || 'Image'}">
+                             <div style="position: absolute; bottom: 15px; right: 15px; background: rgba(0,0,0,0.6); color: white; padding: 8px 15px; border-radius: 20px; font-size: 13px; pointer-events: none; backdrop-filter: blur(4px); box-shadow: 0 4px 10px rgba(0,0,0,0.3);">${enlargeHint}</div>`;
+            } else {
+                let icon = (ad.category && CATEGORIES[ad.category]) ? CATEGORIES[ad.category].icon : '📦';
+                imageHTML = `<div style="font-size: 120px;">${icon}</div>`;
+            }
 
-                    <div style="margin-bottom: 30px;">
-                        <h4 style="margin-bottom: 12px; font-size: 18px; border-bottom: 1px solid var(--border); padding-bottom: 8px;">${descLabel}</h4>
-                        <p style="white-space: pre-wrap; line-height: 1.6; color: var(--text); font-size: 15px;">${ad.desc || ''}</p>
+            const clickAction = hasImage ? `onclick="openLightbox('${ad.image}')"` : '';
+            const cursorStyle = hasImage ? 'cursor: zoom-in;' : 'cursor: default;';
+
+            // БЕЗПЕКА: Додаємо кнопки керування ТІЛЬКИ для авторизованих власників або адміна
+            let actionsHTML = '';
+            if (currentUser && !currentUser.isAnonymous && (ad.userId === currentUser.uid || isAdmin())) {
+                actionsHTML = `<div style="margin-top: 20px; display: flex; gap: 10px; border-top: 1px solid var(--border); padding-top: 20px; flex-wrap: wrap;">`;
+                if (isAdmin() && ad.status === 'pending') {
+                    actionsHTML += `<button class="btn btn-success" style="flex:1; min-width: 120px;" onclick="approveAd('${ad.id}'); closeAdDetails(true);">✅ Схвалити</button>`;
+                    actionsHTML += `<button class="btn btn-warning" style="flex:1; min-width: 120px;" onclick="rejectAd('${ad.id}'); closeAdDetails(true);">❌ Відхилити</button>`;
+                }
+                actionsHTML += `<button class="btn btn-primary" style="flex:1; min-width: 120px;" onclick="editAd('${ad.id}')">✏️ Редагувати</button>`;
+                actionsHTML += `<button class="btn btn-danger" style="flex:1; min-width: 120px;" onclick="deleteAd('${ad.id}'); closeAdDetails(true);">🗑️ Видалити</button>`;
+                actionsHTML += `</div>`;
+            }
+
+            // Відображення переглядів у повному екрані
+            let viewsHTML = '';
+            if (currentUser && !currentUser.isAnonymous && (ad.userId === currentUser.uid || isAdmin())) {
+                viewsHTML = `<span style="margin-left: 15px; font-weight: bold; color: var(--primary);">👁️ ${ad.views || 0} ${currentLang === 'uk' ? 'переглядів' : 'просмотров'}</span>`;
+            }
+
+            const detailsHTML = `
+                <div class="ad-details-container">
+                    <div class="ad-details-image-wrapper" ${clickAction} style="${cursorStyle}">
+                        ${imageHTML}
                     </div>
+                    
+                    <div class="ad-details-info">
+                        <div style="margin-bottom: 15px;"><span class="category-badge" style="font-size: 13px; padding: 6px 12px;">${catName}${subName}</span></div>
+                        <h2 style="margin-bottom: 15px; font-size: 26px; line-height: 1.3;">${ad.title || ''}</h2>
+                        <div class="ad-price" style="font-size: 32px; margin-bottom: 25px;">${ad.price || ''}</div>
 
-                    <div class="ad-contacts" style="padding: 20px; font-size: 16px; background: var(--bg); border: 1px solid var(--border); box-shadow: inset 0 2px 5px rgba(0,0,0,0.02);">
-                        <h4 style="margin-bottom: 15px; font-size: 18px;">${contactsLabel}</h4>
-                        <div style="margin-bottom: 10px; display: flex; align-items: center; gap: 10px;">👤 <strong>${ad.name}</strong></div>
-                        <div style="margin-bottom: 10px; display: flex; align-items: center; gap: 10px;">📞 <a href="tel:${ad.phone}" style="font-size: 20px;">${ad.phone}</a></div>
-                        ${ad.email ? `<div style="margin-bottom: 10px; display: flex; align-items: center; gap: 10px;">📧 <a href="mailto:${ad.email}">${ad.email}</a></div>` : ''}
-                        
-                        <div style="margin-top: 20px; padding-top: 15px; border-top: 1px solid var(--border); color: var(--text-muted); font-size: 14px; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap;">
-                            <span>📍 ${ad.location}</span>
-                            <div><span>⏱ ${ad.date ? ad.date : ''}</span>${viewsHTML}</div>
+                        <div style="margin-bottom: 30px;">
+                            <h4 style="margin-bottom: 12px; font-size: 18px; border-bottom: 1px solid var(--border); padding-bottom: 8px;">${descLabel}</h4>
+                            <p style="white-space: pre-wrap; line-height: 1.6; color: var(--text); font-size: 15px;">${ad.desc || ''}</p>
                         </div>
-                        
-                        ${actionsHTML}
+
+                        <div class="ad-contacts" style="padding: 20px; font-size: 16px; background: var(--bg); border: 1px solid var(--border); box-shadow: inset 0 2px 5px rgba(0,0,0,0.02);">
+                            <h4 style="margin-bottom: 15px; font-size: 18px;">${contactsLabel}</h4>
+                            <div style="margin-bottom: 10px; display: flex; align-items: center; gap: 10px;">👤 <strong>${ad.name || ''}</strong></div>
+                            <div style="margin-bottom: 10px; display: flex; align-items: center; gap: 10px;">📞 <a href="tel:${ad.phone}" style="font-size: 20px;">${ad.phone || ''}</a></div>
+                            ${ad.email ? `<div style="margin-bottom: 10px; display: flex; align-items: center; gap: 10px;">📧 <a href="mailto:${ad.email}">${ad.email}</a></div>` : ''}
+                            
+                            <div style="margin-top: 20px; padding-top: 15px; border-top: 1px solid var(--border); color: var(--text-muted); font-size: 14px; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap;">
+                                <span>📍 ${ad.location || ''}</span>
+                                <div><span>⏱ ${ad.date ? String(ad.date) : ''}</span>${viewsHTML}</div>
+                            </div>
+                            
+                            ${actionsHTML}
+                        </div>
                     </div>
                 </div>
-            </div>
-        `;
-        document.getElementById('adDetailsContent').innerHTML = detailsHTML;
+            `;
+            document.getElementById('adDetailsContent').innerHTML = detailsHTML;
+        } catch (err) {
+            console.error("Помилка завантаження деталей оголошення:", err);
+        }
     }
 
     function closeAdDetails(skipPushState = false) {
@@ -1558,14 +1568,14 @@
     });
 
     function editAd(id) {
-        const ad = ads.find(a => a.id.toString() === id.toString());
+        const ad = ads.find(a => String(a.id) === String(id));
         if (!ad) return;
         editingAdId = id;
         
         document.getElementById('modalTitle').innerHTML = currentLang==='uk'?'<span class="uk">Редагування оголошення</span>':'<span class="ru">Редактирование</span>';
-        document.getElementById('adTitle').value = ad.title;
-        document.getElementById('adPrice').value = parseInt(ad.price);
-        document.getElementById('adCategory').value = ad.category;
+        document.getElementById('adTitle').value = ad.title || '';
+        document.getElementById('adPrice').value = parseInt(ad.price) || 0;
+        document.getElementById('adCategory').value = ad.category || '';
         updateSubcategories();
         document.getElementById('adSubcategory').value = ad.subcategory || '';
         document.getElementById('adDesc').value = ad.desc || '';
@@ -1586,21 +1596,21 @@
     async function deleteAd(id) {
         if(!confirm(currentLang==='uk'?'Видалити назавжди?':'Удалить навсегда?')) return;
         try {
-            await deleteDoc(doc(db, 'artifacts', appId, 'public', 'data', 'nikolaev_ads', id.toString()));
+            await deleteDoc(doc(db, 'artifacts', appId, 'public', 'data', 'nikolaev_ads', String(id)));
             showToast('Видалено');
         } catch (e) { showToast('Помилка видалення', true); }
     }
 
     async function approveAd(id) {
         try {
-            await updateDoc(doc(db, 'artifacts', appId, 'public', 'data', 'nikolaev_ads', id.toString()), { status: 'approved' });
+            await updateDoc(doc(db, 'artifacts', appId, 'public', 'data', 'nikolaev_ads', String(id)), { status: 'approved' });
             showToast('Опубліковано!');
         } catch (e) { showToast('Помилка', true); }
     }
 
     async function rejectAd(id) {
         try {
-            await updateDoc(doc(db, 'artifacts', appId, 'public', 'data', 'nikolaev_ads', id.toString()), { status: 'rejected' });
+            await updateDoc(doc(db, 'artifacts', appId, 'public', 'data', 'nikolaev_ads', String(id)), { status: 'rejected' });
             showToast('Відхилено!');
         } catch (e) { showToast('Помилка', true); }
     }
@@ -1633,7 +1643,7 @@
         try {
             if (editingAdId) {
                 // Оновлення
-                const adRef = doc(db, 'artifacts', appId, 'public', 'data', 'nikolaev_ads', editingAdId.toString());
+                const adRef = doc(db, 'artifacts', appId, 'public', 'data', 'nikolaev_ads', String(editingAdId));
                 if(!isAdmin()) adData.status = 'pending'; 
                 await updateDoc(adRef, adData);
                 showToast(currentLang === 'uk' ? 'Оголошення оновлено!' : 'Объявление обновлено!');
@@ -1644,7 +1654,7 @@
                 adData.status = isAdmin() ? 'approved' : 'pending';
                 adData.views = 0; // Початкові перегляди
                 
-                const adRef = doc(db, 'artifacts', appId, 'public', 'data', 'nikolaev_ads', adData.id.toString());
+                const adRef = doc(db, 'artifacts', appId, 'public', 'data', 'nikolaev_ads', String(adData.id));
                 await setDoc(adRef, adData);
                 showToast(currentLang === 'uk' ? 'Оголошення відправлено на модерацію!' : 'Отправлено на модерацию!');
                 
@@ -1812,18 +1822,23 @@
         const adsRef = collection(db, 'artifacts', appId, 'public', 'data', 'nikolaev_ads');
         
         onSnapshot(adsRef, (snapshot) => {
-            ads = [];
-            snapshot.forEach((doc) => {
-                ads.push(doc.data());
-            });
-            
-            const ldr = document.getElementById('loadingIndicator');
-            if (ldr) ldr.style.display = 'none';
-            
-            ads.sort((a, b) => a.id - b.id);
-            
-            renderAds();
-            hideError();
+            try {
+                const newAds = [];
+                snapshot.forEach((doc) => {
+                    newAds.push(doc.data());
+                });
+                ads = newAds;
+                
+                const ldr = document.getElementById('loadingIndicator');
+                if (ldr) ldr.style.display = 'none';
+                
+                ads.sort((a, b) => Number(a.id) - Number(b.id));
+                
+                renderAds();
+                hideError();
+            } catch (err) {
+                console.error("Помилка обробки знімка даних:", err);
+            }
         }, (error) => {
             console.error("Firestore Error:", error);
             if (error.code === 'permission-denied') {
