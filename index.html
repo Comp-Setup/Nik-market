@@ -1,0 +1,1175 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Оголошення м. Миколаїв | Міні-дошка оголошень</title>
+    <style>
+        :root {
+            --primary: #4776E6;
+            --primary-hover: #8E54E9;
+            --bg: #f4f7f6;
+            --surface: #ffffff;
+            --text: #333333;
+            --text-muted: #777777;
+            --border: #e0e0e0;
+            --shadow: 0 10px 30px rgba(0, 0, 0, 0.08);
+            --radius: 16px;
+        }
+
+        body.dark-theme {
+            --primary: #00d2ff;
+            --primary-hover: #3a7bd5;
+            --bg: #121212;
+            --surface: #1e1e1e;
+            --text: #f0f0f0;
+            --text-muted: #aaaaaa;
+            --border: #333333;
+            --shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+        }
+
+        body {
+            background-color: var(--bg);
+            color: var(--text);
+            transition: background-color 0.3s, color 0.3s;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* Language Toggle Logic in CSS */
+        body.lang-uk .ru { display: none !important; }
+        body.lang-ru .uk { display: none !important; }
+
+        /* HEADER */
+        header {
+            background-color: var(--surface);
+            box-shadow: 0 4px 20px rgba(0,0,0,0.05);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            transition: background-color 0.3s;
+        }
+
+        .nav-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 15px 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo {
+            font-size: 24px;
+            font-weight: 800;
+            background: linear-gradient(135deg, var(--primary), var(--primary-hover));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            text-decoration: none;
+            cursor: pointer;
+        }
+
+        .header-actions {
+            display: flex;
+            gap: 10px;
+            align-items: center;
+        }
+
+        /* BUTTONS */
+        .btn {
+            padding: 10px 20px;
+            border-radius: 30px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            border: none;
+            outline: none;
+            font-size: 14px;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, var(--primary), var(--primary-hover));
+            color: white;
+            box-shadow: 0 4px 15px rgba(71, 118, 230, 0.3);
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(71, 118, 230, 0.5);
+        }
+
+        .btn-icon {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            color: var(--text);
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 16px;
+            font-weight: bold;
+            cursor: pointer;
+        }
+
+        .btn-icon:hover {
+            border-color: var(--primary);
+            color: var(--primary);
+            transform: translateY(-2px);
+        }
+
+        /* MAIN HERO */
+        .hero {
+            text-align: center;
+            padding: 40px 20px 30px;
+            background: linear-gradient(to bottom, rgba(71, 118, 230, 0.05), transparent);
+        }
+
+        .hero h1 { font-size: 36px; margin-bottom: 15px; }
+        .hero p { color: var(--text-muted); font-size: 18px; margin-bottom: 30px; }
+
+        .search-bar {
+            max-width: 600px;
+            margin: 0 auto;
+            display: flex;
+            gap: 10px;
+        }
+
+        .search-input {
+            flex: 1;
+            padding: 15px 25px;
+            border-radius: 30px;
+            border: 1px solid var(--border);
+            background: var(--surface);
+            color: var(--text);
+            font-size: 16px;
+            outline: none;
+            transition: border-color 0.3s, box-shadow 0.3s;
+        }
+
+        .search-input:focus {
+            border-color: var(--primary);
+            box-shadow: 0 0 0 4px rgba(71, 118, 230, 0.1);
+        }
+
+        /* CATEGORIES */
+        .categories-wrapper { max-width: 1200px; margin: 0 auto 20px auto; padding: 0 20px; }
+        .categories-list {
+            display: flex; gap: 15px; overflow-x: auto; padding: 15px 5px;
+            scrollbar-width: thin; scrollbar-color: var(--primary) var(--surface);
+        }
+        .categories-list::-webkit-scrollbar { height: 6px; }
+        .categories-list::-webkit-scrollbar-thumb { background-color: var(--primary); border-radius: 10px; }
+
+        .category-item {
+            display: flex; flex-direction: column; align-items: center;
+            min-width: 100px; cursor: pointer; transition: transform 0.2s;
+            flex-shrink: 0;
+        }
+        .category-item:hover { transform: translateY(-5px); }
+        .category-item:hover .cat-icon { background-color: rgba(71, 118, 230, 0.2); border-color: var(--primary); }
+
+        .cat-icon {
+            width: 70px; height: 70px; background-color: var(--surface);
+            border: 1px solid var(--border); border-radius: 50%;
+            display: flex; justify-content: center; align-items: center;
+            font-size: 32px; margin-bottom: 10px; box-shadow: 0 4px 10px rgba(0,0,0,0.05);
+            transition: all 0.3s;
+        }
+        .category-item span { font-size: 13px; font-weight: 600; text-align: center; color: var(--text); white-space: nowrap; }
+
+        .category-item.active .cat-icon {
+            background-color: var(--primary); color: white; border-color: var(--primary);
+            box-shadow: 0 5px 15px rgba(71, 118, 230, 0.4);
+        }
+        .category-item.active span { color: var(--primary); }
+
+        /* ADS GRID */
+        .container { max-width: 1200px; margin: 0 auto; padding: 20px; flex: 1; }
+        .section-title { margin-bottom: 25px; font-size: 22px; display: flex; justify-content: space-between; align-items: center; }
+        #activeCategoryLabel { font-size: 16px; color: var(--primary); font-weight: normal; margin-left: 10px; }
+        
+        .btn-clear {
+            font-size: 12px; padding: 5px 10px; background: transparent; border: 1px solid var(--border);
+            color: var(--text-muted); border-radius: 15px; cursor: pointer; display: none; margin-left: 10px;
+        }
+        .btn-clear:hover { background: var(--surface); color: var(--text); }
+
+        .ads-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 25px; }
+
+        /* AD CARD */
+        .ad-card {
+            background: var(--surface); border-radius: var(--radius); overflow: hidden;
+            box-shadow: var(--shadow); transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            border: 1px solid var(--border); display: flex; flex-direction: column;
+            cursor: pointer;
+        }
+        .ad-card:hover { transform: translateY(-5px); border-color: var(--primary); box-shadow: 0 15px 35px rgba(0,0,0,0.1); }
+        .ad-image {
+            width: 100%; height: 200px; background-color: var(--bg);
+            object-fit: contain;
+            display: flex; justify-content: center; align-items: center; font-size: 40px; color: #999;
+            border-bottom: 1px solid var(--border);
+        }
+        .ad-content { padding: 20px; display: flex; flex-direction: column; flex: 1; }
+        .ad-price { font-size: 22px; font-weight: 800; color: var(--primary); margin-bottom: 5px; }
+        .ad-title { font-size: 16px; font-weight: 600; margin-bottom: 5px; line-height: 1.4; }
+        .ad-desc { font-size: 13px; color: var(--text-muted); margin-bottom: 15px; flex: 1; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+        
+        .ad-contacts {
+            background: rgba(71, 118, 230, 0.05); padding: 10px; border-radius: 8px; margin-bottom: 15px;
+            border: 1px dashed var(--border); font-size: 13px;
+        }
+        .ad-contacts a { color: var(--primary); font-weight: bold; text-decoration: none; }
+
+        .ad-meta { display: flex; justify-content: space-between; font-size: 12px; color: var(--text-muted); border-top: 1px solid var(--border); padding-top: 15px; }
+        .category-badge {
+            background: rgba(71, 118, 230, 0.1); color: var(--primary); padding: 4px 8px;
+            border-radius: 6px; font-size: 11px; font-weight: bold; display: inline-block; margin-bottom: 10px;
+        }
+
+        /* --- DETAILED AD VIEW --- */
+        .ad-details-container {
+            background: var(--surface);
+            border-radius: var(--radius);
+            padding: 30px;
+            box-shadow: var(--shadow);
+            margin-bottom: 30px;
+            display: flex;
+            gap: 40px;
+            border: 1px solid var(--border);
+        }
+        .ad-details-image-wrapper {
+            flex: 1;
+            background: var(--bg);
+            border-radius: 12px;
+            overflow: hidden;
+            cursor: zoom-in;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 300px;
+            position: relative;
+            border: 1px solid var(--border);
+        }
+        .ad-details-image-wrapper img {
+            max-width: 100%;
+            max-height: 500px;
+            object-fit: contain;
+            transition: transform 0.3s;
+        }
+        .ad-details-image-wrapper:hover img {
+            transform: scale(1.02);
+        }
+        .ad-details-info {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* --- LIGHTBOX (ZOOM) MODAL --- */
+        .lightbox-overlay {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0, 0, 0, 0.95); z-index: 2000;
+            display: none; justify-content: center; align-items: center;
+            overflow: hidden; backdrop-filter: blur(5px);
+        }
+        .lightbox-overlay.active { display: flex; }
+        .lightbox-img {
+            max-width: 95vw; max-height: 95vh;
+            object-fit: contain; transition: transform 0.1s ease-out;
+            cursor: zoom-in;
+        }
+        .lightbox-img.zoomed {
+            transform: scale(2.5);
+            cursor: zoom-out;
+        }
+
+        /* MODAL FORM */
+        .modal-overlay {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0, 0, 0, 0.6); backdrop-filter: blur(5px);
+            display: flex; justify-content: center; align-items: flex-start;
+            overflow-y: auto; z-index: 1000; opacity: 0; visibility: hidden;
+            transition: opacity 0.3s, visibility 0.3s; padding: 20px 0;
+        }
+        .modal-overlay.active { opacity: 1; visibility: visible; }
+        
+        .modal-box {
+            background: var(--surface); width: 90%; max-width: 600px;
+            border-radius: var(--radius); padding: 30px; position: relative;
+            transform: translateY(-20px) scale(0.95); transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            box-shadow: 0 25px 50px rgba(0,0,0,0.3); border: 1px solid var(--border); margin: auto;
+        }
+        .modal-overlay.active .modal-box { transform: translateY(0) scale(1); }
+        .modal-close { position: absolute; top: 15px; right: 20px; font-size: 24px; cursor: pointer; color: var(--text-muted); }
+        .modal-close:hover { color: var(--text); }
+
+        .form-row { display: flex; gap: 15px; }
+        .form-row .form-group { flex: 1; }
+        .form-group { margin-bottom: 15px; }
+        .form-group label { display: block; margin-bottom: 5px; font-size: 14px; font-weight: 600; }
+        
+        .form-control {
+            width: 100%; padding: 12px 15px; border-radius: 10px; border: 1px solid var(--border);
+            background: var(--bg); color: var(--text); font-size: 14px; outline: none; transition: 0.3s;
+        }
+        .form-control:focus { border-color: var(--primary); }
+        textarea.form-control { resize: vertical; min-height: 100px; }
+
+        /* Price Input Wrapper */
+        .price-input-wrapper { position: relative; display: flex; align-items: center; }
+        .price-input-wrapper input { padding-right: 50px; }
+        .price-input-wrapper .currency-label { position: absolute; right: 15px; color: var(--text-muted); font-weight: 600; pointer-events: none; }
+        .price-input-wrapper input[type="number"]::-webkit-inner-spin-button, 
+        .price-input-wrapper input[type="number"]::-webkit-outer-spin-button { -webkit-appearance: none; margin: 0; }
+        .price-input-wrapper input[type="number"] { -moz-appearance: textfield; }
+
+        .photo-toggle {
+            display: flex; gap: 15px; margin-bottom: 10px; background: var(--bg);
+            padding: 10px; border-radius: 10px; border: 1px solid var(--border);
+        }
+        .photo-toggle label { font-size: 13px; font-weight: normal; cursor: pointer; display: flex; align-items: center; gap: 5px; margin: 0; }
+
+        .custom-file-upload {
+            display: inline-block; padding: 12px 15px; cursor: pointer; background: var(--surface);
+            border: 2px dashed var(--primary); border-radius: 10px; color: var(--primary);
+            font-weight: bold; text-align: center; width: 100%; transition: 0.3s;
+        }
+        .custom-file-upload:hover { background: rgba(71, 118, 230, 0.1); }
+        input[type="file"] { display: none; }
+        #imagePreview { display: none; max-width: 100%; height: 150px; object-fit: contain; margin-top: 10px; border-radius: 8px; border: 1px solid var(--border); background: var(--bg); }
+
+        .toast {
+            position: fixed; bottom: 20px; right: 20px; background: linear-gradient(135deg, #00b09b, #96c93d);
+            color: white; padding: 15px 25px; border-radius: 10px; font-weight: bold;
+            box-shadow: 0 10px 20px rgba(0,0,0,0.2); transform: translateX(120%); transition: 0.4s; z-index: 2000;
+        }
+        .toast.show { transform: translateX(0); }
+        
+        /* Loading indicator for DB */
+        #loadingIndicator {
+            text-align: center;
+            padding: 40px;
+            color: var(--primary);
+            font-weight: bold;
+            display: none;
+            grid-column: 1/-1;
+        }
+
+        @media (max-width: 768px) {
+            .hero h1 { font-size: 28px; }
+            .search-bar, .form-row { flex-direction: column; gap: 0; }
+            .ad-details-container { flex-direction: column; gap: 20px; padding: 20px; }
+            .ad-details-image-wrapper { min-height: 250px; }
+        }
+    </style>
+</head>
+<body class="lang-uk">
+
+<header>
+    <div class="nav-container">
+        <a class="logo" onclick="closeAdDetails()">NIK-MARKET</a>
+        <div class="header-actions">
+            <button class="btn-icon" id="langToggle" onclick="toggleLang()" title="Змінити мову / Сменить язык">RU</button>
+            <button class="btn-icon" id="themeToggle" title="Змінити тему / Сменить тему">🌙</button>
+            <button class="btn btn-primary" onclick="openModal()">
+                <span class="uk">+ Подати оголошення</span><span class="ru">+ Подать объявление</span>
+            </button>
+        </div>
+    </div>
+</header>
+
+<!-- ОБГОРТКА ГОЛОВНОЇ СТОРІНКИ -->
+<div id="mainView">
+    <div class="hero">
+        <h1>
+            <span class="uk">Оголошення м. Миколаїв</span><span class="ru">Объявления г. Николаев</span>
+        </h1>
+        <p>
+            <span class="uk">Купуйте, продавайте та знаходьте послуги у нашому місті</span>
+            <span class="ru">Покупайте, продавайте и находите услуги в нашем городе</span>
+        </p>
+        <div class="search-bar">
+            <input type="text" id="searchInput" class="search-input" placeholder="Що шукаєте? / Что ищете?" oninput="searchAds(true)">
+            <button class="btn btn-primary" onclick="searchAds(true)">
+                <span class="uk">Знайти</span><span class="ru">Найти</span>
+            </button>
+        </div>
+    </div>
+
+    <div class="categories-wrapper">
+        <div class="categories-list" id="categoriesBar">
+            <!-- Генерується через JS -->
+        </div>
+    </div>
+
+    <div class="container">
+        <div class="section-title">
+            <div style="display: flex; align-items: center; flex-wrap: wrap;">
+                <h3>
+                    <span class="uk">Оголошення</span><span class="ru">Объявления</span>
+                </h3>
+                <span id="activeCategoryLabel"></span>
+                <button class="btn-clear" id="clearFilterBtn" onclick="clearCategoryFilter()">
+                    <span class="uk">Скинути фільтр ✖</span><span class="ru">Сбросить фильтр ✖</span>
+                </button>
+            </div>
+            <span id="adsCount" style="color: var(--text-muted); font-size: 14px;">0</span>
+        </div>
+        
+        <div class="ads-grid" id="adsContainer">
+            <div id="loadingIndicator">Завантаження бази даних... / Загрузка базы данных...</div>
+            <!-- Карточки будут генерироваться через JavaScript -->
+        </div>
+    </div>
+</div>
+
+<!-- ОБГОРТКА ДЕТАЛЬНОГО ПЕРЕГЛЯДУ ОГОЛОШЕННЯ -->
+<div id="detailsView" class="container" style="display: none; padding-top: 30px;">
+    <button class="btn btn-primary" onclick="closeAdDetails()" style="margin-bottom: 20px; background: transparent; border: 1px solid var(--primary); color: var(--primary); box-shadow: none;">
+        <span class="uk">← Повернутися назад</span><span class="ru">← Вернуться назад</span>
+    </button>
+    
+    <div id="adDetailsContent">
+        <!-- Деталі генеруються через JS -->
+    </div>
+</div>
+
+<!-- LIGHTBOX (ЗБІЛЬШЕННЯ ФОТО / ЛУПА) -->
+<div class="lightbox-overlay" id="lightbox" onclick="closeLightbox(event)">
+    <span class="modal-close" style="color: white; top: 20px; right: 30px; font-size: 40px;">&times;</span>
+    <img src="" id="lightboxImg" class="lightbox-img" onclick="toggleZoom(event)" onmousemove="moveZoom(event)" title="Натисніть для збільшення">
+</div>
+
+<!-- Модальное окно добавления объявления -->
+<div class="modal-overlay" id="addModal">
+    <div class="modal-box">
+        <span class="modal-close" onclick="closeModal()">&times;</span>
+        <h2 style="margin-bottom: 20px;">
+            <span class="uk">Нове оголошення</span><span class="ru">Новое объявление</span>
+        </h2>
+        
+        <form id="adForm" onsubmit="submitAd(event)">
+            
+            <div class="form-row">
+                <div class="form-group">
+                    <label><span class="uk">Назва товару/послуги *</span><span class="ru">Название товара/услуги *</span></label>
+                    <input type="text" id="adTitle" class="form-control" required placeholder="...">
+                </div>
+                <div class="form-group">
+                    <label><span class="uk">Ціна *</span><span class="ru">Цена *</span></label>
+                    <div class="price-input-wrapper">
+                        <input type="number" id="adPrice" class="form-control" required placeholder="500" min="0" step="1">
+                        <span class="currency-label">грн</span>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="form-row">
+                <div class="form-group">
+                    <label><span class="uk">Категорія *</span><span class="ru">Категория *</span></label>
+                    <select id="adCategory" class="form-control" required onchange="updateSubcategories()">
+                        <!-- Options generated by JS -->
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label><span class="uk">Підкатегорія *</span><span class="ru">Подкатегория *</span></label>
+                    <select id="adSubcategory" class="form-control" required>
+                        <option value="">Оберіть підкатегорію / Выберите...</option>
+                    </select>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label><span class="uk">Опис товару або послуги *</span><span class="ru">Описание товара или услуги *</span></label>
+                <textarea id="adDesc" class="form-control" required placeholder="Опишіть детально ваш товар або послугу..."></textarea>
+            </div>
+
+            <div class="form-row">
+                <div class="form-group">
+                    <label><span class="uk">Ваше Ім'я *</span><span class="ru">Ваше Имя *</span></label>
+                    <input type="text" id="adName" class="form-control" required placeholder="Іван Іванов">
+                </div>
+                <div class="form-group">
+                    <label><span class="uk">Телефон *</span><span class="ru">Телефон *</span></label>
+                    <input type="tel" id="adPhone" class="form-control" required placeholder="+380...">
+                </div>
+            </div>
+
+            <div class="form-row">
+                <div class="form-group">
+                    <label><span class="uk">Email (за бажанням)</span><span class="ru">Email (по желанию)</span></label>
+                    <input type="email" id="adEmail" class="form-control" placeholder="example@gmail.com">
+                </div>
+                <div class="form-group">
+                    <label><span class="uk">Район в Миколаєві</span><span class="ru">Район в Николаеве</span></label>
+                    <select id="adLocation" class="form-control">
+                        <option value="Корабельний район">Корабельний / Корабельный</option>
+                        <option value="Центр">Центр</option>
+                        <option value="Інгульський район">Інгульський / Ингульский</option>
+                        <option value="Заводський район">Заводський / Заводской</option>
+                        <option value="Передмістя">Передмістя / Пригород</option>
+                    </select>
+                </div>
+            </div>
+
+            <div class="form-group" style="background: rgba(71, 118, 230, 0.05); padding: 15px; border-radius: 10px; border: 1px dashed var(--primary);">
+                <label><span class="uk">Фотографія *</span><span class="ru">Фотография *</span></label>
+                <div class="photo-toggle">
+                    <label><input type="radio" name="photoType" value="upload" checked onchange="togglePhotoInput()"> <span class="uk">Завантажити з ПК/смартфона</span><span class="ru">Загрузить с ПК/смартфона</span></label>
+                    <label><input type="radio" name="photoType" value="url" onchange="togglePhotoInput()"> <span class="uk">Посилання (URL)</span><span class="ru">Ссылка (URL)</span></label>
+                </div>
+
+                <div id="uploadPhotoBlock">
+                    <label class="custom-file-upload">
+                        <input type="file" id="adImageFile" accept="image/*" onchange="previewAndCompressImage(event)">
+                        📸 <span class="uk">Обрати фото...</span><span class="ru">Выбрать фото...</span>
+                    </label>
+                    <img id="imagePreview" alt="Preview">
+                </div>
+
+                <div id="urlPhotoBlock" style="display: none;">
+                    <input type="url" id="adImage" class="form-control" placeholder="https://...">
+                </div>
+            </div>
+            
+            <button type="submit" class="btn btn-primary" style="width: 100%; margin-top: 10px; padding: 15px; font-size: 16px;">
+                <span class="uk">Опублікувати оголошення</span><span class="ru">Опубликовать объявление</span>
+            </button>
+        </form>
+    </div>
+</div>
+
+<div class="toast" id="toastMsg">
+    <span class="uk">Оголошення успішно додано!</span><span class="ru">Объявление успешно добавлено!</span>
+</div>
+
+<script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
+    import { getAuth, signInAnonymously, signInWithCustomToken, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
+    import { getFirestore, collection, onSnapshot, setDoc, doc } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+
+    // --- 1. ПРИВ'ЯЗКА ФУНКЦІЙ ДО WINDOW (ГАРАНТУЄ РОБОТУ КНОПОК) ---
+    window.toggleLang = toggleLang;
+    window.openModal = openModal;
+    window.closeModal = closeModal;
+    window.submitAd = submitAd;
+    window.togglePhotoInput = togglePhotoInput;
+    window.previewAndCompressImage = previewAndCompressImage;
+    window.searchAds = searchAds;
+    window.clearCategoryFilter = clearCategoryFilter;
+    window.filterByCategory = filterByCategory;
+    window.closeAdDetails = closeAdDetails;
+    window.closeLightbox = closeLightbox;
+    window.toggleZoom = toggleZoom;
+    window.moveZoom = moveZoom;
+    window.updateSubcategories = updateSubcategories;
+    window.openLightbox = openLightbox;
+
+    // --- 2. ГЛОБАЛЬНІ ЗМІННІ ---
+    let ads = []; 
+    let currentUser = null;
+    let useFirebase = false;
+    let db, auth, appId;
+    let currentCategoryFilter = '';
+    let compressedBase64Image = '';
+
+    // --- ДАНІ КАТЕГОРІЙ ТА ПІДКАТЕГОРІЙ ---
+    const CATEGORIES = {
+        "Свіжі": { icon: "🔥", uk: "Свіжі оголошення", ru: "Свежие объявления", sub: { uk:[], ru:[] } },
+        "Хобі": { 
+            icon: "⚽", uk: "Хобі, спорт і відпочинок", ru: "Хобби, спорт и отдых", 
+            sub: { 
+                uk: ["Колекціонування та антикваріат", "Спорт, фітнес та активний відпочинок", "Велосипеди та екіпірування", "Мілітарія та тактичне спорядження", "Дрони, коптери та аксесуари", "Книги, комікси та журнали", "Музика, фільми та вініл", "Квитки на концерти та події", "Пошук компанії для подорожей", "Музичні інструменти та звук", "Настільні ігри та пазли", "Риболовля та полювання", "Матеріали для рукоділля", "Інші захоплення"],
+                ru: ["Коллекционирование и антиквариат", "Спорт, фитнес и активный отдых", "Велосипеды и экипировка", "Милитария и тактическое снаряжение", "Дроны, коптеры и аксессуары", "Книги, комиксы и журналы", "Музыка, фильмы и винил", "Билеты на концерты и события", "Поиск компании для путешествий", "Музыкальные инструменты и звук", "Настольные игры и пазлы", "Рыбалка и охота", "Материалы для рукоделия", "Другие увлечения"]
+            } 
+        },
+        "Електроніка": { 
+            icon: "📱", uk: "Електроніка", ru: "Электроника", 
+            sub: { 
+                uk: ["Смартфони та телефони", "Ноутбуки та ультрабуки", "ПК та системні блоки", "Планшети та електронні книги", "Комплектуючі та деталі", "Монітори та проектори", "Периферія (миші, клавіатури)", "Телевізори та плазми", "Аудіотехніка та акустика", "Фото- та відеотехніка", "Ігрові приставки та консолі", "Смарт-годинники та фітнес-браслети", "Побутова техніка для кухні", "Побутова техніка для дому", "Кліматичне обладнання (Кондиціонери)", "Аксесуари до електроніки"], 
+                ru: ["Смартфоны и телефоны", "Ноутбуки и ультрабуки", "ПК и системные блоки", "Планшеты и электронные книги", "Комплектующие и детали", "Мониторы и проекторы", "Периферия (мыши, клавиатуры)", "Телевизоры и плазмы", "Аудиотехника и акустика", "Фото- и видеотехника", "Игровые приставки и консоли", "Смарт-часы и фитнес-браслеты", "Бытовая техника для кухни", "Бытовая техника для дома", "Климатическое оборудование (Кондиционеры)", "Аксессуары к электронике"] 
+            } 
+        },
+        "Нерухомість": { 
+            icon: "🏠", uk: "Нерухомість", ru: "Недвижимость", 
+            sub: { 
+                uk: ["Оренда квартир (довгострокова)", "Оренда квартир (подобово)", "Продаж квартир", "Оренда будинків та котеджів", "Продаж будинків та дач", "Продаж землі та ділянок", "Оренда кімнат", "Продаж кімнат", "Оренда комерційної нерухомості", "Продаж комерційної нерухомості", "Оренда гаражів та паркінгів", "Продаж гаражів", "Нерухомість за кордоном"], 
+                ru: ["Аренда квартир (долгосрочная)", "Аренда квартир (посуточно)", "Продажа квартир", "Аренда домов и коттеджей", "Продажа домов и дач", "Продажа земли и участков", "Аренда комнат", "Продажа комнат", "Аренда коммерческой недвижимости", "Продажа коммерческой недвижимости", "Аренда гаражей и паркингов", "Продажа гаражей", "Недвижимость за рубежом"] 
+            } 
+        },
+        "Транспорт": { 
+            icon: "🚗", uk: "Транспорт", ru: "Транспорт", 
+            sub: { 
+                uk: ["Легкові автомобілі", "Мотоцикли та скутери", "Вантажні автомобілі", "Автобуси та мікроавтобуси", "Сільгосптехніка (Трактори, комбайни)", "Спецтехніка (Екскаватори, крани)", "Водний транспорт (Човни, яхти)", "Причепи та напівпричепи", "Повітряний транспорт", "Електротранспорт (Самокати, гіроборди)", "Автобудинки та трейлери", "Інший транспорт"], 
+                ru: ["Легковые автомобили", "Мотоциклы и скутеры", "Грузовые автомобили", "Автобусы и микроавтобусы", "Сельхозтехника (Тракторы, комбайны)", "Спецтехника (Экскаваторы, краны)", "Водный транспорт (Лодки, яхты)", "Прицепы и полуприцепы", "Воздушный транспорт", "Электротранспорт (Самокаты, гироборды)", "Автодома и трейлеры", "Другой транспорт"] 
+            } 
+        },
+        "Запчастини": { 
+            icon: "⚙️", uk: "Запчастини", ru: "Запчасти", 
+            sub: { 
+                uk: ["Автозапчастини", "Запчастини для мототехніки", "Запчастини для спецтехніки", "Шини та диски", "Акумулятори автомобільні", "Автозвук та електроніка", "Кузовні деталі", "Двигуни та компоненти", "Оптика та світло", "Салон та інтер'єр", "Тюнінг та аксесуари", "Автохімія та масла", "GPS-навігатори та відеореєстратори", "Інструменти для СТО"], 
+                ru: ["Автозапчасти", "Запчасти для мототехники", "Запчасти для спецтехники", "Шины и диски", "Аккумуляторы автомобильные", "Автозвук и электроника", "Кузовные детали", "Двигатели и компоненты", "Оптика и свет", "Салон и интерьер", "Тюнинг и аксессуары", "Автохимия и масла", "GPS-навигаторы и видеорегистраторы", "Инструменты для СТО"] 
+            } 
+        },
+        "Робота": { 
+            icon: "💼", uk: "Робота", ru: "Работа", 
+            sub: { 
+                uk: ["Роздрібна торгівля / Продажі", "Логістика / Склад / Доставка", "Будівництво / Архітектура", "IT / Телекомунікації", "Без досвіду / Студенти", "Ресторанний бізнес / Кулінарія", "Готельно-туристичний бізнес", "Виробництво / Робітничі спеціальності", "Охорона / Безпека", "Медицина / Фармація", "Освіта / Наука", "Краса / Фітнес / Спорт", "Бухгалтерія / Фінанси", "Маркетинг / Реклама / PR", "HR / Управління персоналом", "Віддалена робота / Фріланс"], 
+                ru: ["Розничная торговля / Продажи", "Логистика / Склад / Доставка", "Строительство / Архитектура", "IT / Телекоммуникации", "Без опыта / Студенты", "Ресторанный бизнес / Кулинария", "Гостинично-туристический бизнес", "Производство / Рабочие специальности", "Охрана / Безопасность", "Медицина / Фармация", "Образование / Наука", "Красота / Фитнес / Спорт", "Бухгалтерия / Финансы", "Маркетинг / Реклама / PR", "HR / Управление персоналом", "Удаленная работа / Фриланс"] 
+            } 
+        },
+        "Тварини": { 
+            icon: "🐾", uk: "Тварини", ru: "Животные", 
+            sub: { 
+                uk: ["Собаки та цуценята", "Коти та кошенята", "Птахи", "Акваріумістика", "Гризуни", "Рептилії", "Сільськогосподарські тварини", "Безкоштовна віддача тварин", "В'язка тварин", "Зоотовари (Корми, іграшки)", "Амуніція та одяг для тварин", "Будки, клітки та акваріуми", "Грумінг та догляд", "Послуги ветеринара"], 
+                ru: ["Собаки и щенки", "Коты и котята", "Птицы", "Аквариумистика", "Грызуны", "Рептилии", "Сельскохозяйственные животные", "Бесплатная отдача животных", "Вязка животных", "Зоотовары (Корма, игрушки)", "Амуниция и одежда для животных", "Будки, клетки и аквариумы", "Груминг и уход", "Услуги ветеринара"] 
+            } 
+        },
+        "Дім і Сад": { 
+            icon: "🪴", uk: "Дім і Сад", ru: "Дом и Сад", 
+            sub: { 
+                uk: ["Меблі для вітальні", "Меблі для спальні", "Кухонні меблі", "Садові та вуличні меблі", "Предмети інтер'єру та декор", "Кімнатні рослини", "Посуд та кухонне приладдя", "Садово-городній інвентар", "Насіння та саджанці", "Будівельні матеріали", "Оздоблювальні матеріали", "Інструменти (Електро та ручні)", "Сантехніка", "Освітлення", "Господарський інвентар / Побутова хімія"], 
+                ru: ["Мебель для гостиной", "Мебель для спальни", "Кухонная мебель", "Садовая и уличная мебель", "Предметы интерьера и декор", "Комнатные растения", "Посуда и кухонные принадлежности", "Садово-огородный инвентарь", "Семена и саженцы", "Строительные материалы", "Отделочные материалы", "Инструменты (Электро и ручные)", "Сантехника", "Освещение", "Хозяйственный инвентарь / Бытовая химия"] 
+            } 
+        },
+        "Бізнес та Послуги": { 
+            icon: "🤝", uk: "Бізнес та Послуги", ru: "Бизнес и Услуги", 
+            sub: { 
+                uk: ["Ремонт та обслуговування авто", "Б'юті-сфера та здоров'я", "Послуги няні та доглядальниці", "Майстер на годину та побут", "Прибирання та клінінг", "Репетиторство та тренування", "Вантажоперевезення та логістика", "Оренда спецтехніки", "Фотосесії та відеозйомка", "Аніматори та ведення свят", "Ремонт цифрової та побутової техніки", "Будівельні та оздоблювальні роботи", "Продаж та оренда бізнес-обладнання", "Юридичні та бухгалтерські послуги", "Дизайн, IT та фріланс", "Грумінг та послуги для тварин", "Сировина, матеріали та переробка", "Туристичні послуги та візи", "Інші професійні послуги"],
+                ru: ["Ремонт и обслуживание авто", "Бьюти-сфера и здоровье", "Услуги няни и сиделки", "Мастер на час и быт", "Уборка и клининг", "Репетиторство и тренировки", "Грузоперевозки и логистика", "Аренда спецтехники", "Фотосессии и видеосъемка", "Аниматоры и проведение праздников", "Ремонт цифровой и бытовой техники", "Строительные и отделочные работы", "Продажа и аренда бизнес-оборудования", "Юридические и бухгалтерские услуги", "Дизайн, IT и фриланс", "Груминг и услуги для животных", "Сырье, материалы и переработка", "Туристические услуги и визы", "Другие профессиональные услуги"]
+            } 
+        },
+        "Мода": { 
+            icon: "👕", uk: "Мода і стиль", ru: "Мода и стиль", 
+            sub: { 
+                uk: ["Жіночий одяг", "Чоловічий одяг", "Жіноче взуття", "Чоловіче взуття", "Спортивний одяг та взуття", "Сумки та рюкзаки", "Годинники", "Ювелірні вироби та біжутерія", "Аксесуари (Ремені, краватки)", "Головні убори", "Спецодяг та уніформа", "Подарунки та сувеніри", "Весільний одяг та аксесуари"], 
+                ru: ["Женская одежда", "Мужская одежда", "Женская обувь", "Мужская обувь", "Спортивная одежда и обувь", "Сумки и рюкзаки", "Часы", "Ювелирные изделия и бижутерия", "Аксессуары (Ремни, галстуки)", "Головные уборы", "Спецодежда и униформа", "Подарки и сувениры", "Свадебная одежда и аксессуары"] 
+            } 
+        },
+        "Діти": { 
+            icon: "🧸", uk: "Дитячий світ", ru: "Детский мир", 
+            sub: { 
+                uk: ["Дитячий одяг", "Дитяче взуття", "Іграшки та ігри", "Дитячий транспорт (Велосипеди, самокати)", "Дитячі меблі", "Візочки (Коляски)", "Автокрісла", "Товари для годування", "Товари для догляду та гігієни", "Шкільне приладдя", "Товари для матусь", "Дитяча кімната (Декор)"], 
+                ru: ["Детская одежда", "Детская обувь", "Игрушки и игры", "Детский транспорт (Велосипеды, самокаты)", "Детская мебель", "Коляски", "Автокресла", "Товары для кормления", "Товары для ухода и гигиены", "Школьные принадлежности", "Товары для мам", "Детская комната (Декор)"] 
+            } 
+        },
+        "Їжа": { 
+            icon: "🦞", uk: "Їжа та Продукти", ru: "Еда и Продукты", 
+            sub: { 
+                uk: ["М'ясо та ковбасні вироби", "Морепродукти та риба", "Раки свіжі та варені", "Овочі, фрукти та ягоди", "Молочні продукти", "Яйця", "Крупи та бакалія", "Мед та продукти бджільництва", "Домашня випічка та солодощі", "Напої (Соки, вода)", "Фермерські продукти", "Горіхи та сухофрукти"], 
+                ru: ["Мясо и колбасные изделия", "Морепродукты и рыба", "Раки свежие и вареные", "Овощи, фрукты и ягоды", "Молочные продукты", "Яйца", "Крупы и бакалея", "Мед и продукты пчеловодства", "Домашняя выпечка и сладости", "Напитки (Соки, вода)", "Фермерские продукты", "Орехи и сухофрукты"] 
+            } 
+        },
+        "Даром": { 
+            icon: "🎁", uk: "Віддам даром / Обмін", ru: "Отдам даром / Обмен", 
+            sub: { 
+                uk: ["Одяг та взуття безкоштовно", "Віддам тварин", "Електроніка та техніка", "Меблі", "Дитячі речі", "Будматеріали та залишки", "Обмін речами", "Інше (Віддам даром)"], 
+                ru: ["Одежда и обувь бесплатно", "Отдам животных", "Электроника и техника", "Мебель", "Детские вещи", "Стройматериалы и остатки", "Обмен вещами", "Другое (Отдам даром)"] 
+            } 
+        }
+    };
+
+    // --- 3. ФУНКЦІЇ ІНТЕРФЕЙСУ ТА ЛОГІКИ ---
+    let currentLang = localStorage.getItem('nik-lang') || 'uk';
+    const langToggle = document.getElementById('langToggle');
+    const themeToggle = document.getElementById('themeToggle');
+
+    function initSettings() {
+        if(localStorage.getItem('nik-theme') === 'dark') {
+            document.body.classList.add('dark-theme');
+            themeToggle.innerText = '☀️';
+        }
+        applyLanguage();
+        buildCategoriesBar();
+        buildFormCategories();
+    }
+
+    function toggleLang() {
+        currentLang = currentLang === 'uk' ? 'ru' : 'uk';
+        localStorage.setItem('nik-lang', currentLang);
+        applyLanguage();
+        buildCategoriesBar();
+        buildFormCategories();
+        renderAds(); 
+        if(document.getElementById('detailsView').style.display === 'block') {
+            closeAdDetails(); 
+        }
+    }
+
+    function applyLanguage() {
+        document.body.className = `lang-${currentLang} ${document.body.classList.contains('dark-theme') ? 'dark-theme' : ''}`;
+        langToggle.innerText = currentLang === 'uk' ? 'RU' : 'УКР';
+    }
+
+    themeToggle.addEventListener('click', () => {
+        document.body.classList.toggle('dark-theme');
+        if(document.body.classList.contains('dark-theme')) {
+            localStorage.setItem('nik-theme', 'dark');
+            themeToggle.innerText = '☀️';
+        } else {
+            localStorage.setItem('nik-theme', 'light');
+            themeToggle.innerText = '🌙';
+        }
+    });
+
+    function buildCategoriesBar() {
+        const bar = document.getElementById('categoriesBar');
+        bar.innerHTML = '';
+        for (const [key, data] of Object.entries(CATEGORIES)) {
+            const name = data[currentLang];
+            const div = document.createElement('div');
+            div.className = `category-item ${currentCategoryFilter === key ? 'active' : ''}`;
+            div.onclick = () => filterByCategory(key, div);
+            div.innerHTML = `<div class="cat-icon">${data.icon}</div><span>${name}</span>`;
+            bar.appendChild(div);
+        }
+    }
+
+    function buildFormCategories() {
+        const select = document.getElementById('adCategory');
+        select.innerHTML = `<option value="">${currentLang === 'uk' ? 'Оберіть категорію...' : 'Выберите категорию...'}</option>`;
+        for (const [key, data] of Object.entries(CATEGORIES)) {
+            if (key === 'Свіжі') continue; 
+            const option = document.createElement('option');
+            option.value = key;
+            option.innerText = data[currentLang];
+            select.appendChild(option);
+        }
+    }
+
+    function updateSubcategories() {
+        const catKey = document.getElementById('adCategory').value;
+        const subSelect = document.getElementById('adSubcategory');
+        subSelect.innerHTML = `<option value="">${currentLang === 'uk' ? 'Оберіть підкатегорію...' : 'Выберите подкатегорию...'}</option>`;
+        
+        if (catKey && CATEGORIES[catKey].sub[currentLang]) {
+            CATEGORIES[catKey].sub[currentLang].forEach(sub => {
+                const option = document.createElement('option');
+                option.value = sub;
+                option.innerText = sub;
+                subSelect.appendChild(option);
+            });
+        }
+    }
+
+    const container = document.getElementById('adsContainer');
+    const adsCount = document.getElementById('adsCount');
+
+    function renderAds(adsToRender = ads) {
+        const loader = document.getElementById('loadingIndicator');
+        const loaderHTML = loader ? loader.outerHTML : '';
+        
+        container.innerHTML = loaderHTML; 
+        
+        if (adsToRender.length === 0 && (!loader || loader.style.display === 'none')) {
+            container.innerHTML += `<p style="grid-column: 1/-1; text-align:center; color: var(--text-muted); padding: 50px;">${currentLang === 'uk' ? 'Оголошень не знайдено. Будьте першим!' : 'Объявлений не найдено. Будьте первым!'}</p>`;
+        }
+
+        adsCount.innerText = `${adsToRender.length} ${currentLang === 'uk' ? 'оголошень' : 'объявлений'}`;
+
+        [...adsToRender].reverse().forEach(ad => {
+            const card = document.createElement('div');
+            card.className = 'ad-card';
+            card.onclick = () => openAdDetails(ad.id);
+            
+            let imageHTML = '';
+            if (ad.image && (ad.image.startsWith('data:image') || ad.image.startsWith('http'))) {
+                imageHTML = `<img src="${ad.image}" class="ad-image" alt="${ad.title}" onerror="this.src='data:image/svg+xml;utf8,<svg xmlns=\\'http://www.w3.org/2000/svg\\' width=\\'100%\\' height=\\'100%\\'><rect width=\\'100%\\' height=\\'100%\\' fill=\\'%23e0e0e0\\'/><text x=\\'50%\\' y=\\'50%\\' font-size=\\'40\\' text-anchor=\\'middle\\' dy=\\'.3em\\'>📦</text></svg>'">`;
+            } else {
+                let icon = CATEGORIES[ad.category] ? CATEGORIES[ad.category].icon : '📦';
+                imageHTML = `<div class="ad-image" style="font-size: 60px;">${icon}</div>`;
+            }
+
+            const catName = CATEGORIES[ad.category] ? CATEGORIES[ad.category][currentLang] : ad.category;
+            const subName = ad.subcategory ? ` › ${ad.subcategory}` : '';
+
+            card.innerHTML = `
+                ${imageHTML}
+                <div class="ad-content">
+                    <div style="margin-bottom: 5px;"><span class="category-badge">${catName}${subName}</span></div>
+                    <div class="ad-title">${ad.title}</div>
+                    <div class="ad-price">${ad.price}</div>
+                    <div class="ad-desc">${ad.desc || ''}</div>
+                    <div class="ad-meta">
+                        <span>📍 ${ad.location}</span>
+                        <span>⏱ ${ad.date.split(',')[0]}</span>
+                    </div>
+                </div>
+            `;
+            container.appendChild(card);
+        });
+    }
+
+    function openAdDetails(id) {
+        const ad = ads.find(a => a.id === id);
+        if (!ad) return;
+
+        document.getElementById('mainView').style.display = 'none';
+        document.getElementById('detailsView').style.display = 'block';
+        window.scrollTo(0, 0);
+
+        const catName = CATEGORIES[ad.category] ? CATEGORIES[ad.category][currentLang] : ad.category;
+        const subName = ad.subcategory ? ` › ${ad.subcategory}` : '';
+        const descLabel = currentLang === 'uk' ? 'Опис:' : 'Описание:';
+        const contactsLabel = currentLang === 'uk' ? 'Контакти:' : 'Контакты:';
+        const enlargeHint = currentLang === 'uk' ? '🔍 Збільшити' : '🔍 Увеличить';
+
+        const hasImage = ad.image && (ad.image.startsWith('data:image') || ad.image.startsWith('http'));
+        
+        let imageHTML = '';
+        if (hasImage) {
+            imageHTML = `<img src="${ad.image}" alt="${ad.title}">
+                         <div style="position: absolute; bottom: 15px; right: 15px; background: rgba(0,0,0,0.6); color: white; padding: 8px 15px; border-radius: 20px; font-size: 13px; pointer-events: none; backdrop-filter: blur(4px); box-shadow: 0 4px 10px rgba(0,0,0,0.3);">${enlargeHint}</div>`;
+        } else {
+            let icon = CATEGORIES[ad.category] ? CATEGORIES[ad.category].icon : '📦';
+            imageHTML = `<div style="font-size: 120px;">${icon}</div>`;
+        }
+
+        const clickAction = hasImage ? `onclick="openLightbox('${ad.image}')"` : '';
+        const cursorStyle = hasImage ? 'cursor: zoom-in;' : 'cursor: default;';
+
+        const detailsHTML = `
+            <div class="ad-details-container">
+                <div class="ad-details-image-wrapper" ${clickAction} style="${cursorStyle}">
+                    ${imageHTML}
+                </div>
+                
+                <div class="ad-details-info">
+                    <div style="margin-bottom: 15px;"><span class="category-badge" style="font-size: 13px; padding: 6px 12px;">${catName}${subName}</span></div>
+                    <h2 style="margin-bottom: 15px; font-size: 26px; line-height: 1.3;">${ad.title}</h2>
+                    <div class="ad-price" style="font-size: 32px; margin-bottom: 25px;">${ad.price}</div>
+
+                    <div style="margin-bottom: 30px;">
+                        <h4 style="margin-bottom: 12px; font-size: 18px; border-bottom: 1px solid var(--border); padding-bottom: 8px;">${descLabel}</h4>
+                        <p style="white-space: pre-wrap; line-height: 1.6; color: var(--text); font-size: 15px;">${ad.desc || ''}</p>
+                    </div>
+
+                    <div class="ad-contacts" style="padding: 20px; font-size: 16px; background: var(--bg); border: 1px solid var(--border); box-shadow: inset 0 2px 5px rgba(0,0,0,0.02);">
+                        <h4 style="margin-bottom: 15px; font-size: 18px;">${contactsLabel}</h4>
+                        <div style="margin-bottom: 10px; display: flex; align-items: center; gap: 10px;">👤 <strong>${ad.name}</strong></div>
+                        <div style="margin-bottom: 10px; display: flex; align-items: center; gap: 10px;">📞 <a href="tel:${ad.phone}" style="font-size: 20px;">${ad.phone}</a></div>
+                        ${ad.email ? `<div style="margin-bottom: 10px; display: flex; align-items: center; gap: 10px;">📧 <a href="mailto:${ad.email}">${ad.email}</a></div>` : ''}
+                        
+                        <div style="margin-top: 20px; padding-top: 15px; border-top: 1px solid var(--border); color: var(--text-muted); font-size: 14px; display: flex; justify-content: space-between;">
+                            <span>📍 ${ad.location}</span>
+                            <span>⏱ ${ad.date}</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        `;
+        document.getElementById('adDetailsContent').innerHTML = detailsHTML;
+    }
+
+    function closeAdDetails() {
+        document.getElementById('mainView').style.display = 'block';
+        document.getElementById('detailsView').style.display = 'none';
+        window.scrollTo(0, 0);
+    }
+
+    function openLightbox(imgSrc) {
+        if (!imgSrc) return;
+        const overlay = document.getElementById('lightbox');
+        const img = document.getElementById('lightboxImg');
+        img.src = imgSrc;
+        img.classList.remove('zoomed');
+        img.style.transformOrigin = 'center center';
+        overlay.classList.add('active');
+    }
+
+    function closeLightbox(e) {
+        if (e.target.id === 'lightbox' || e.target.className === 'modal-close') {
+            document.getElementById('lightbox').classList.remove('active');
+        }
+    }
+
+    function toggleZoom(e) {
+        const img = e.currentTarget;
+        img.classList.toggle('zoomed');
+        if(img.classList.contains('zoomed')) {
+            moveZoom(e); 
+        } else {
+            img.style.transformOrigin = 'center center';
+        }
+    }
+
+    function moveZoom(e) {
+        const img = e.currentTarget;
+        if (!img.classList.contains('zoomed')) return;
+
+        const rect = img.getBoundingClientRect();
+        const xPos = ((e.clientX - rect.left) / rect.width) * 100;
+        const yPos = ((e.clientY - rect.top) / rect.height) * 100;
+
+        img.style.transformOrigin = `${xPos}% ${yPos}%`;
+    }
+
+    function searchAds(fromInput = false) {
+        const query = document.getElementById('searchInput').value.toLowerCase().trim();
+        
+        if (fromInput && query.length > 0 && currentCategoryFilter && currentCategoryFilter !== 'Свіжі') {
+            clearCategoryFilter(true); 
+        }
+
+        let filtered = ads.filter(ad => 
+            ad.title.toLowerCase().includes(query) || 
+            ad.location.toLowerCase().includes(query) ||
+            (ad.desc && ad.desc.toLowerCase().includes(query)) ||
+            (ad.category && ad.category.toLowerCase().includes(query)) ||
+            (ad.subcategory && ad.subcategory.toLowerCase().includes(query))
+        );
+        
+        if (currentCategoryFilter && currentCategoryFilter !== 'Свіжі') {
+            filtered = filtered.filter(ad => ad.category === currentCategoryFilter);
+        }
+        
+        renderAds(filtered);
+    }
+
+    function filterByCategory(categoryKey, element) {
+        document.querySelectorAll('.category-item').forEach(item => item.classList.remove('active'));
+        
+        if (currentCategoryFilter === categoryKey && categoryKey !== 'Свіжі') {
+            clearCategoryFilter();
+            return;
+        }
+
+        element.classList.add('active');
+        currentCategoryFilter = categoryKey;
+
+        if(categoryKey === 'Свіжі') {
+            document.getElementById('activeCategoryLabel').innerText = ``;
+            document.getElementById('clearFilterBtn').style.display = 'none';
+        } else {
+            const catName = CATEGORIES[categoryKey][currentLang];
+            document.getElementById('activeCategoryLabel').innerText = `» ${catName}`;
+            document.getElementById('clearFilterBtn').style.display = 'inline-block';
+        }
+        
+        searchAds();
+    }
+
+    function clearCategoryFilter(skipSearch = false) {
+        document.querySelectorAll('.category-item').forEach(item => item.classList.remove('active'));
+        currentCategoryFilter = '';
+        document.getElementById('activeCategoryLabel').innerText = '';
+        document.getElementById('clearFilterBtn').style.display = 'none';
+        
+        const firstCat = document.querySelector('.category-item');
+        if(firstCat) firstCat.classList.add('active');
+        
+        if (!skipSearch) {
+            searchAds();
+        }
+    }
+
+    const modal = document.getElementById('addModal');
+
+    function togglePhotoInput() {
+        const type = document.querySelector('input[name="photoType"]:checked').value;
+        if (type === 'upload') {
+            document.getElementById('uploadPhotoBlock').style.display = 'block';
+            document.getElementById('urlPhotoBlock').style.display = 'none';
+        } else {
+            document.getElementById('uploadPhotoBlock').style.display = 'none';
+            document.getElementById('urlPhotoBlock').style.display = 'block';
+        }
+    }
+
+    function previewAndCompressImage(event) {
+        const file = event.target.files[0];
+        if (!file) return;
+
+        const reader = new FileReader();
+        reader.readAsDataURL(file);
+        
+        reader.onload = function(e) {
+            const img = new Image();
+            img.src = e.target.result;
+            
+            img.onload = function() {
+                const canvas = document.createElement('canvas');
+                const ctx = canvas.getContext('2d');
+                
+                const MAX_WIDTH = 800; 
+                let width = img.width;
+                let height = img.height;
+
+                if (width > MAX_WIDTH) {
+                    height = height * (MAX_WIDTH / width);
+                    width = MAX_WIDTH;
+                }
+
+                canvas.width = width;
+                canvas.height = height;
+                ctx.drawImage(img, 0, 0, width, height);
+
+                compressedBase64Image = canvas.toDataURL('image/jpeg', 0.7);
+                
+                const preview = document.getElementById('imagePreview');
+                preview.src = compressedBase64Image;
+                preview.style.display = 'block';
+            }
+        }
+    }
+
+    function openModal() {
+        modal.classList.add('active');
+        
+        const selectCat = document.getElementById('adCategory');
+        if (currentCategoryFilter && currentCategoryFilter !== 'Свіжі') {
+            selectCat.value = currentCategoryFilter;
+            updateSubcategories(); 
+        }
+    }
+
+    function closeModal() {
+        modal.classList.remove('active');
+        document.getElementById('adForm').reset();
+        document.getElementById('imagePreview').style.display = 'none';
+        document.getElementById('adSubcategory').innerHTML = `<option value="">${currentLang === 'uk' ? 'Оберіть підкатегорію...' : 'Выберите подкатегорию...'}</option>`;
+        compressedBase64Image = '';
+        togglePhotoInput();
+    }
+
+    modal.addEventListener('click', function(e) {
+        if (e.target === modal) closeModal();
+    });
+
+    async function submitAd(e) {
+        e.preventDefault();
+
+        const photoType = document.querySelector('input[name="photoType"]:checked').value;
+        let finalImage = photoType === 'upload' ? compressedBase64Image : document.getElementById('adImage').value;
+        const priceValue = document.getElementById('adPrice').value + ' грн';
+
+        const newAd = {
+            id: Date.now(),
+            title: document.getElementById('adTitle').value,
+            price: priceValue,
+            category: document.getElementById('adCategory').value,
+            subcategory: document.getElementById('adSubcategory').value,
+            desc: document.getElementById('adDesc').value,
+            name: document.getElementById('adName').value,
+            phone: document.getElementById('adPhone').value,
+            email: document.getElementById('adEmail').value,
+            location: document.getElementById('adLocation').value,
+            image: finalImage,
+            date: new Date().toLocaleString()
+        };
+
+        try {
+            if (useFirebase && currentUser) {
+                // Серверне збереження (Firebase)
+                const adRef = doc(db, 'artifacts', appId, 'public', 'data', 'nikolaev_ads', newAd.id.toString());
+                await setDoc(adRef, newAd);
+            } else {
+                // Локальне збереження (якщо сервер недоступний)
+                ads.push(newAd);
+                if(ads.length > 50) ads.shift(); 
+                localStorage.setItem('nik-ads', JSON.stringify(ads));
+                renderAds();
+            }
+            
+            closeModal();
+            showToast();
+            clearCategoryFilter(); 
+        } catch (error) {
+            console.error(error);
+            alert(currentLang === 'uk' ? 'Помилка публікації. ' + error.message : 'Ошибка публикации. ' + error.message);
+        }
+    }
+
+    function showToast() {
+        const toast = document.getElementById('toastMsg');
+        toast.classList.add('show');
+        setTimeout(() => toast.classList.remove('show'), 3000);
+    }
+
+    function fallbackToLocal() {
+        console.warn("Підключення до сервера відсутнє. Використовується безпечна локальна пам'ять.");
+        document.getElementById('loadingIndicator').style.display = 'none';
+        let localAds = JSON.parse(localStorage.getItem('nik-ads'));
+        ads = localAds ? localAds : [];
+        renderAds();
+    }
+
+    // --- 4. БЕЗПЕЧНА ІНІЦІАЛІЗАЦІЯ БАЗИ ДАНИХ FIREBASE ---
+    initSettings();
+    clearCategoryFilter(true);
+
+    try {
+        const configString = typeof __firebase_config !== 'undefined' ? __firebase_config : null;
+        
+        if (configString && configString.trim() !== "" && configString !== "{}") {
+            const firebaseConfig = JSON.parse(configString);
+            
+            if (firebaseConfig.apiKey) {
+                const app = initializeApp(firebaseConfig);
+                auth = getAuth(app);
+                db = getFirestore(app);
+                appId = typeof __app_id !== 'undefined' ? __app_id : 'default-app-id';
+                useFirebase = true;
+                
+                const initAuth = async () => {
+                    if (typeof __initial_auth_token !== 'undefined' && __initial_auth_token) {
+                        await signInWithCustomToken(auth, __initial_auth_token);
+                    } else {
+                        await signInAnonymously(auth);
+                    }
+                };
+                initAuth();
+
+                onAuthStateChanged(auth, (user) => {
+                    currentUser = user;
+                    if (user) {
+                        setupRealtimeListener();
+                    }
+                });
+            } else {
+                fallbackToLocal();
+            }
+        } else {
+            fallbackToLocal();
+        }
+    } catch (e) {
+        console.error("Помилка ініціалізації Firebase:", e);
+        fallbackToLocal();
+    }
+
+    function setupRealtimeListener() {
+        if (!currentUser || !useFirebase) return;
+        
+        document.getElementById('loadingIndicator').style.display = 'block';
+
+        const adsRef = collection(db, 'artifacts', appId, 'public', 'data', 'nikolaev_ads');
+        onSnapshot(adsRef, (snapshot) => {
+            ads = [];
+            snapshot.forEach((doc) => {
+                ads.push(doc.data());
+            });
+            
+            document.getElementById('loadingIndicator').style.display = 'none';
+            ads.sort((a, b) => a.id - b.id);
+            searchAds(false);
+        }, (error) => {
+            console.error("Error fetching ads from DB: ", error);
+            document.getElementById('loadingIndicator').innerText = "Помилка завантаження бази даних :(";
+            fallbackToLocal();
+        });
+    }
+
+</script>
+</body>
+</html>
