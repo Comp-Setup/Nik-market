@@ -48,8 +48,12 @@
         }
 
         /* Language Toggle Logic in CSS */
-        body.lang-uk .ru { display: none !important; }
-        body.lang-ru .uk { display: none !important; }
+        body.lang-uk .ru { 
+            display: none !important; 
+        }
+        body.lang-ru .uk { 
+            display: none !important; 
+        }
 
         /* HEADER */
         header {
@@ -72,7 +76,11 @@
             gap: 15px;
         }
 
-        .logo-box { display: flex; align-items: center; gap: 15px; }
+        .logo-box { 
+            display: flex; 
+            align-items: center; 
+            gap: 15px; 
+        }
 
         .logo {
             font-size: 24px;
@@ -99,10 +107,29 @@
             justify-content: center;
             cursor: help;
         }
-        .conn-status .dot { width: 8px; height: 8px; border-radius: 50%; display: inline-block; }
-        .dot-cloud { background: #00c853; box-shadow: 0 0 6px #00c853; }
-        .dot-local { background: #ff3d00; box-shadow: 0 0 6px #ff3d00; }
-        .dot-sync { background: var(--warning); box-shadow: 0 0 6px var(--warning); animation: pulse 1.5s infinite; }
+
+        .conn-status .dot { 
+            width: 8px; 
+            height: 8px; 
+            border-radius: 50%; 
+            display: inline-block; 
+        }
+
+        .dot-cloud { 
+            background: #00c853; 
+            box-shadow: 0 0 6px #00c853; 
+        }
+
+        .dot-local { 
+            background: #ff3d00; 
+            box-shadow: 0 0 6px #ff3d00; 
+        }
+
+        .dot-sync { 
+            background: var(--warning); 
+            box-shadow: 0 0 6px var(--warning); 
+            animation: pulse 1.5s infinite; 
+        }
 
         @keyframes pulse {
             0% { opacity: 1; }
@@ -145,13 +172,25 @@
             color: var(--primary);
             border: 1px solid var(--primary);
         }
+
         .btn-outline:hover {
             background: rgba(71, 118, 230, 0.1);
         }
 
-        .btn-danger { background: var(--danger); color: white; }
-        .btn-success { background: var(--success); color: white; }
-        .btn-warning { background: var(--warning); color: #333; }
+        .btn-danger { 
+            background: var(--danger); 
+            color: white; 
+        }
+
+        .btn-success { 
+            background: var(--success); 
+            color: white; 
+        }
+
+        .btn-warning { 
+            background: var(--warning); 
+            color: #333; 
+        }
 
         .btn-icon {
             background: var(--surface);
@@ -181,8 +220,16 @@
             background: linear-gradient(to bottom, rgba(71, 118, 230, 0.05), transparent);
         }
 
-        .hero h1 { font-size: 36px; margin-bottom: 15px; }
-        .hero p { color: var(--text-muted); font-size: 18px; margin-bottom: 30px; }
+        .hero h1 { 
+            font-size: 36px; 
+            margin-bottom: 15px; 
+        }
+
+        .hero p { 
+            color: var(--text-muted); 
+            font-size: 18px; 
+            margin-bottom: 30px; 
+        }
 
         .search-bar {
             max-width: 600px;
@@ -209,100 +256,289 @@
         }
 
         /* CATEGORIES */
-        .categories-wrapper { max-width: 1200px; margin: 0 auto 20px auto; padding: 0 20px; }
-        .categories-list {
-            display: flex; gap: 15px; overflow-x: auto; padding: 15px 5px;
-            scrollbar-width: thin; scrollbar-color: var(--primary) var(--surface);
+        .categories-wrapper { 
+            max-width: 1200px; 
+            margin: 0 auto 20px auto; 
+            padding: 0 20px; 
         }
-        .categories-list::-webkit-scrollbar { height: 6px; }
-        .categories-list::-webkit-scrollbar-thumb { background-color: var(--primary); border-radius: 10px; }
+
+        .categories-list {
+            display: flex; 
+            gap: 15px; 
+            overflow-x: auto; 
+            padding: 15px 5px;
+            scrollbar-width: thin; 
+            scrollbar-color: var(--primary) var(--surface);
+        }
+
+        .categories-list::-webkit-scrollbar { 
+            height: 6px; 
+        }
+
+        .categories-list::-webkit-scrollbar-thumb { 
+            background-color: var(--primary); 
+            border-radius: 10px; 
+        }
 
         .category-item {
-            display: flex; flex-direction: column; align-items: center;
-            min-width: 100px; cursor: pointer; transition: transform 0.2s;
+            display: flex; 
+            flex-direction: column; 
+            align-items: center;
+            min-width: 100px; 
+            cursor: pointer; 
+            transition: transform 0.2s;
             flex-shrink: 0;
         }
-        .category-item:hover { transform: translateY(-5px); }
-        .category-item:hover .cat-icon { background-color: rgba(71, 118, 230, 0.2); border-color: var(--primary); }
+
+        .category-item:hover { 
+            transform: translateY(-5px); 
+        }
+
+        .category-item:hover .cat-icon { 
+            background-color: rgba(71, 118, 230, 0.2); 
+            border-color: var(--primary); 
+        }
 
         .cat-icon {
-            width: 70px; height: 70px; background-color: var(--surface);
-            border: 1px solid var(--border); border-radius: 50%;
-            display: flex; justify-content: center; align-items: center;
-            font-size: 32px; margin-bottom: 10px; box-shadow: 0 4px 10px rgba(0,0,0,0.05);
+            width: 70px; 
+            height: 70px; 
+            background-color: var(--surface);
+            border: 1px solid var(--border); 
+            border-radius: 50%;
+            display: flex; 
+            justify-content: center; 
+            align-items: center;
+            font-size: 32px; 
+            margin-bottom: 10px; 
+            box-shadow: 0 4px 10px rgba(0,0,0,0.05);
             transition: all 0.3s;
         }
-        .category-item span { font-size: 13px; font-weight: 600; text-align: center; color: var(--text); white-space: nowrap; }
+
+        .category-item span { 
+            font-size: 13px; 
+            font-weight: 600; 
+            text-align: center; 
+            color: var(--text); 
+            white-space: nowrap; 
+        }
 
         .category-item.active .cat-icon {
-            background-color: var(--primary); color: white; border-color: var(--primary);
+            background-color: var(--primary); 
+            color: white; 
+            border-color: var(--primary);
             box-shadow: 0 5px 15px rgba(71, 118, 230, 0.4);
         }
-        .category-item.active span { color: var(--primary); }
+
+        .category-item.active span { 
+            color: var(--primary); 
+        }
 
         /* ADS GRID */
-        .container { max-width: 1200px; margin: 0 auto; padding: 20px; flex: 1; }
-        .section-title { margin-bottom: 25px; font-size: 22px; display: flex; justify-content: space-between; align-items: center; }
-        #activeCategoryLabel { font-size: 16px; color: var(--primary); font-weight: normal; margin-left: 10px; }
+        .container { 
+            max-width: 1200px; 
+            margin: 0 auto; 
+            padding: 20px; 
+            flex: 1; 
+        }
+
+        .section-title { 
+            margin-bottom: 25px; 
+            font-size: 22px; 
+            display: flex; 
+            justify-content: space-between; 
+            align-items: center; 
+        }
+
+        #activeCategoryLabel { 
+            font-size: 16px; 
+            color: var(--primary); 
+            font-weight: normal; 
+            margin-left: 10px; 
+        }
         
         .btn-clear {
-            font-size: 12px; padding: 5px 10px; background: transparent; border: 1px solid var(--border);
-            color: var(--text-muted); border-radius: 15px; cursor: pointer; display: none; margin-left: 10px;
+            font-size: 12px; 
+            padding: 5px 10px; 
+            background: transparent; 
+            border: 1px solid var(--border);
+            color: var(--text-muted); 
+            border-radius: 15px; 
+            cursor: pointer; 
+            display: none; 
+            margin-left: 10px;
         }
-        .btn-clear:hover { background: var(--surface); color: var(--text); }
 
-        .ads-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 25px; }
+        .btn-clear:hover { 
+            background: var(--surface); 
+            color: var(--text); 
+        }
+
+        .ads-grid { 
+            display: grid; 
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); 
+            gap: 25px; 
+        }
 
         /* AD CARD */
         .ad-card {
-            background: var(--surface); border-radius: var(--radius); overflow: hidden;
-            box-shadow: var(--shadow); transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-            border: 1px solid var(--border); display: flex; flex-direction: column;
+            background: var(--surface); 
+            border-radius: var(--radius); 
+            overflow: hidden;
+            box-shadow: var(--shadow); 
+            transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            border: 1px solid var(--border); 
+            display: flex; 
+            flex-direction: column;
             cursor: pointer;
             position: relative;
         }
-        .ad-card:hover { transform: translateY(-5px); border-color: var(--primary); box-shadow: 0 15px 35px rgba(0,0,0,0.1); }
+
+        .ad-card:hover { 
+            transform: translateY(-5px); 
+            border-color: var(--primary); 
+            box-shadow: 0 15px 35px rgba(0,0,0,0.1); 
+        }
+
         .ad-image {
-            width: 100%; height: 200px; background-color: var(--bg);
+            width: 100%; 
+            height: 200px; 
+            background-color: var(--bg);
             object-fit: contain;
-            display: flex; justify-content: center; align-items: center; font-size: 40px; color: #999;
+            display: flex; 
+            justify-content: center; 
+            align-items: center; 
+            font-size: 40px; 
+            color: #999;
             border-bottom: 1px solid var(--border);
         }
-        .ad-content { padding: 20px; display: flex; flex-direction: column; flex: 1; }
-        .ad-price { font-size: 22px; font-weight: 800; color: var(--primary); margin-bottom: 5px; }
-        .ad-title { font-size: 16px; font-weight: 600; margin-bottom: 5px; line-height: 1.4; }
-        .ad-desc { font-size: 13px; color: var(--text-muted); margin-bottom: 15px; flex: 1; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+
+        .ad-content { 
+            padding: 20px; 
+            display: flex; 
+            flex-direction: column; 
+            flex: 1; 
+        }
+
+        .ad-price { 
+            font-size: 22px; 
+            font-weight: 800; 
+            color: var(--primary); 
+            margin-bottom: 5px; 
+        }
+
+        .ad-title { 
+            font-size: 16px; 
+            font-weight: 600; 
+            margin-bottom: 5px; 
+            line-height: 1.4; 
+        }
+
+        .ad-desc { 
+            font-size: 13px; 
+            color: var(--text-muted); 
+            margin-bottom: 15px; 
+            flex: 1; 
+            display: -webkit-box; 
+            -webkit-line-clamp: 2; 
+            -webkit-box-orient: vertical; 
+            overflow: hidden; 
+        }
         
         .ad-contacts {
-            background: rgba(71, 118, 230, 0.05); padding: 10px; border-radius: 8px; margin-bottom: 15px;
-            border: 1px dashed var(--border); font-size: 13px;
+            background: rgba(71, 118, 230, 0.05); 
+            padding: 10px; 
+            border-radius: 8px; 
+            margin-bottom: 15px;
+            border: 1px dashed var(--border); 
+            font-size: 13px;
         }
-        .ad-contacts a { color: var(--primary); font-weight: bold; text-decoration: none; }
 
-        .ad-meta { display: flex; justify-content: space-between; font-size: 12px; color: var(--text-muted); border-top: 1px solid var(--border); padding-top: 15px; align-items: center; flex-wrap: wrap;}
+        .ad-contacts a { 
+            color: var(--primary); 
+            font-weight: bold; 
+            text-decoration: none; 
+        }
+
+        .ad-meta { 
+            display: flex; 
+            justify-content: space-between; 
+            font-size: 12px; 
+            color: var(--text-muted); 
+            border-top: 1px solid var(--border); 
+            padding-top: 15px; 
+            align-items: center; 
+            flex-wrap: wrap;
+        }
+
         .category-badge {
-            background: rgba(71, 118, 230, 0.1); color: var(--primary); padding: 4px 8px;
-            border-radius: 6px; font-size: 11px; font-weight: bold; display: inline-block; margin-bottom: 10px;
+            background: rgba(71, 118, 230, 0.1); 
+            color: var(--primary); 
+            padding: 4px 8px;
+            border-radius: 6px; 
+            font-size: 11px; 
+            font-weight: bold; 
+            display: inline-block; 
+            margin-bottom: 10px;
         }
 
         /* Status & Action Badges */
         .status-badge {
-            position: absolute; top: 10px; right: 10px; padding: 5px 10px; border-radius: 20px;
-            font-size: 11px; font-weight: bold; color: white; z-index: 10;
+            position: absolute; 
+            top: 10px; 
+            right: 10px; 
+            padding: 5px 10px; 
+            border-radius: 20px;
+            font-size: 11px; 
+            font-weight: bold; 
+            color: white; 
+            z-index: 10;
         }
-        .status-pending { background: var(--warning); color: #333; }
-        .status-approved { background: var(--success); }
-        .status-rejected { background: var(--danger); }
+
+        .status-pending { 
+            background: var(--warning); 
+            color: #333; 
+        }
+
+        .status-approved { 
+            background: var(--success); 
+        }
+
+        .status-rejected { 
+            background: var(--danger); 
+        }
 
         .card-actions {
-            display: flex; gap: 5px; margin-top: 10px; border-top: 1px solid var(--border); padding-top: 10px;
+            display: flex; 
+            gap: 5px; 
+            margin-top: 10px; 
+            border-top: 1px solid var(--border); 
+            padding-top: 10px;
         }
+
         .card-actions button {
-            flex: 1; padding: 6px; font-size: 12px; border-radius: 6px; cursor: pointer; border: none; font-weight: bold;
+            flex: 1; 
+            padding: 6px; 
+            font-size: 12px; 
+            border-radius: 6px; 
+            cursor: pointer; 
+            border: none; 
+            font-weight: bold;
         }
-        .btn-edit { background: var(--primary); color: white; }
-        .btn-del { background: var(--danger); color: white; }
-        .btn-appr { background: var(--success); color: white; }
+
+        .btn-edit { 
+            background: var(--primary); 
+            color: white; 
+        }
+
+        .btn-del { 
+            background: var(--danger); 
+            color: white; 
+        }
+
+        .btn-appr { 
+            background: var(--success); 
+            color: white; 
+        }
 
         /* --- DETAILED AD VIEW --- */
         .ad-details-container {
@@ -315,6 +551,7 @@
             gap: 40px;
             border: 1px solid var(--border);
         }
+
         .ad-details-image-wrapper {
             flex: 1;
             background: var(--bg);
@@ -328,15 +565,18 @@
             position: relative;
             border: 1px solid var(--border);
         }
+
         .ad-details-image-wrapper img {
             max-width: 100%;
             max-height: 500px;
             object-fit: contain;
             transition: transform 0.3s;
         }
+
         .ad-details-image-wrapper:hover img {
             transform: scale(1.02);
         }
+
         .ad-details-info {
             flex: 1;
             display: flex;
@@ -345,17 +585,32 @@
 
         /* --- LIGHTBOX (ZOOM) MODAL --- */
         .lightbox-overlay {
-            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-            background: rgba(0, 0, 0, 0.95); z-index: 2000;
-            display: none; justify-content: center; align-items: center;
-            overflow: hidden; backdrop-filter: blur(5px);
+            position: fixed; 
+            top: 0; 
+            left: 0; 
+            width: 100%; 
+            height: 100%;
+            background: rgba(0, 0, 0, 0.95); 
+            z-index: 2000;
+            display: none; 
+            justify-content: center; 
+            align-items: center;
+            overflow: hidden; 
+            backdrop-filter: blur(5px);
         }
-        .lightbox-overlay.active { display: flex; }
+
+        .lightbox-overlay.active { 
+            display: flex; 
+        }
+
         .lightbox-img {
-            max-width: 95vw; max-height: 95vh;
-            object-fit: contain; transition: transform 0.1s ease-out;
+            max-width: 95vw; 
+            max-height: 95vh;
+            object-fit: contain; 
+            transition: transform 0.1s ease-out;
             cursor: zoom-in;
         }
+
         .lightbox-img.zoomed {
             transform: scale(2.5);
             cursor: zoom-out;
@@ -363,65 +618,201 @@
 
         /* MODAL FORM */
         .modal-overlay {
-            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-            background: rgba(0, 0, 0, 0.6); backdrop-filter: blur(5px);
-            display: flex; justify-content: center; align-items: flex-start;
-            overflow-y: auto; z-index: 1000; opacity: 0; visibility: hidden;
-            transition: opacity 0.3s, visibility 0.3s; padding: 20px 0;
+            position: fixed; 
+            top: 0; 
+            left: 0; 
+            width: 100%; 
+            height: 100%;
+            background: rgba(0, 0, 0, 0.6); 
+            backdrop-filter: blur(5px);
+            display: flex; 
+            justify-content: center; 
+            align-items: flex-start;
+            overflow-y: auto; 
+            z-index: 1000; 
+            opacity: 0; 
+            visibility: hidden;
+            transition: opacity 0.3s, visibility 0.3s; 
+            padding: 20px 0;
         }
-        .modal-overlay.active { opacity: 1; visibility: visible; }
+
+        .modal-overlay.active { 
+            opacity: 1; 
+            visibility: visible; 
+        }
         
         .modal-box {
-            background: var(--surface); width: 90%; max-width: 600px;
-            border-radius: var(--radius); padding: 30px; position: relative;
-            transform: translateY(-20px) scale(0.95); transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-            box-shadow: 0 25px 50px rgba(0,0,0,0.3); border: 1px solid var(--border); margin: auto;
+            background: var(--surface); 
+            width: 90%; 
+            max-width: 600px;
+            border-radius: var(--radius); 
+            padding: 30px; 
+            position: relative;
+            transform: translateY(-20px) scale(0.95); 
+            transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            box-shadow: 0 25px 50px rgba(0,0,0,0.3); 
+            border: 1px solid var(--border); 
+            margin: auto;
         }
-        .modal-overlay.active .modal-box { transform: translateY(0) scale(1); }
-        .modal-close { position: absolute; top: 15px; right: 20px; font-size: 24px; cursor: pointer; color: var(--text-muted); }
-        .modal-close:hover { color: var(--text); }
 
-        .form-row { display: flex; gap: 15px; }
-        .form-row .form-group { flex: 1; }
-        .form-group { margin-bottom: 15px; }
-        .form-group label { display: block; margin-bottom: 5px; font-size: 14px; font-weight: 600; }
+        .modal-overlay.active .modal-box { 
+            transform: translateY(0) scale(1); 
+        }
+
+        .modal-close { 
+            position: absolute; 
+            top: 15px; 
+            right: 20px; 
+            font-size: 24px; 
+            cursor: pointer; 
+            color: var(--text-muted); 
+        }
+
+        .modal-close:hover { 
+            color: var(--text); 
+        }
+
+        .form-row { 
+            display: flex; 
+            gap: 15px; 
+        }
+
+        .form-row .form-group { 
+            flex: 1; 
+        }
+
+        .form-group { 
+            margin-bottom: 15px; 
+        }
+
+        .form-group label { 
+            display: block; 
+            margin-bottom: 5px; 
+            font-size: 14px; 
+            font-weight: 600; 
+        }
         
         .form-control {
-            width: 100%; padding: 12px 15px; border-radius: 10px; border: 1px solid var(--border);
-            background: var(--bg); color: var(--text); font-size: 14px; outline: none; transition: 0.3s;
+            width: 100%; 
+            padding: 12px 15px; 
+            border-radius: 10px; 
+            border: 1px solid var(--border);
+            background: var(--bg); 
+            color: var(--text); 
+            font-size: 14px; 
+            outline: none; 
+            transition: 0.3s;
         }
-        .form-control:focus { border-color: var(--primary); }
-        textarea.form-control { resize: vertical; min-height: 100px; }
+
+        .form-control:focus { 
+            border-color: var(--primary); 
+        }
+
+        textarea.form-control { 
+            resize: vertical; 
+            min-height: 100px; 
+        }
 
         /* Price Input Wrapper */
-        .price-input-wrapper { position: relative; display: flex; align-items: center; }
-        .price-input-wrapper input { padding-right: 50px; }
-        .price-input-wrapper .currency-label { position: absolute; right: 15px; color: var(--text-muted); font-weight: 600; pointer-events: none; }
+        .price-input-wrapper { 
+            position: relative; 
+            display: flex; 
+            align-items: center; 
+        }
+
+        .price-input-wrapper input { 
+            padding-right: 50px; 
+        }
+
+        .price-input-wrapper .currency-label { 
+            position: absolute; 
+            right: 15px; 
+            color: var(--text-muted); 
+            font-weight: 600; 
+            pointer-events: none; 
+        }
+
         .price-input-wrapper input[type="number"]::-webkit-inner-spin-button, 
-        .price-input-wrapper input[type="number"]::-webkit-outer-spin-button { -webkit-appearance: none; margin: 0; }
-        .price-input-wrapper input[type="number"] { -moz-appearance: textfield; }
+        .price-input-wrapper input[type="number"]::-webkit-outer-spin-button { 
+            -webkit-appearance: none; 
+            margin: 0; 
+        }
+
+        .price-input-wrapper input[type="number"] { 
+            -moz-appearance: textfield; 
+        }
 
         .photo-toggle {
-            display: flex; gap: 15px; margin-bottom: 10px; background: var(--bg);
-            padding: 10px; border-radius: 10px; border: 1px solid var(--border);
+            display: flex; 
+            gap: 15px; 
+            margin-bottom: 10px; 
+            background: var(--bg);
+            padding: 10px; 
+            border-radius: 10px; 
+            border: 1px solid var(--border);
         }
-        .photo-toggle label { font-size: 13px; font-weight: normal; cursor: pointer; display: flex; align-items: center; gap: 5px; margin: 0; }
+
+        .photo-toggle label { 
+            font-size: 13px; 
+            font-weight: normal; 
+            cursor: pointer; 
+            display: flex; 
+            align-items: center; 
+            gap: 5px; 
+            margin: 0; 
+        }
 
         .custom-file-upload {
-            display: inline-block; padding: 12px 15px; cursor: pointer; background: var(--surface);
-            border: 2px dashed var(--primary); border-radius: 10px; color: var(--primary);
-            font-weight: bold; text-align: center; width: 100%; transition: 0.3s;
+            display: inline-block; 
+            padding: 12px 15px; 
+            cursor: pointer; 
+            background: var(--surface);
+            border: 2px dashed var(--primary); 
+            border-radius: 10px; 
+            color: var(--primary);
+            font-weight: bold; 
+            text-align: center; 
+            width: 100%; 
+            transition: 0.3s;
         }
-        .custom-file-upload:hover { background: rgba(71, 118, 230, 0.1); }
-        input[type="file"] { display: none; }
-        #imagePreview { display: none; max-width: 100%; height: 150px; object-fit: contain; margin-top: 10px; border-radius: 8px; border: 1px solid var(--border); background: var(--bg); }
+
+        .custom-file-upload:hover { 
+            background: rgba(71, 118, 230, 0.1); 
+        }
+
+        input[type="file"] { 
+            display: none; 
+        }
+
+        #imagePreview { 
+            display: none; 
+            max-width: 100%; 
+            height: 150px; 
+            object-fit: contain; 
+            margin-top: 10px; 
+            border-radius: 8px; 
+            border: 1px solid var(--border); 
+            background: var(--bg); 
+        }
 
         .toast {
-            position: fixed; bottom: 20px; right: 20px; background: linear-gradient(135deg, #00b09b, #96c93d);
-            color: white; padding: 15px 25px; border-radius: 10px; font-weight: bold;
-            box-shadow: 0 10px 20px rgba(0,0,0,0.2); transform: translateX(120%); transition: 0.4s; z-index: 2000;
+            position: fixed; 
+            bottom: 20px; 
+            right: 20px; 
+            background: linear-gradient(135deg, #00b09b, #96c93d);
+            color: white; 
+            padding: 15px 25px; 
+            border-radius: 10px; 
+            font-weight: bold;
+            box-shadow: 0 10px 20px rgba(0,0,0,0.2); 
+            transform: translateX(120%); 
+            transition: 0.4s; 
+            z-index: 2000;
         }
-        .toast.show { transform: translateX(0); }
+
+        .toast.show { 
+            transform: translateX(0); 
+        }
         
         /* Loading indicator for DB */
         #loadingIndicator {
@@ -458,7 +849,9 @@
             word-break: break-all;
         }
 
-        #cabinetHero, #adminHero { display: none; }
+        #cabinetHero, #adminHero { 
+            display: none; 
+        }
 
         @media (max-width: 768px) {
             .hero h1 { font-size: 28px; }
@@ -482,7 +875,8 @@
             <a class="logo" onclick="switchView('main')">NIK-MARKET</a>
             <div id="statusBadge" class="conn-status">
                 <span class="dot dot-sync"></span>
-                <span class="uk">Підключення...</span><span class="ru">Подключение...</span>
+                <span class="uk">Підключення...</span>
+                <span class="ru">Подключение...</span>
             </div>
         </div>
         <div class="header-actions">
@@ -490,10 +884,12 @@
             <button class="btn-icon" id="themeToggle" title="Змінити тему / Сменить тему">🌙</button>
             
             <button class="btn btn-outline" id="cabinetBtn" onclick="openCabinet()">
-                <span class="uk">👤 Увійти / Кабінет</span><span class="ru">👤 Войти / Кабинет</span>
+                <span class="uk">👤 Увійти / Кабінет</span>
+                <span class="ru">👤 Войти / Кабинет</span>
             </button>
             <button class="btn btn-primary" onclick="openAddModal()">
-                <span class="uk">+ Подати оголошення</span><span class="ru">+ Подать объявление</span>
+                <span class="uk">+ Подати оголошення</span>
+                <span class="ru">+ Подать объявление</span>
             </button>
         </div>
     </div>
@@ -502,7 +898,8 @@
 <div id="mainView">
     <div class="hero" id="mainHero">
         <h1>
-            <span class="uk">Оголошення м. Миколаїв</span><span class="ru">Объявления г. Николаев</span>
+            <span class="uk">Оголошення м. Миколаїв</span>
+            <span class="ru">Объявления г. Николаев</span>
         </h1>
         <p>
             <span class="uk">Купуйте, продавайте та знаходьте послуги у нашому місті</span>
@@ -511,30 +908,43 @@
         <div class="search-bar">
             <input type="text" id="searchInput" class="search-input" placeholder="Що шукаєте? / Что ищете?" oninput="searchAds(true)">
             <button class="btn btn-primary" onclick="searchAds(true)">
-                <span class="uk">Знайти</span><span class="ru">Найти</span>
+                <span class="uk">Знайти</span>
+                <span class="ru">Найти</span>
             </button>
         </div>
     </div>
 
     <div class="hero" id="cabinetHero" style="background: rgba(71, 118, 230, 0.1);">
-        <h1><span class="uk">Особистий кабінет</span><span class="ru">Личный кабинет</span></h1>
+        <h1>
+            <span class="uk">Особистий кабінет</span>
+            <span class="ru">Личный кабинет</span>
+        </h1>
         <p id="cabinetUserEmail" style="font-weight: bold; color: var(--primary);"></p>
         <div style="display: flex; gap: 10px; justify-content: center; margin-top: 15px;">
             <button class="btn btn-primary" id="adminPanelBtn" style="display: none; background: var(--danger);" onclick="switchView('admin')">
-                <span class="uk">🛡️ Адмін-Панель</span><span class="ru">🛡️ Админ-Панель</span>
+                <span class="uk">🛡️ Адмін-Панель</span>
+                <span class="ru">🛡️ Админ-Панель</span>
             </button>
             <button class="btn btn-outline" onclick="logout()">
-                <span class="uk">🚪 Вийти з акаунту</span><span class="ru">🚪 Выйти из аккаунта</span>
+                <span class="uk">🚪 Вийти з акаунту</span>
+                <span class="ru">🚪 Выйти из аккаунта</span>
             </button>
         </div>
     </div>
 
     <div class="hero" id="adminHero" style="background: rgba(220, 53, 69, 0.1);">
-        <h1 style="color: var(--danger);"><span class="uk">🛡️ Панель Адміністратора</span><span class="ru">🛡️ Панель Администратора</span></h1>
-        <p><span class="uk">Модерація та керування всіма оголошеннями</span><span class="ru">Модерация и управление всеми объявлениями</span></p>
+        <h1 style="color: var(--danger);">
+            <span class="uk">🛡️ Панель Адміністратора</span>
+            <span class="ru">🛡️ Панель Администратора</span>
+        </h1>
+        <p>
+            <span class="uk">Модерація та керування всіма оголошеннями</span>
+            <span class="ru">Модерация и управление всеми объявлениями</span>
+        </p>
         <div style="display: flex; gap: 10px; justify-content: center; margin-top: 15px;">
             <button class="btn btn-primary" onclick="openCabinet()">
-                <span class="uk">← Назад у кабінет</span><span class="ru">← Назад в кабинет</span>
+                <span class="uk">← Назад у кабінет</span>
+                <span class="ru">← Назад в кабинет</span>
             </button>
         </div>
     </div>
@@ -553,11 +963,13 @@
         <div class="section-title">
             <div style="display: flex; align-items: center; flex-wrap: wrap;">
                 <h3 id="sectionTitleText">
-                    <span class="uk">Оголошення</span><span class="ru">Объявления</span>
+                    <span class="uk">Оголошення</span>
+                    <span class="ru">Объявления</span>
                 </h3>
                 <span id="activeCategoryLabel"></span>
                 <button class="btn-clear" id="clearFilterBtn" onclick="clearCategoryFilter()">
-                    <span class="uk">Скинути фільтр ✖</span><span class="ru">Сбросить фильтр ✖</span>
+                    <span class="uk">Скинути фільтр ✖</span>
+                    <span class="ru">Сбросить фильтр ✖</span>
                 </button>
             </div>
             <span id="adsCount" style="color: var(--text-muted); font-size: 14px;">0</span>
@@ -577,7 +989,8 @@
 
 <div id="detailsView" class="container" style="display: none; padding-top: 30px;">
     <button class="btn btn-primary" onclick="closeAdDetails()" style="margin-bottom: 20px; background: transparent; border: 1px solid var(--primary); color: var(--primary); box-shadow: none;">
-        <span class="uk">← Повернутися назад</span><span class="ru">← Вернуться назад</span>
+        <span class="uk">← Повернутися назад</span>
+        <span class="ru">← Вернуться назад</span>
     </button>
     
     <div id="adDetailsContent">
@@ -595,7 +1008,8 @@
     <div class="modal-box" style="max-width: 400px;">
         <span class="modal-close" onclick="closeAuthModal()">&times;</span>
         <h2 style="margin-bottom: 20px; text-align: center;">
-            <span class="uk">Вхід / Реєстрація</span><span class="ru">Вход / Регистрация</span>
+            <span class="uk">Вхід / Реєстрація</span>
+            <span class="ru">Вход / Регистрация</span>
         </h2>
         <p style="text-align: center; color: var(--text-muted); font-size: 13px; margin-bottom: 20px;">
             <span class="uk">Введіть номер телефону та пароль. Email необов'язковий.</span>
@@ -603,7 +1017,10 @@
         </p>
 
         <div class="form-group">
-            <label><span class="uk">Телефон (обов'язково) *</span><span class="ru">Телефон (обязательно) *</span></label>
+            <label>
+                <span class="uk">Телефон (обов'язково) *</span>
+                <span class="ru">Телефон (обязательно) *</span>
+            </label>
             <div style="display: flex; align-items: center; border: 1px solid var(--border); border-radius: 10px; background: var(--bg); overflow: hidden;">
                 <span style="padding: 12px 15px; background: rgba(0,0,0,0.05); font-weight: bold; border-right: 1px solid var(--border); color: var(--text);">+380</span>
                 <input type="tel" id="authPhone" class="form-control" style="border: none; border-radius: 0; outline: none; flex: 1;" placeholder="501234567" maxlength="9" oninput="this.value = this.value.replace(/[^0-9]/g, '')">
@@ -611,21 +1028,29 @@
         </div>
 
         <div class="form-group">
-            <label><span class="uk">Email (необов'язково)</span><span class="ru">Email (необязательно)</span></label>
+            <label>
+                <span class="uk">Email (необов'язково)</span>
+                <span class="ru">Email (необязательно)</span>
+            </label>
             <input type="email" id="authUserEmail" class="form-control" placeholder="your@email.com (або залиште пустим)">
         </div>
 
         <div class="form-group">
-            <label><span class="uk">Пароль *</span><span class="ru">Пароль *</span></label>
+            <label>
+                <span class="uk">Пароль *</span>
+                <span class="ru">Пароль *</span>
+            </label>
             <input type="password" id="authPassword" class="form-control" placeholder="••••••••">
         </div>
 
         <div style="display: flex; gap: 10px; margin-top: 25px;">
             <button class="btn btn-primary" style="flex: 1;" onclick="processAuth('login')">
-                <span class="uk">Увійти</span><span class="ru">Войти</span>
+                <span class="uk">Увійти</span>
+                <span class="ru">Войти</span>
             </button>
             <button class="btn btn-outline" style="flex: 1;" onclick="processAuth('register')">
-                <span class="uk">Реєстрація</span><span class="ru">Регистрация</span>
+                <span class="uk">Реєстрація</span>
+                <span class="ru">Регистрация</span>
             </button>
         </div>
     </div>
@@ -636,18 +1061,25 @@
     <div class="modal-box">
         <span class="modal-close" onclick="closeModal()">&times;</span>
         <h2 style="margin-bottom: 20px;" id="modalTitle">
-            <span class="uk">Нове оголошення</span><span class="ru">Новое объявление</span>
+            <span class="uk">Нове оголошення</span>
+            <span class="ru">Новое объявление</span>
         </h2>
         
         <form id="adForm" onsubmit="submitAd(event)">
             
             <div class="form-row">
                 <div class="form-group">
-                    <label><span class="uk">Назва товару/послуги *</span><span class="ru">Название товара/услуги *</span></label>
+                    <label>
+                        <span class="uk">Назва товару/послуги *</span>
+                        <span class="ru">Название товара/услуги *</span>
+                    </label>
                     <input type="text" id="adTitle" class="form-control" required placeholder="...">
                 </div>
                 <div class="form-group">
-                    <label><span class="uk">Ціна *</span><span class="ru">Цена *</span></label>
+                    <label>
+                        <span class="uk">Ціна *</span>
+                        <span class="ru">Цена *</span>
+                    </label>
                     <div class="price-input-wrapper">
                         <input type="number" id="adPrice" class="form-control" required placeholder="500" min="0" step="1">
                         <span class="currency-label">грн</span>
@@ -657,13 +1089,19 @@
             
             <div class="form-row">
                 <div class="form-group">
-                    <label><span class="uk">Категорія *</span><span class="ru">Категория *</span></label>
+                    <label>
+                        <span class="uk">Категорія *</span>
+                        <span class="ru">Категория *</span>
+                    </label>
                     <select id="adCategory" class="form-control" required onchange="updateSubcategories()">
                         <!-- Dynamically populated -->
                     </select>
                 </div>
                 <div class="form-group">
-                    <label><span class="uk">Підкатегорія *</span><span class="ru">Подкатегория *</span></label>
+                    <label>
+                        <span class="uk">Підкатегорія *</span>
+                        <span class="ru">Подкатегория *</span>
+                    </label>
                     <select id="adSubcategory" class="form-control" required>
                         <option value="">Оберіть підкатегорію / Выберите...</option>
                     </select>
@@ -671,17 +1109,26 @@
             </div>
 
             <div class="form-group">
-                <label><span class="uk">Опис товару або послуги *</span><span class="ru">Описание товара или услуги *</span></label>
+                <label>
+                    <span class="uk">Опис товару або послуги *</span>
+                    <span class="ru">Описание товара или услуги *</span>
+                </label>
                 <textarea id="adDesc" class="form-control" required placeholder="Опишіть детально ваш товар або послугу..."></textarea>
             </div>
 
             <div class="form-row">
                 <div class="form-group">
-                    <label><span class="uk">Ваше Ім'я *</span><span class="ru">Ваше Имя *</span></label>
+                    <label>
+                        <span class="uk">Ваше Ім'я *</span>
+                        <span class="ru">Ваше Имя *</span>
+                    </label>
                     <input type="text" id="adName" class="form-control" required placeholder="Іван Іванов">
                 </div>
                 <div class="form-group">
-                    <label><span class="uk">Телефон *</span><span class="ru">Телефон *</span></label>
+                    <label>
+                        <span class="uk">Телефон *</span>
+                        <span class="ru">Телефон *</span>
+                    </label>
                     <div style="display: flex; align-items: center; border: 1px solid var(--border); border-radius: 10px; background: var(--bg); overflow: hidden;">
                         <span style="padding: 12px 15px; background: rgba(0,0,0,0.05); font-weight: bold; border-right: 1px solid var(--border); color: var(--text);">+380</span>
                         <input type="tel" id="adPhone" class="form-control" style="border: none; border-radius: 0; outline: none; flex: 1;" required placeholder="501234567" maxlength="9" oninput="this.value = this.value.replace(/[^0-9]/g, '')">
@@ -691,11 +1138,17 @@
 
             <div class="form-row">
                 <div class="form-group">
-                    <label><span class="uk">Email (за бажанням)</span><span class="ru">Email (по желанию)</span></label>
+                    <label>
+                        <span class="uk">Email (за бажанням)</span>
+                        <span class="ru">Email (по желанию)</span>
+                    </label>
                     <input type="email" id="adEmail" class="form-control" placeholder="example@gmail.com">
                 </div>
                 <div class="form-group">
-                    <label><span class="uk">Район в Миколаєві</span><span class="ru">Район в Николаеве</span></label>
+                    <label>
+                        <span class="uk">Район в Миколаєві</span>
+                        <span class="ru">Район в Николаеве</span>
+                    </label>
                     <select id="adLocation" class="form-control">
                         <option value="Корабельний район">Корабельний / Корабельный</option>
                         <option value="Центр">Центр</option>
@@ -707,16 +1160,29 @@
             </div>
 
             <div class="form-group" style="background: rgba(71, 118, 230, 0.05); padding: 15px; border-radius: 10px; border: 1px dashed var(--primary);">
-                <label><span class="uk">Фотографія *</span><span class="ru">Фотография *</span></label>
+                <label>
+                    <span class="uk">Фотографія *</span>
+                    <span class="ru">Фотография *</span>
+                </label>
                 <div class="photo-toggle">
-                    <label><input type="radio" name="photoType" value="upload" checked onchange="togglePhotoInput()"> <span class="uk">Завантажити з ПК/смартфона</span><span class="ru">Загрузить с ПК/смартфона</span></label>
-                    <label><input type="radio" name="photoType" value="url" onchange="togglePhotoInput()"> <span class="uk">Посилання (URL)</span><span class="ru">Ссылка (URL)</span></label>
+                    <label>
+                        <input type="radio" name="photoType" value="upload" checked onchange="togglePhotoInput()"> 
+                        <span class="uk">Завантажити з ПК/смартфона</span>
+                        <span class="ru">Загрузить с ПК/смартфона</span>
+                    </label>
+                    <label>
+                        <input type="radio" name="photoType" value="url" onchange="togglePhotoInput()"> 
+                        <span class="uk">Посилання (URL)</span>
+                        <span class="ru">Ссылка (URL)</span>
+                    </label>
                 </div>
 
                 <div id="uploadPhotoBlock">
                     <label class="custom-file-upload">
                         <input type="file" id="adImageFile" accept="image/*" onchange="previewAndCompressImage(event)">
-                        📸 <span class="uk">Обрати фото...</span><span class="ru">Выбрать фото...</span>
+                        📸 
+                        <span class="uk">Обрати фото...</span>
+                        <span class="ru">Выбрать фото...</span>
                     </label>
                     <img id="imagePreview" alt="Preview">
                 </div>
@@ -727,7 +1193,8 @@
             </div>
             
             <button type="submit" class="btn btn-primary" style="width: 100%; margin-top: 10px; padding: 15px; font-size: 16px;">
-                <span class="uk">Зберегти оголошення</span><span class="ru">Сохранить объявление</span>
+                <span class="uk">Зберегти оголошення</span>
+                <span class="ru">Сохранить объявление</span>
             </button>
         </form>
     </div>
@@ -776,98 +1243,514 @@
     let editingAdId = null;
     let currentLang = localStorage.getItem('nik-lang') || 'uk';
 
-    // Categories
+    // Розгорнута структура категорій для повноцінного завантаження та підтримки коду
     const CATEGORIES = {
-        "Свіжі": { icon: "🔥", uk: "Свіжі оголошення", ru: "Свежие объявления", sub: { uk:[], ru:[] } },
-        "Хобі": { 
-            icon: "⚽", uk: "Хобі, спорт і відпочинок", ru: "Хобби, спорт и отдых", 
+        "Свіжі": { 
+            icon: "🔥", 
+            uk: "Свіжі оголошення", 
+            ru: "Свежие объявления", 
             sub: { 
-                uk: ["Колекціонування та антикваріат", "Спорт, фітнес та активний відпочинок", "Велосипеди та екіпірування", "Мілітарія та тактичне спорядження", "Дрони, коптери та аксесуари", "Книги, комікси та журнали", "Музика, фільми та вініл", "Квитки на концерти та події", "Пошук компанії для подорожей", "Музичні інструменти та звук", "Настільні ігри та пазли", "Риболовля та полювання", "Матеріали для рукоділля", "Інші захоплення"],
-                ru: ["Коллекционирование и антиквариат", "Спорт, фитнес и активный отдых", "Велосипеды и экипировка", "Милитария и тактическое снаряжение", "Дроны, коптеры и аксессуары", "Книги, комиксы и журналы", "Музыка, фильмы и винил", "Билеты на концерты и события", "Поиск компании для путешествий", "Музыкальные инструменты и звук", "Настольные игры и пазлы", "Рыбалка и охота", "Материалы для рукоделия", "Другие увлечения"]
+                uk: [], 
+                ru: [] 
+            } 
+        },
+        "Хобі": { 
+            icon: "⚽", 
+            uk: "Хобі, спорт і відпочинок", 
+            ru: "Хобби, спорт и отдых", 
+            sub: { 
+                uk: [
+                    "Колекціонування та антикваріат", 
+                    "Спорт, фітнес та активний відпочинок", 
+                    "Велосипеди та екіпірування", 
+                    "Мілітарія та тактичне спорядження", 
+                    "Дрони, коптери та аксесуари", 
+                    "Книги, комікси та журнали", 
+                    "Музика, фільми та вініл", 
+                    "Квитки на концерти та події", 
+                    "Пошук компанії для подорожей", 
+                    "Музичні інструменти та звук", 
+                    "Настільні ігри та пазли", 
+                    "Риболовля та полювання", 
+                    "Матеріали для рукоділля", 
+                    "Інші захоплення"
+                ],
+                ru: [
+                    "Коллекционирование и антиквариат", 
+                    "Спорт, фитнес и активный отдых", 
+                    "Велосипеды и экипировка", 
+                    "Милитария и тактическое снаряжение", 
+                    "Дроны, коптеры и аксессуары", 
+                    "Книги, комиксы и журналы", 
+                    "Музыка, фильмы и винил", 
+                    "Билеты на концерты и события", 
+                    "Поиск компании для путешествий", 
+                    "Музыкальные инструменты и звук", 
+                    "Настольные игры и пазлы", 
+                    "Рыбалка и охота", 
+                    "Материалы для рукоделия", 
+                    "Другие увлечения"
+                ]
             } 
         },
         "Електроніка": { 
-            icon: "📱", uk: "Електроніка", ru: "Электроника", 
+            icon: "📱", 
+            uk: "Електроніка", 
+            ru: "Электроника", 
             sub: { 
-                uk: ["Смартфони та телефони", "Ноутбуки та ультрабуки", "ПК та системні блоки", "Планшети та електронні книги", "Комплектуючі та деталі", "Монітори та проектори", "Периферія (миші, клавіатури)", "Телевізори та плазми", "Аудіотехніка та акустика", "Фото- та відеотехніка", "Ігрові приставки та консолі", "Смарт-годинники та фітнес-браслети", "Побутова техніка для кухни", "Побутова техніка для дому", "Кліматичне обладнання (Кондиціонери)", "Аксесуари до электроніки"], 
-                ru: ["Смартфоны и телефоны", "Ноутбуки и ультрабуки", "ПК и системные блоки", "Планшеты и электронные книги", "Комплектующие и детали", "Мониторы и проекты", "Периферия (мыши, клавиатуры)", "Телевизоры и плазмы", "Аудиосистема и акустика", "Фото- и видеотехника", "Игровые приставки и консоли", "Смарт-часы и фитнес-браслеты", "Бытовая техника для кухни", "Бытовая техника для дома", "Климатическое оборудование (Кондиционеры)", "Аксессуары к электронике"] 
+                uk: [
+                    "Смартфони та телефони", 
+                    "Ноутбуки та ультрабуки", 
+                    "ПК та системні блоки", 
+                    "Планшети та електронні книги", 
+                    "Комплектуючі та деталі", 
+                    "Монітори та проектори", 
+                    "Периферія (миші, клавіатури)", 
+                    "Телевізори та плазми", 
+                    "Аудіотехніка та акустика", 
+                    "Фото- та відеотехніка", 
+                    "Ігрові приставки та консолі", 
+                    "Смарт-годинники та фітнес-браслети", 
+                    "Побутова техніка для кухни", 
+                    "Побутова техніка для дому", 
+                    "Кліматичне обладнання (Кондиціонери)", 
+                    "Аксесуари до электроніки"
+                ], 
+                ru: [
+                    "Смартфоны и телефоны", 
+                    "Ноутбуки и ультрабуки", 
+                    "ПК и системные блоки", 
+                    "Планшеты и электронные книги", 
+                    "Комплектующие и детали", 
+                    "Мониторы и проекты", 
+                    "Периферия (мыши, клавиатуры)", 
+                    "Телевизоры и плазмы", 
+                    "Аудиосистема и акустика", 
+                    "Фото- и видеотехника", 
+                    "Игровые приставки и консоли", 
+                    "Смарт-часы и фитнес-браслеты", 
+                    "Бытовая техника для кухни", 
+                    "Бытовая техника для дома", 
+                    "Климатическое оборудование (Кондиционеры)", 
+                    "Аксессуары к электронике"
+                ] 
             } 
         },
         "Нерухомість": { 
-            icon: "🏠", uk: "Нерухомість", ru: "Недвижимость", 
+            icon: "🏠", 
+            uk: "Нерухомість", 
+            ru: "Недвижимость", 
             sub: { 
-                uk: ["Оренда квартир (довгострокова)", "Оренда квартир (подобово)", "Продаж квартир", "Оренда будинків та котеджів", "Продаж будинків та дач", "Продаж землі та ділянок", "Оренда кімнат", "Продаж кімнат", "Оренда комерційної нерухомості", "Продаж комерційної нерухомості", "Оренда гаражів та паркінгів", "Продаж гаражів", "Нерухомість за кордоном"], 
-                ru: ["Aренда квартир (долгосрочная)", "Aренда квартир (посуточно)", "Продажа квартир", "Aренда домов и коттеджей", "Продажа домов и дач", "Продажа земли и участков", "Aренда комнат", "Продажа комнат", "Aренда коммерческой недвижимости", "Продажа коммерческой недвижимости", "Aренда гаражей и паркингов", "Продажа гаражей", "Недвижимость за рубежом"] 
+                uk: [
+                    "Оренда квартир (довгострокова)", 
+                    "Оренда квартир (подобово)", 
+                    "Продаж квартир", 
+                    "Оренда будинків та котеджів", 
+                    "Продаж будинків та дач", 
+                    "Продаж землі та ділянок", 
+                    "Оренда кімнат", 
+                    "Продаж кімнат", 
+                    "Оренда комерційної нерухомості", 
+                    "Продаж комерційної нерухомості", 
+                    "Оренда гаражів та паркінгів", 
+                    "Продаж гаражів", 
+                    "Нерухомість за кордоном"
+                ], 
+                ru: [
+                    "Aренда квартир (долгосрочная)", 
+                    "Aренда квартир (посуточно)", 
+                    "Продажа квартир", 
+                    "Aренда домов и коттеджей", 
+                    "Продажа домов и дач", 
+                    "Продажа земли и участков", 
+                    "Aренда комнат", 
+                    "Продажа комнат", 
+                    "Aренда коммерческой недвижимости", 
+                    "Продажа коммерческой недвижимости", 
+                    "Aренда гаражей и паркингов", 
+                    "Продажа гаражей", 
+                    "Недвижимость за рубежом"
+                ] 
             } 
         },
         "Транспорт": { 
-            icon: "🚗", uk: "Транспорт", ru: "Транспорт", 
+            icon: "🚗", 
+            uk: "Транспорт", 
+            ru: "Транспорт", 
             sub: { 
-                uk: ["Легкові автомобілі", "Мотоцикли та скутери", "Вантажні автомобілі", "Автобуси та мікроавтобуси", "Сільгосптехніка (Трактори, комбайни)", "Спецтехніка (Екскаватори, крани)", "Водний транспорт (Човни, яхти)", "Причепи та напівпричепи", "Повітряний транспорт", "Електротранспорт (Самокати, гіроборди)", "Автобудинки та трейлери", "Інший транспорт"], 
-                ru: ["Легковые автомобили", "Мотоциклы и скутеры", "Грузовые автомобили", "Автобусы и микроавтобусы", "Сельхозтехника (Тракторы, комбайны)", "Спецтехника (Экскаваторы, краны)", "Водный транспорт (Лодки, яхты)", "Прицепы и полуприцепы", "Воздушный транспорт", "Электротранспорт (Самокаты, гироборды)", "Автодома и трейлеры", "Другой транспорт"] 
+                uk: [
+                    "Легкові автомобілі", 
+                    "Мотоцикли та скутери", 
+                    "Вантажні автомобілі", 
+                    "Автобуси та мікроавтобуси", 
+                    "Сільгосптехніка (Трактори, комбайни)", 
+                    "Спецтехніка (Екскаватори, крани)", 
+                    "Водний транспорт (Човни, яхти)", 
+                    "Причепи та напівпричепи", 
+                    "Повітряний транспорт", 
+                    "Електротранспорт (Самокати, гіроборди)", 
+                    "Автобудинки та трейлери", 
+                    "Інший транспорт"
+                ], 
+                ru: [
+                    "Легковые автомобили", 
+                    "Мотоциклы и скутеры", 
+                    "Грузовые автомобили", 
+                    "Автобусы и микроавтобусы", 
+                    "Сельхозтехника (Тракторы, комбайны)", 
+                    "Спецтехника (Экскаваторы, краны)", 
+                    "Водный транспорт (Лодки, яхты)", 
+                    "Прицепы и полуприцепы", 
+                    "Воздушный транспорт", 
+                    "Электротранспорт (Самокаты, гироборды)", 
+                    "Автодома и трейлеры", 
+                    "Другой транспорт"
+                ] 
             } 
         },
         "Запчастини": { 
-            icon: "⚙️", uk: "Запчастини", ru: "Запчасти", 
+            icon: "⚙️", 
+            uk: "Запчастини", 
+            ru: "Запчасти", 
             sub: { 
-                uk: ["Автозапчастини", "Запчастини для мототехніки", "Запчастини для спецтехніки", "Шини та диски", "Акумулятори автомобільні", "Автозвук та электроніка", "Кузовні деталі", "Двигуни та компоненти", "Оптика та світло", "Салон та інтер'єр", "Тюнінг та аксесуари", "Автохімія та масла", "GPS-навигаторы та відеореєстратори", "Інструменти для СТО"], 
-                ru: ["Автозапчасти", "Запчасти для мототехники", "Запчасти для спецтехники", "Шины и диски", "Аккумуляторы автомобильные", "Автозвук и электроника", "Кузовные детали", "Двигатели и компоненты", "Оптика и свет", "Салон и интерьер", "Тюнинг и аксессуары", "Автохимия и масла", "GPS-навигаторы и видеорегистраторы", "Инструменты для СТО"] 
+                uk: [
+                    "Автозапчастини", 
+                    "Запчастини для мототехніки", 
+                    "Запчастини для спецтехніки", 
+                    "Шини та диски", 
+                    "Акумулятори автомобільні", 
+                    "Автозвук та электроніка", 
+                    "Кузовні деталі", 
+                    "Двигуни та компоненти", 
+                    "Оптика та світло", 
+                    "Салон та інтер'єр", 
+                    "Тюнінг та аксесуари", 
+                    "Автохімія та масла", 
+                    "GPS-навигаторы та відеореєстратори", 
+                    "Інструменти для СТО"
+                ], 
+                ru: [
+                    "Автозапчасти", 
+                    "Запчасти для мототехники", 
+                    "Запчасти для спецтехники", 
+                    "Шины и диски", 
+                    "Аккумуляторы автомобильные", 
+                    "Автозвук и электроника", 
+                    "Кузовные детали", 
+                    "Двигатели и компоненты", 
+                    "Оптика и свет", 
+                    "Салон и интерьер", 
+                    "Тюнинг и аксессуары", 
+                    "Автохимия и масла", 
+                    "GPS-навигаторы и видеорегистраторы", 
+                    "Инструменты для СТО"
+                ] 
             } 
         },
         "Робота": { 
-            icon: "💼", uk: "Робота", ru: "Работа", 
+            icon: "💼", 
+            uk: "Робота", 
+            ru: "Работа", 
             sub: { 
-                uk: ["Роздрібна торгівля / Продажі", "Логістика / Склад / Доставка", "Будівництво / Архітектура", "IT / Телекомунікації", "Без досвіду / Студенти", "Ресторанний бізнес / Кулінарія", "Готельно-туристичний бізнес", "Виробництво / Робітничі спеціальності", "Охорона / Безпека", "Медицина / Фармація", "Освіта / Наука", "Краса / Фітнес / Спорт", "Бухгалтерія / Фінанси", "Маркетинг / Реклама / PR", "HR / Управління персоналом", "Віддалена робота / Фріланс"], 
-                ru: ["Розничная торговля / Продажи", "Логистика / Склад / Доставка", "Строительство / Архитектура", "IT / Телекоммуникации", "Без опыта / Студенты", "Ресторанный бизнес / Кулинария", "Гостиничный бизнес / Кулинария", "Производство / Рабочие специальности", "Охрана / Безопасность", "Медицина / Фармация", "Образование / Наука", "Красота / Фитнес / Спорт", "Бухгалтерия / Финансы", "Маркетинг / Реклама / PR", "HR / Управление персоналом", "Удаленная работа / Фриланс"] 
+                uk: [
+                    "Роздрібна торгівля / Продажі", 
+                    "Логістика / Склад / Доставка", 
+                    "Будівництво / Архітектура", 
+                    "IT / Телекомунікації", 
+                    "Без досвіду / Студенти", 
+                    "Ресторанний бізнес / Кулінарія", 
+                    "Готельно-туристичний бізнес", 
+                    "Виробництво / Робітничі спеціальності", 
+                    "Охорона / Безпека", 
+                    "Медицина / Фармація", 
+                    "Освіта / Наука", 
+                    "Краса / Фітнес / Спорт", 
+                    "Бухгалтерія / Фінанси", 
+                    "Маркетинг / Реклама / PR", 
+                    "HR / Управління персоналом", 
+                    "Віддалена робота / Фріланс"
+                ], 
+                ru: [
+                    "Розничная торговля / Продажи", 
+                    "Логистика / Склад / Доставка", 
+                    "Строительство / Архитектура", 
+                    "IT / Телекоммуникации", 
+                    "Без опыта / Студенты", 
+                    "Ресторанный бизнес / Кулинария", 
+                    "Гостиничный бизнес / Кулинария", 
+                    "Производство / Рабочие специальности", 
+                    "Охрана / Безопасность", 
+                    "Медицина / Фармация", 
+                    "Образование / Наука", 
+                    "Красота / Фитнес / Спорт", 
+                    "Бухгалтерия / Финансы", 
+                    "Маркетинг / Реклама / PR", 
+                    "HR / Управление персоналом", 
+                    "Удаленная работа / Фриланс"
+                ] 
             } 
         },
         "Тварини": { 
-            icon: "🐾", uk: "Тварини", ru: "Животные", 
+            icon: "🐾", 
+            uk: "Тварини", 
+            ru: "Животные", 
             sub: { 
-                uk: ["Собаки та цуценята", "Коти та кошенята", "Птахи", "Акваріумістика", "Гризуни", "Рептилії", "Сільськогосподарські тварини", "Безкоштовна віддача тварин", "В'язка тварин", "Зоотовари (Корми, іграшки)", "Амуніція та одяг для тварин", "Будки, клітки та акваріуми", "Грумінг та догляд", "Послуги ветеринара"], 
-                ru: ["Собаки и щенки", "Коты и котята", "Птицы", "Аквариумистика", "Грызуны", "Рептилии", "Сельскохозяйственные животные", "Бесплатная отдача животных", "Вязка животных", "Зоотовары (Корма, игрушки)", "Амуниция и одежда для животных", "Будки, клетки и аквариумы", "Груминг и уход", "Услуги ветеринара"] 
+                uk: [
+                    "Собаки та цуценята", 
+                    "Коти та кошенята", 
+                    "Птахи", 
+                    "Акваріумістика", 
+                    "Гризуни", 
+                    "Рептилії", 
+                    "Сільськогосподарські тварини", 
+                    "Безкоштовна віддача тварин", 
+                    "В'язка тварин", 
+                    "Зоотовари (Корми, іграшки)", 
+                    "Амуніція та одяг для тварин", 
+                    "Будки, клітки та акваріуми", 
+                    "Грумінг та догляд", 
+                    "Послуги ветеринара"
+                ], 
+                ru: [
+                    "Собаки и щенки", 
+                    "Коты и котята", 
+                    "Птицы", 
+                    "Аквариумистика", 
+                    "Грызуны", 
+                    "Рептилии", 
+                    "Сельскохозяйственные животные", 
+                    "Бесплатная отдача животных", 
+                    "Вязка животных", 
+                    "Зоотовары (Корма, игрушки)", 
+                    "Амуниция и одежда для животных", 
+                    "Будки, клетки и аквариумы", 
+                    "Груминг и уход", 
+                    "Услуги ветеринара"
+                ] 
             } 
         },
         "Дім і Сад": { 
-            icon: "🪴", uk: "Дім і Сад", ru: "Дом и Сад", 
+            icon: "🪴", 
+            uk: "Дім і Сад", 
+            ru: "Дом и Сад", 
             sub: { 
-                uk: ["Меблі для вітальні", "Меблі для спальні", "Кухонні меблі", "Садові та вуличні меблі", "Предмети інтер'єру та декор", "Кімнатні рослини", "Посуд та кухонне приладдя", "Садово-городній інвентар", "Насіння та саджанці", "Будівельні матеріали", "Оздоблювальні матеріали", "Інструменти (Електро та ручні)", "Сантехніка", "Освітлення", "Господарський інвентар / Побутова хімія"], 
-                ru: ["Мебель для гостиной", "Мебель для спальни", "Кухонная мебель", "Садовая и уличная мебель", "Предметы интерьера и декор", "Комнатные растения", "Посуда и кухонные принадлежности", "Садово-городний инвентарь", "Семена и саженцы", "Стройтельные материалы", "Отделочные материалы", "Инструменты (Эклектро и ручные)", "Сантехника", "Освещение", "Хозяйственный инвентарь / Бытовая химия"] 
+                uk: [
+                    "Меблі для вітальні", 
+                    "Меблі для спальні", 
+                    "Кухонні меблі", 
+                    "Садові та вуличні меблі", 
+                    "Предмети інтер'єру та декор", 
+                    "Кімнатні рослини", 
+                    "Посуд та кухонне приладдя", 
+                    "Садово-городній інвентар", 
+                    "Насіння та саджанці", 
+                    "Будівельні матеріали", 
+                    "Оздоблювальні матеріали", 
+                    "Інструменти (Електро та ручні)", 
+                    "Сантехніка", 
+                    "Освітлення", 
+                    "Господарський інвентар / Побутова хімія"
+                ], 
+                ru: [
+                    "Мебель для гостиной", 
+                    "Мебель для спальни", 
+                    "Кухонная мебель", 
+                    "Садовая и уличная мебель", 
+                    "Предметы интерьера и декор", 
+                    "Комнатные растения", 
+                    "Посуда и кухонные принадлежности", 
+                    "Садово-городний инвентарь", 
+                    "Семена и саженцы", 
+                    "Стройтельные материалы", 
+                    "Отделочные материалы", 
+                    "Инструменты (Эклектро и ручные)", 
+                    "Сантехника", 
+                    "Освещение", 
+                    "Хозяйственный инвентарь / Бытовая химия"
+                ] 
             } 
         },
         "Бізнес та Послуги": { 
-            icon: "🤝", uk: "Бізнес та Послуги", ru: "Бизнес и Услуги", 
+            icon: "🤝", 
+            uk: "Бізнес та Послуги", 
+            ru: "Бизнес и Услуги", 
             sub: { 
-                uk: ["Ремонт та обслуговування авто", "Б'юті-сфера та здоров'я", "Послуги няні та доглядальниці", "Майстер на годину та побут", "Прибирання та клінінг", "Репетиторство та тренування", "Вантажоперевезення та логістика", "Оренда спецтехніки", "Фотосесії та відеозйомка", "Аніматори та ведення свят", "Ремонт цифрової та побутової техніки", "Будівельні та оздоблювальні роботи", "Продаж та оренда бізнес-обладнання", "Юридичні та бухгалтерські послуги", "Дизайн, IT та фріланс", "Грумінг та послуги для тварин", "Сировина, матеріали та переробка", "Туристичні послуги та візи", "Інші професійні послуги"],
-                ru: ["Ремонт и обслуживание авто", "Бьюти-сфера и здоровье", "Услуги няни и сиделки", "Мастер на час и быт", "Уборка и клининг", "Репетиторство и тренировки", "Грузоперевозки и логистика", "Аренда спецтехники", "Фотосессии и видеосъемка", "Аниматоры и проведение праздников", "Ремонт цифровой и бытовой техники", "Строительные и отделочные работы", "Продажа и аренда бизнес-оборудования", "Юридические и бухгалтерские услуги", "Дизайн, IT и фриланс", "Груминг и услуги для животных", "Сырье, материалы и переработка", "Туристические услуги и визы", "Другие профессиональные услуги"]
+                uk: [
+                    "Ремонт та обслуговування авто", 
+                    "Б'юті-сфера та здоров'я", 
+                    "Послуги няні та доглядальниці", 
+                    "Майстер на годину та побут", 
+                    "Прибирання та клінінг", 
+                    "Репетиторство та тренування", 
+                    "Вантажоперевезення та логістика", 
+                    "Оренда спецтехніки", 
+                    "Фотосесії та відеозйомка", 
+                    "Аніматори та ведення свят", 
+                    "Ремонт цифрової та побутової техніки", 
+                    "Будівельні та оздоблювальні роботи", 
+                    "Продаж та оренда бізнес-обладнання", 
+                    "Юридичні та бухгалтерські послуги", 
+                    "Дизайн, IT та фріланс", 
+                    "Грумінг та послуги для тварин", 
+                    "Сировина, матеріали та переробка", 
+                    "Туристичні послуги та візи", 
+                    "Інші професійні послуги"
+                ],
+                ru: [
+                    "Ремонт и обслуживание авто", 
+                    "Бьюти-сфера и здоровье", 
+                    "Услуги няни и сиделки", 
+                    "Мастер на час и быт", 
+                    "Уборка и клининг", 
+                    "Репетиторство и тренировки", 
+                    "Грузоперевозки и логистика", 
+                    "Аренда спецтехники", 
+                    "Фотосессии и видеосъемка", 
+                    "Аниматоры и проведение праздников", 
+                    "Ремонт цифровой и бытовой техники", 
+                    "Строительные и отделочные работы", 
+                    "Продажа и аренда бизнес-оборудования", 
+                    "Юридические и бухгалтерские услуги", 
+                    "Дизайн, IT и фриланс", 
+                    "Груминг и услуги для животных", 
+                    "Сырье, материалы и переработка", 
+                    "Туристические услуги и визы", 
+                    "Другие профессиональные услуги"
+                ]
             } 
         },
         "Мода": { 
-            icon: "👕", uk: "Мода і стиль", ru: "Мода и стиль", 
+            icon: "👕", 
+            uk: "Мода і стиль", 
+            ru: "Мода и стиль", 
             sub: { 
-                uk: ["Жіночий одяг", "Чоловічий одяг", "Жіноче взуття", "Чоловіче взуття", "Спортивний одяг та взуття", "Сумки та рюкзаки", "Годинники", "Ювелірні вироби та біжутерія", "Аксесуари (Ремені, краватки)", "Головні убори", "Спецодяг та уніформа", "Подарунки та сувеніри", "Весільний одяг та аксесуари"], 
-                ru: ["Женская одежда", "Мужская одежда", "Женская обувь", "Мужская обувь", "Спортивная одежда и обувь", "Сумки и рюкзаки", "Часы", "Ювелирные изделия и бижутерия", "Аксессуары (Ремни, галстуки)", "Головные уборы", "Спецодежда и универсальная одежда", "Подарки и сувениры", "Свадебная одежда и аксессуары"] 
+                uk: [
+                    "Жіночий одяг", 
+                    "Чоловічий одяг", 
+                    "Жіноче взуття", 
+                    "Чоловіче взуття", 
+                    "Спортивний одяг та взуття", 
+                    "Сумки та рюкзаки", 
+                    "Годинники", 
+                    "Ювелірні вироби та біжутерія", 
+                    "Аксесуари (Ремені, краватки)", 
+                    "Головні убори", 
+                    "Спецодяг та уніформа", 
+                    "Подарунки та сувеніри", 
+                    "Весільний одяг та аксесуари"
+                ], 
+                ru: [
+                    "Женская одежда", 
+                    "Мужская одежда", 
+                    "Женская обувь", 
+                    "Мужская обувь", 
+                    "Спортивная одежда и обувь", 
+                    "Сумки и рюкзаки", 
+                    "Часы", 
+                    "Ювелирные изделия и бижутерия", 
+                    "Аксессуары (Ремни, галстуки)", 
+                    "Головные уборы", 
+                    "Спецодежда и универсальная одежда", 
+                    "Подарки и сувениры", 
+                    "Свадебная одежда и аксессуары"
+                ] 
             } 
         },
         "Діти": { 
-            icon: "🧸", uk: "Дитячий світ", ru: "Детский мир", 
+            icon: "🧸", 
+            uk: "Дитячий світ", 
+            ru: "Детский мир", 
             sub: { 
-                uk: ["Дитячий одяг", "Дитяче взуття", "Іграшки та ігри", "Дитячий транспорт (Велосипеди, самокати)", "Дитячі меблі", "Візочки (Коляски)", "Автокрісла", "Товари для годування", "Товари для догляду та гігієни", "Шкільне приладдя", "Товари для матусь", "Дитяча кімната (Декор)"], 
-                ru: ["Детская одежда", "Детская обувь", "Игрушки и игры", "Детский транспорт (Велосипеды, самокаты)", "Детская мебель", "Коляски", "Автокресла", "Товары для кормления", "Товары для ухода и гигиены", "Школьные принадлежности", "Товары для мам", "Детская комната (Декор)"] 
+                uk: [
+                    "Дитячий одяг", 
+                    "Дитяче взуття", 
+                    "Іграшки та ігри", 
+                    "Дитячий транспорт (Велосипеди, самокати)", 
+                    "Дитячі меблі", 
+                    "Візочки (Коляски)", 
+                    "Автокрісла", 
+                    "Товари для годування", 
+                    "Товари для догляду та гігієни", 
+                    "Шкільне приладдя", 
+                    "Товари для матусь", 
+                    "Дитяча кімната (Декор)"
+                ], 
+                ru: [
+                    "Детская одежда", 
+                    "Детская обувь", 
+                    "Игрушки и игры", 
+                    "Детский транспорт (Велосипеды, самокаты)", 
+                    "Детская мебель", 
+                    "Коляски", 
+                    "Автокресла", 
+                    "Товары для кормления", 
+                    "Товары для ухода и гигиены", 
+                    "Школьные принадлежности", 
+                    "Товары для мам", 
+                    "Детская комната (Декор)"
+                ] 
             } 
         },
         "Їжа": { 
-            icon: "🦞", uk: "Їжа та Продукти", ru: "Еда и Продукты", 
+            icon: "🦞", 
+            uk: "Їжа та Продукти", 
+            ru: "Еда и Продукты", 
             sub: { 
-                uk: ["М'ясо та ковбасні вироби", "Морепродукти та риба", "Раки свіжі та варені", "Овочі, фрукты та ягоди", "Молочні продукти", "Яйця", "Крупи та бакалія", "Мед та продукти бджільництва", "Домашня випічка та солодощі", "Напої (Соки, вода)", "Фермерські продукти", "Горіхи та сухофрукти"], 
-                ru: ["Мясо и колбасные изделия", "Морепродукты и рыба", "Раки свежие и вареные", "Овощи, фрукты и ягоды", "Молочные продукты", "Яйца", "Крупы и бакалея", "Мед и продукты пчеловодства", "Домашняя выпечка и сладости", "Напитки (Соки, вода)", "Фермерские продукты", "Орехи и сухофрукты"] 
+                uk: [
+                    "М'ясо та ковбасні вироби", 
+                    "Морепродукти та риба", 
+                    "Раки свіжі та варені", 
+                    "Овочі, фрукты та ягоди", 
+                    "Молочні продукти", 
+                    "Яйця", 
+                    "Крупи та бакалія", 
+                    "Мед та продукти бджільництва", 
+                    "Домашня випічка та солодощі", 
+                    "Напої (Соки, вода)", 
+                    "Фермерські продукти", 
+                    "Горіхи та сухофрукти"
+                ], 
+                ru: [
+                    "Мясо и колбасные изделия", 
+                    "Морепродукты и рыба", 
+                    "Раки свежие и вареные", 
+                    "Овощи, фрукты и ягоды", 
+                    "Молочные продукты", 
+                    "Яйца", 
+                    "Крупы и бакалея", 
+                    "Мед и продукты пчеловодства", 
+                    "Домашняя выпечка и сладости", 
+                    "Напитки (Соки, вода)", 
+                    "Фермерские продукты", 
+                    "Орехи и сухофрукты"
+                ] 
             } 
         },
         "Даром": { 
-            icon: "🎁", uk: "Віддам даром / Обмін", ru: "Отдам даром / Обмен", 
+            icon: "🎁", 
+            uk: "Віддам даром / Обмін", 
+            ru: "Отдам даром / Обмен", 
             sub: { 
-                uk: ["Одяг та взуття безкоштовно", "Віддам тварин", "Електроніка та техніка", "Меблі", "Дитячі речі", "Будматеріали та залишки", "Обмін речами", "Інше (Віддам даром)"], 
-                ru: ["Одежда и обувь бесплатно", "Отдам животных", "Электроника и техника", "Мебель", "Детские вещи", "Стройматериалы и остатки", "Обмен вещами", "Другое (Отдам даром)"] 
+                uk: [
+                    "Одяг та взуття безкоштовно", 
+                    "Віддам тварин", 
+                    "Електроніка та техніка", 
+                    "Меблі", 
+                    "Дитячі речі", 
+                    "Будматеріали та залишки", 
+                    "Обмін речами", 
+                    "Інше (Віддам даром)"
+                ], 
+                ru: [
+                    "Одежда и обувь бесплатно", 
+                    "Отдам животных", 
+                    "Электроника и техника", 
+                    "Мебель", 
+                    "Детские вещи", 
+                    "Стройматериалы и остатки", 
+                    "Обмен вещами", 
+                    "Другое (Отдам даром)"
+                ] 
             } 
         }
     };
@@ -875,12 +1758,16 @@
     // UI Functions
     function openAuthModal() { 
         const modal = document.getElementById('authModal');
-        if (modal) modal.classList.add('active'); 
+        if (modal) {
+            modal.classList.add('active'); 
+        }
     }
     
     function closeAuthModal() { 
         const modal = document.getElementById('authModal');
-        if (modal) modal.classList.remove('active'); 
+        if (modal) {
+            modal.classList.remove('active'); 
+        }
     }
 
     function toggleLang() {
@@ -895,13 +1782,16 @@
     function applyLanguage() {
         document.body.className = `lang-${currentLang} ${document.body.classList.contains('dark-theme') ? 'dark-theme' : ''}`;
         const langBtn = document.getElementById('langToggle');
-        if (langBtn) langBtn.innerText = currentLang === 'uk' ? 'RU' : 'УКР';
+        if (langBtn) {
+            langBtn.innerText = currentLang === 'uk' ? 'RU' : 'УКР';
+        }
     }
 
     function buildCategoriesBar() {
         const bar = document.getElementById('categoriesBar');
         if (!bar) return;
         bar.innerHTML = '';
+        
         for (const [key, data] of Object.entries(CATEGORIES)) {
             const div = document.createElement('div');
             div.className = `category-item ${currentCategoryFilter === key ? 'active' : ''}`;
@@ -915,10 +1805,13 @@
         const select = document.getElementById('adCategory');
         if (!select) return;
         select.innerHTML = `<option value="">${currentLang === 'uk' ? 'Обрати категорію...' : 'Выбрать категорию...'}</option>`;
+        
         for (const [key, data] of Object.entries(CATEGORIES)) {
             if (key === 'Свіжі') continue; 
             const opt = document.createElement('option');
-            opt.value = key; opt.innerText = data[currentLang]; select.appendChild(opt);
+            opt.value = key; 
+            opt.innerText = data[currentLang]; 
+            select.appendChild(opt);
         }
     }
 
@@ -926,11 +1819,15 @@
         const key = document.getElementById('adCategory').value;
         const sub = document.getElementById('adSubcategory');
         if (!sub) return;
+        
         sub.innerHTML = `<option value="">${currentLang === 'uk' ? 'Оберіть підкатегорію...' : 'Выберите подкатегорию...'}</option>`;
+        
         if (key && CATEGORIES[key].sub[currentLang]) {
             CATEGORIES[key].sub[currentLang].forEach(s => {
                 const opt = document.createElement('option');
-                opt.value = s; opt.innerText = s; sub.appendChild(opt);
+                opt.value = s; 
+                opt.innerText = s; 
+                sub.appendChild(opt);
             });
         }
     }
@@ -942,50 +1839,75 @@
         
         container.innerHTML = (loader && loader.style.display !== 'none') ? loader.outerHTML : '';
 
-        let filtered = adsToRender;
+        // Спочатку копіюємо масив для безпечного сортування
+        let filtered = [...adsToRender];
+        
+        // Рівномірне сортування: найновіші спочатку
+        filtered.sort((a, b) => (Number(b.id) || 0) - (Number(a.id) || 0));
+
         if (currentView === 'main') {
-            filtered = adsToRender.filter(a => a.status === 'approved' || !a.status);
+            filtered = filtered.filter(a => a.status === 'approved' || !a.status);
         } else if (currentView === 'cabinet') {
-            filtered = (currentUser && !currentUser.isAnonymous) ? adsToRender.filter(a => a.userId === currentUser.uid) : [];
+            filtered = (currentUser && !currentUser.isAnonymous) ? filtered.filter(a => a.userId === currentUser.uid) : [];
         } else if (currentView === 'admin') {
-            filtered = isAdmin() ? [...adsToRender].sort((a,b) => (Number(b.id) || 0) - (Number(a.id) || 0)) : [];
+            filtered = isAdmin() ? filtered : [];
         }
 
         const qInput = document.getElementById('searchInput');
         const q = qInput ? qInput.value.toLowerCase().trim() : "";
-        if (q) filtered = filtered.filter(a => a.title?.toLowerCase().includes(q) || a.desc?.toLowerCase().includes(q));
-        if (currentCategoryFilter && currentCategoryFilter !== 'Свіжі') filtered = filtered.filter(a => a.category === currentCategoryFilter);
+        
+        if (q) {
+            filtered = filtered.filter(a => (a.title && a.title.toLowerCase().includes(q)) || (a.desc && a.desc.toLowerCase().includes(q)));
+        }
+        
+        if (currentCategoryFilter && currentCategoryFilter !== 'Свіжі') {
+            filtered = filtered.filter(a => a.category === currentCategoryFilter);
+        }
 
         const adsCountElem = document.getElementById('adsCount');
-        if (adsCountElem) adsCountElem.innerText = filtered.length;
+        if (adsCountElem) {
+            adsCountElem.innerText = filtered.length;
+        }
 
         if (filtered.length === 0 && (!loader || loader.style.display === 'none')) {
             container.innerHTML += `<p style="grid-column: 1/-1; text-align:center; color: var(--text-muted); padding: 50px;">${currentLang==='uk'?'Порожньо':'Пусто'}</p>`;
         }
 
-        filtered.reverse().forEach(ad => {
+        // Більше ніяких .reverse(), масив вже відсортований правильно!
+        filtered.forEach(ad => {
             const card = document.createElement('div');
             card.className = 'ad-card';
             card.onclick = () => openAdDetails(ad.id);
             
-            let imgHTML = ad.image ? `<img src="${ad.image}" class="ad-image" onerror="this.src='data:image/svg+xml;utf8,<svg xmlns=\\'http://www.w3.org/2000/svg\\' width=\\'100%\\' height=\\'100%\\'><rect width=\\'100%\\' height=\\'100%\\' fill=\\'%23eee\\'/></svg>'">` 
-                                  : `<div class="ad-image" style="font-size:60px">${CATEGORIES[ad.category]?.icon || '📦'}</div>`;
+            let imgHTML = ad.image 
+                ? `<img src="${ad.image}" class="ad-image" onerror="this.src='data:image/svg+xml;utf8,<svg xmlns=\\'http://www.w3.org/2000/svg\\' width=\\'100%\\' height=\\'100%\\'><rect width=\\'100%\\' height=\\'100%\\' fill=\\'%23eee\\'/></svg>'">` 
+                : `<div class="ad-image" style="font-size:60px">${CATEGORIES[ad.category]?.icon || '📦'}</div>`;
             
             let statusHTML = '';
+            // Адміністратор або власник бачить статус оголошення
             if (currentUser && !currentUser.isAnonymous && (ad.userId === currentUser.uid || isAdmin())) {
                 const s = ad.status || 'pending';
                 statusHTML = `<div class="status-badge status-${s}">${s==='pending'?'Очікує':s==='rejected'?'Відхилено':'Активно'}</div>`;
             }
 
             let actionsHTML = '';
+            // Дії доступні тільки власнику або адміну
             if (currentUser && !currentUser.isAnonymous && (ad.userId === currentUser.uid || isAdmin())) {
-                actionsHTML = `<div class="card-actions" onclick="event.stopPropagation()">`;
-                if (isAdmin() && ad.status === 'pending') {
-                    actionsHTML += `<button class="btn-appr" onclick="approveAd('${ad.id}')">✅ Схвалити</button>`;
-                    actionsHTML += `<button class="btn-warning" onclick="rejectAd('${ad.id}')">❌ Відхилити</button>`;
+                actionsHTML = `<div class="card-actions" onclick="event.stopPropagation()">`; // Запобігаємо відкриттю оголошення
+                
+                // Адміністраторські дії: Схвалити та Відхилити з запобіганням кліку
+                if (isAdmin()) {
+                    if (ad.status !== 'approved') {
+                        actionsHTML += `<button class="btn-appr" onclick="event.stopPropagation(); approveAd('${ad.id}')">✅ Схвалити</button>`;
+                    }
+                    if (ad.status !== 'rejected') {
+                        actionsHTML += `<button class="btn-warning" onclick="event.stopPropagation(); rejectAd('${ad.id}')">❌ Відхилити</button>`;
+                    }
                 }
-                actionsHTML += `<button class="btn-edit" onclick="editAd('${ad.id}')">✏️ Ред.</button>`;
-                actionsHTML += `<button class="btn-del" onclick="deleteAd('${ad.id}')">🗑️ Видалити</button></div>`;
+                
+                actionsHTML += `<button class="btn-edit" onclick="event.stopPropagation(); editAd('${ad.id}')">✏️ Ред.</button>`;
+                actionsHTML += `<button class="btn-del" onclick="event.stopPropagation(); deleteAd('${ad.id}')">🗑️ Видалити</button>`;
+                actionsHTML += `</div>`;
             }
 
             card.innerHTML = `
@@ -1007,12 +1929,15 @@
     function openAdDetails(id, skipPush = false) {
         const ad = ads.find(a => String(a.id) === String(id));
         if (!ad) return;
+        
         document.getElementById('mainView').style.display = 'none';
         document.getElementById('detailsView').style.display = 'block';
         window.scrollTo(0,0);
 
         if (!skipPush) {
-            try { history.pushState({v:'details', id}, '', '?id=' + id); } catch(e){}
+            try { 
+                history.pushState({v:'details', id}, '', '?id=' + id); 
+            } catch(e) {}
         }
 
         const detailsContent = document.getElementById('adDetailsContent');
@@ -1024,10 +1949,13 @@
                     ${ad.image ? `<img src="${ad.image}">` : `<div style="font-size:100px">${CATEGORIES[ad.category]?.icon || '📦'}</div>`}
                 </div>
                 <div class="ad-details-info">
-                    <h2>${ad.title}</h2><div class="ad-price">${ad.price}</div>
+                    <h2>${ad.title}</h2>
+                    <div class="ad-price">${ad.price}</div>
                     <p style="white-space:pre-wrap; margin:20px 0;">${ad.desc}</p>
                     <div class="ad-contacts">
-                        <strong>📞 ${ad.phone}</strong><br>👤 ${ad.name}<br>📍 ${ad.location}
+                        <strong>📞 ${ad.phone}</strong><br>
+                        👤 ${ad.name}<br>
+                        📍 ${ad.location}
                     </div>
                 </div>
             </div>`;
@@ -1035,36 +1963,55 @@
 
     function closeAdDetails() {
         switchView(currentView);
-        try { history.pushState({v:'main'}, '', window.location.pathname); } catch(e){}
+        try { 
+            history.pushState({v:'main'}, '', window.location.pathname); 
+        } catch(e) {}
     }
 
     function filterByCategory(cat, el) {
         document.querySelectorAll('.category-item').forEach(i => i.classList.remove('active'));
-        if (currentCategoryFilter === cat) currentCategoryFilter = '';
-        else { currentCategoryFilter = cat; el.classList.add('active'); }
+        if (currentCategoryFilter === cat) {
+            currentCategoryFilter = '';
+        } else { 
+            currentCategoryFilter = cat; 
+            el.classList.add('active'); 
+        }
         renderAds();
     }
 
-    function clearCategoryFilter() { currentCategoryFilter = ''; renderAds(); }
-    function searchAds() { renderAds(); }
+    function clearCategoryFilter() { 
+        currentCategoryFilter = ''; 
+        renderAds(); 
+    }
+
+    function searchAds() { 
+        renderAds(); 
+    }
 
     function togglePhotoInput() {
         const checkedInput = document.querySelector('input[name="photoType"]:checked');
         const type = checkedInput ? checkedInput.value : "upload";
+        
         document.getElementById('uploadPhotoBlock').style.display = type === 'upload' ? 'block' : 'none';
         document.getElementById('urlPhotoBlock').style.display = type === 'url' ? 'block' : 'none';
     }
 
     function previewAndCompressImage(e) {
-        const file = e.target.files[0]; if (!file) return;
+        const file = e.target.files[0]; 
+        if (!file) return;
+        
         const reader = new FileReader();
         reader.onload = (re) => {
             const img = new Image();
             img.onload = () => {
-                const canvas = document.createElement('canvas'); const ctx = canvas.getContext('2d');
-                canvas.width = 800; canvas.height = img.height * (800 / img.width);
+                const canvas = document.createElement('canvas'); 
+                const ctx = canvas.getContext('2d');
+                canvas.width = 800; 
+                canvas.height = img.height * (800 / img.width);
+                
                 ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
                 compressedBase64Image = canvas.toDataURL('image/jpeg', 0.7);
+                
                 const prev = document.getElementById('imagePreview');
                 if (prev) {
                     prev.src = compressedBase64Image;
@@ -1077,12 +2024,18 @@
     }
 
     function openAddModal() {
-        if (!currentUser || currentUser.isAnonymous) { openAuthModal(); return; }
+        if (!currentUser || currentUser.isAnonymous) { 
+            openAuthModal(); 
+            return; 
+        }
         editingAdId = null; 
+        
         const form = document.getElementById('adForm');
         if (form) form.reset();
+        
         const prev = document.getElementById('imagePreview');
         if (prev) prev.style.display = 'none';
+        
         const modal = document.getElementById('addModal');
         if (modal) modal.classList.add('active');
     }
@@ -1093,41 +2046,59 @@
     }
 
     function editAd(id) {
-        const ad = ads.find(a => String(a.id) === String(id)); if (!ad) return;
+        const ad = ads.find(a => String(a.id) === String(id)); 
+        if (!ad) return;
+        
         editingAdId = id;
-        document.getElementById('adTitle').value = ad.title;
-        document.getElementById('adPrice').value = parseInt(ad.price);
-        document.getElementById('adCategory').value = ad.category;
+        document.getElementById('adTitle').value = ad.title || '';
+        document.getElementById('adPrice').value = ad.price ? parseInt(ad.price) : 0;
+        document.getElementById('adCategory').value = ad.category || '';
+        
         updateSubcategories(); 
-        document.getElementById('adSubcategory').value = ad.subcategory;
-        document.getElementById('adDesc').value = ad.desc;
-        document.getElementById('adName').value = ad.name;
-        document.getElementById('adPhone').value = ad.phone.replace('+380','');
-        document.getElementById('adLocation').value = ad.location;
+        
+        document.getElementById('adSubcategory').value = ad.subcategory || '';
+        document.getElementById('adDesc').value = ad.desc || '';
+        document.getElementById('adName').value = ad.name || '';
+        document.getElementById('adPhone').value = ad.phone ? ad.phone.replace('+380','') : '';
+        document.getElementById('adLocation').value = ad.location || '';
+        
         const modal = document.getElementById('addModal');
         if (modal) modal.classList.add('active');
     }
 
     async function deleteAd(id) {
         let confirmDel = true;
-        try { confirmDel = window.confirm(currentLang==='uk'?'Видалити назавжди?':'Удалить навсегда?'); } catch(e){}
+        try { 
+            confirmDel = window.confirm(currentLang==='uk'?'Видалити назавжди?':'Удалить навсегда?'); 
+        } catch(e) {}
+        
         if (!confirmDel) return;
-        try { await deleteDoc(doc(db, 'artifacts', appId, 'public', 'data', 'nikolaev_ads', String(id))); } catch(e){}
+        
+        try { 
+            await deleteDoc(doc(db, 'artifacts', appId, 'public', 'data', 'nikolaev_ads', String(id))); 
+        } catch(e) {}
     }
 
     async function approveAd(id) { 
-        try { await updateDoc(doc(db, 'artifacts', appId, 'public', 'data', 'nikolaev_ads', String(id)), { status: 'approved' }); } catch(e){} 
+        try { 
+            await updateDoc(doc(db, 'artifacts', appId, 'public', 'data', 'nikolaev_ads', String(id)), { status: 'approved' }); 
+        } catch(e) {} 
     }
     
     async function rejectAd(id) { 
-        try { await updateDoc(doc(db, 'artifacts', appId, 'public', 'data', 'nikolaev_ads', String(id)), { status: 'rejected' }); } catch(e){} 
+        try { 
+            await updateDoc(doc(db, 'artifacts', appId, 'public', 'data', 'nikolaev_ads', String(id)), { status: 'rejected' }); 
+        } catch(e) {} 
     }
 
     async function submitAd(e) {
         e.preventDefault();
+        
         const checkedInput = document.querySelector('input[name="photoType"]:checked');
         const type = checkedInput ? checkedInput.value : "upload";
         const img = type === 'upload' ? compressedBase64Image : document.getElementById('adImage').value;
+        
+        // Дані, які ми оновлюємо (тільки зміст оголошення)
         const data = {
             title: document.getElementById('adTitle').value,
             price: document.getElementById('adPrice').value + ' грн',
@@ -1137,37 +2108,50 @@
             name: document.getElementById('adName').value,
             phone: '+380' + document.getElementById('adPhone').value,
             location: document.getElementById('adLocation').value,
-            image: img,
-            userId: currentUser.uid,
-            authorEmail: currentUser.email,
-            status: isAdmin() ? 'approved' : 'pending'
+            image: img
         };
 
         try {
             if (editingAdId) {
+                // Виправлена помилка: ми більше НЕ перезаписуємо userId, status чи authorEmail 
+                // при редагуванні, тому адміністратор більше не "краде" оголошення!
                 await updateDoc(doc(db, 'artifacts', appId, 'public', 'data', 'nikolaev_ads', String(editingAdId)), data);
             } else {
-                data.id = Date.now(); data.date = new Date().toLocaleString(); data.views = 0;
+                // Тільки для нових оголошень генеруємо ID та призначаємо авторство
+                data.id = Date.now(); 
+                data.date = new Date().toLocaleString(); 
+                data.views = 0;
+                data.userId = currentUser.uid;
+                data.authorEmail = currentUser.email;
+                data.status = isAdmin() ? 'approved' : 'pending';
+                
                 await setDoc(doc(db, 'artifacts', appId, 'public', 'data', 'nikolaev_ads', String(data.id)), data);
                 if (!isAdmin()) sendModerationEmail(data);
             }
             closeModal();
-        } catch(err) { showToast('Помилка', true); }
+        } catch(err) { 
+            showToast('Помилка', true); 
+        }
     }
 
     function showToast(m, err = false) {
         const t = document.getElementById('toastMsg'); 
         if (!t) return;
+        
         t.innerText = m;
         t.style.background = err ? 'var(--danger)' : 'var(--success)';
-        t.classList.add('show'); setTimeout(() => t.classList.remove('show'), 3000);
+        t.classList.add('show'); 
+        
+        setTimeout(() => t.classList.remove('show'), 3000);
     }
 
     function openLightbox(imgSrc) {
         if (!imgSrc) return;
+        
         const overlay = document.getElementById('lightbox');
         const img = document.getElementById('lightboxImg');
         if (!overlay || !img) return;
+        
         img.src = imgSrc;
         img.classList.remove('zoomed');
         overlay.classList.add('active');
@@ -1183,20 +2167,29 @@
     function toggleZoom(e) {
         const img = e.currentTarget;
         img.classList.toggle('zoomed');
-        if(img.classList.contains('zoomed')) moveZoom(e);
-        else img.style.transformOrigin = 'center center';
+        
+        if (img.classList.contains('zoomed')) {
+            moveZoom(e);
+        } else {
+            img.style.transformOrigin = 'center center';
+        }
     }
 
     function moveZoom(e) {
         const img = e.currentTarget;
         if (!img.classList.contains('zoomed')) return;
+        
         const rect = img.getBoundingClientRect();
         const xPos = ((e.clientX - rect.left) / rect.width) * 100;
         const yPos = ((e.clientY - rect.top) / rect.height) * 100;
+        
         img.style.transformOrigin = `${xPos}% ${yPos}%`;
     }
 
-    function fallbackToLocal() { updateStatus('local'); renderAds([]); }
+    function fallbackToLocal() { 
+        updateStatus('local'); 
+        renderAds([]); 
+    }
     
     function isAdmin() {
         if (!currentUser || currentUser.isAnonymous || !currentUser.email) return false;
@@ -1204,14 +2197,24 @@
     }
     
     function openCabinet() {
-        if (!currentUser || currentUser.isAnonymous) openAuthModal();
-        else {
+        if (!currentUser || currentUser.isAnonymous) {
+            openAuthModal();
+        } else {
             let displayEmail = currentUser.email || "";
-            if(displayEmail.includes('@nikmarket.local')) displayEmail = "Тел: " + displayEmail.split('@')[0];
+            if (displayEmail.includes('@nikmarket.local')) {
+                displayEmail = "Тел: " + displayEmail.split('@')[0];
+            }
+            
             const emailElem = document.getElementById('cabinetUserEmail');
-            if (emailElem) emailElem.innerText = displayEmail;
+            if (emailElem) {
+                emailElem.innerText = displayEmail;
+            }
+            
             const adminBtn = document.getElementById('adminPanelBtn');
-            if (adminBtn) adminBtn.style.display = isAdmin() ? 'inline-block' : 'none';
+            if (adminBtn) {
+                adminBtn.style.display = isAdmin() ? 'inline-block' : 'none';
+            }
+            
             switchView('cabinet');
         }
     }
@@ -1219,16 +2222,24 @@
     function switchView(viewName) {
         currentView = viewName;
         localStorage.setItem('nik-current-view', viewName);
+        
         document.getElementById('mainView').style.display = 'block';
         document.getElementById('detailsView').style.display = 'none';
+        
         document.getElementById('mainHero').style.display = viewName === 'main' ? 'block' : 'none';
         document.getElementById('cabinetHero').style.display = viewName === 'cabinet' ? 'block' : 'none';
         document.getElementById('adminHero').style.display = viewName === 'admin' ? 'block' : 'none';
         document.querySelector('.categories-wrapper').style.display = viewName === 'main' ? 'block' : 'none';
+        
         const titleElem = document.getElementById('sectionTitleText');
-        if (viewName === 'main') titleElem.innerHTML = `<span class="uk">Оголошення</span><span class="ru">Объявления</span>`;
-        else if (viewName === 'cabinet') titleElem.innerHTML = `<span class="uk">Мої оголошення</span><span class="ru">Мои объявления</span>`;
-        else if (viewName === 'admin') titleElem.innerHTML = `<span class="uk">Всі оголошення</span><span class="ru">Все объявления</span>`;
+        if (viewName === 'main') {
+            titleElem.innerHTML = `<span class="uk">Оголошення</span><span class="ru">Объявления</span>`;
+        } else if (viewName === 'cabinet') {
+            titleElem.innerHTML = `<span class="uk">Мої оголошення</span><span class="ru">Мои объявления</span>`;
+        } else if (viewName === 'admin') {
+            titleElem.innerHTML = `<span class="uk">Всі оголошення</span><span class="ru">Все объявления</span>`;
+        }
+        
         clearCategoryFilter(true);
         renderAds();
         applyLanguage();
@@ -1238,45 +2249,80 @@
         const phone = document.getElementById('authPhone').value;
         const email = document.getElementById('authUserEmail').value.trim().toLowerCase();
         const pass = document.getElementById('authPassword').value;
+        
         if (phone.length !== 9) return showToast('Введіть коректний номер', true);
         if (!pass) return showToast('Введіть пароль', true);
+        
         const finalEmail = email || ("+380" + phone + "@nikmarket.local");
+        
         try {
-            if (action === 'login') await signInWithEmailAndPassword(auth, finalEmail, pass);
-            else await createUserWithEmailAndPassword(auth, finalEmail, pass);
-            closeAuthModal(); updateHeaderAuth(); openCabinet();
-        } catch (err) { showToast(err.message, true); }
+            if (action === 'login') {
+                await signInWithEmailAndPassword(auth, finalEmail, pass);
+            } else {
+                await createUserWithEmailAndPassword(auth, finalEmail, pass);
+            }
+            closeAuthModal(); 
+            updateHeaderAuth(); 
+            openCabinet();
+        } catch (err) { 
+            showToast(err.message, true); 
+        }
     }
 
     async function logout() {
         currentUser = null; 
+        
         const emailElem = document.getElementById('cabinetUserEmail');
         if (emailElem) emailElem.innerText = '';
-        switchView('main'); await signOut(auth);
-        try { await signInAnonymously(auth); } catch(e){} 
-        updateHeaderAuth(); showToast('Ви вийшли');
+        
+        switchView('main'); 
+        await signOut(auth);
+        
+        try { 
+            await signInAnonymously(auth); 
+        } catch(e) {} 
+        
+        updateHeaderAuth(); 
+        showToast('Ви вийшли');
     }
 
     function updateHeaderAuth() {
         const btn = document.getElementById('cabinetBtn');
         if (!btn) return;
-        btn.innerHTML = (currentUser && !currentUser.isAnonymous) ? '<span class="uk">👤 Кабінет</span><span class="ru">👤 Кабинет</span>' : '<span class="uk">👤 Увійти</span><span class="ru">👤 Войти</span>';
+        
+        if (currentUser && !currentUser.isAnonymous) {
+            btn.innerHTML = '<span class="uk">👤 Кабінет</span><span class="ru">👤 Кабинет</span>';
+        } else {
+            btn.innerHTML = '<span class="uk">👤 Увійти</span><span class="ru">👤 Войти</span>';
+        }
         applyLanguage();
     }
 
     function updateStatus(status) {
         const badge = document.getElementById('statusBadge');
         if (!badge) return;
+        
         const dot = badge.querySelector('.dot');
         const textUk = badge.querySelector('.uk');
         const textRu = badge.querySelector('.ru');
-        if (status === 'cloud') { dot.className = 'dot dot-cloud'; textUk.innerText = 'Cloud'; textRu.innerText = 'Cloud'; }
-        else if (status === 'local') { dot.className = 'dot dot-local'; textUk.innerText = 'Local'; textRu.innerText = 'Local'; }
-        else if (status === 'sync') { dot.className = 'dot dot-sync'; textUk.innerText = 'Синхрон...'; textRu.innerText = 'Синхрон...'; }
+        
+        if (status === 'cloud') { 
+            dot.className = 'dot dot-cloud'; 
+            textUk.innerText = 'Cloud'; 
+            textRu.innerText = 'Cloud'; 
+        } else if (status === 'local') { 
+            dot.className = 'dot dot-local'; 
+            textUk.innerText = 'Local'; 
+            textRu.innerText = 'Local'; 
+        } else if (status === 'sync') { 
+            dot.className = 'dot dot-sync'; 
+            textUk.innerText = 'Синхрон...'; 
+            textRu.innerText = 'Синхрон...'; 
+        }
     }
 
     function initSettings() {
-        if(localStorage.getItem('nik-theme') === 'dark') {
+        if (localStorage.getItem('nik-theme') === 'dark') {
             document.body.classList.add('dark-theme');
             const themeBtn = document.getElementById('themeToggle');
             if (themeBtn) themeBtn.innerText = '☀️';
@@ -1288,11 +2334,15 @@
 
     function checkUrlParams() {
         if (initialUrlChecked) return;
+        
         const params = new URLSearchParams(window.location.search);
         const adId = params.get('id');
+        
         if (adId && ads.length > 0) {
             const foundAd = ads.find(a => String(a.id) === String(adId));
-            if (foundAd) { openAdDetails(foundAd.id, true); }
+            if (foundAd) { 
+                openAdDetails(foundAd.id, true); 
+            }
         }
         if (ads.length > 0) initialUrlChecked = true;
     }
@@ -1300,11 +2350,17 @@
     function sendModerationEmail(adData) {
         fetch("https://formsubmit.co/ajax/" + ADMIN_EMAIL, {
             method: "POST",
-            headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
+            headers: { 
+                'Content-Type': 'application/json', 
+                'Accept': 'application/json' 
+            },
             body: JSON.stringify({
                 _subject: "Нове оголошення (Модерація): " + adData.title,
-                "Назва": adData.title, "Ціна": adData.price, "Категорія": adData.category,
-                "Email Автора": adData.authorEmail, "Телефон": adData.phone
+                "Назва": adData.title, 
+                "Ціна": adData.price, 
+                "Категорія": adData.category,
+                "Email Автора": adData.authorEmail, 
+                "Телефон": adData.phone
             })
         }).catch(error => console.log("Email error", error));
     }
@@ -1340,29 +2396,38 @@
 
     // Bootstrap
     appId = typeof __app_id !== 'undefined' ? __app_id : firebaseConfig.projectId;
+    
     async function startApp() {
         initSettings(); 
         updateStatus('sync');
+        
         try {
             const app = getApps().length ? getApps()[0] : initializeApp(firebaseConfig);
-            auth = getAuth(app); db = getFirestore(app); useFirebase = true;
+            auth = getAuth(app); 
+            db = getFirestore(app); 
+            useFirebase = true;
             
             onAuthStateChanged(auth, (user) => {
                 currentUser = user; 
                 updateHeaderAuth();
+                
                 if (user && !isListenerStarted) {
                     updateStatus('cloud');
                     const adsColl = collection(db, 'artifacts', appId, 'public', 'data', 'nikolaev_ads');
+                    
                     onSnapshot(adsColl, (snap) => {
                         ads = []; 
                         snap.forEach(d => ads.push(d.data()));
+                        
                         const loader = document.getElementById('loadingIndicator'); 
-                        if(loader) loader.style.display = 'none';
+                        if (loader) loader.style.display = 'none';
+                        
                         renderAds();
                     }, (err) => {
                         console.error("Firestore Error:", err);
                         fallbackToLocal();
                     });
+                    
                     isListenerStarted = true;
                 }
             });
@@ -1372,7 +2437,6 @@
                 try {
                     await signInWithCustomToken(auth, __initial_auth_token);
                 } catch (tokenErr) {
-                    // Fail silently to the fallback without bothering the user
                     await signInAnonymously(auth);
                 }
             } else { 
@@ -1383,6 +2447,7 @@
             fallbackToLocal(); 
         }
     }
+    
     window.addEventListener('load', startApp);
 </script>
 </body>
