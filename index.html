@@ -631,7 +631,7 @@
             icon: "📱", uk: "Електроніка", ru: "Электроника", 
             sub: { 
                 uk: ["Смартфони та телефони", "Ноутбуки та ультрабуки", "ПК та системні блоки", "Планшети та електронні книги", "Комплектуючі та деталі", "Монітори та проектори", "Периферія (миші, клавіатури)", "Телевізори та плазми", "Аудіотехніка та акустика", "Фото- та відеотехніка", "Ігрові приставки та консолі", "Смарт-годинники та фітнес-браслети", "Побутова техніка для кухні", "Побутова техніка для дому", "Кліматичне обладнання (Кондиціонери)", "Аксесуари до электроніки"], 
-                ru: ["Смартфоны и телефоны", "Ноутбуки и ультрабуки", "ПК и системные блоки", "Планшеты и электронные книги", "Комплектующие и детали", "Мониторы и проекторы", "Периферия (мыши, клавиатуры)", "Телевизоры и плазмы", "Аудиотехника и акустика", "Фото- и видеотехника", "Игровые приставки и консоли", "Смарт-часы и фитнес-браслеты", "Бытовая техника для кухни", "Бытовая техника для дома", "Климатическое оборудование (Кондиционеры)", "Аксессуары к электронике"] 
+                ru: ["Смартфоны и телефоны", "Ноутбуки и ультрабуки", "ПК и системные блоки", "Планшеты и электронные книги", "Комплектующие и детали", "Мониторы и проекты", "Периферия (мыши, клавиатуры)", "Телевизоры и плазмы", "Аудиотехника и акустика", "Фото- и видеотехника", "Игровые приставки и консоли", "Смарт-часы и фитнес-браслеты", "Бытовая техника для кухни", "Бытовая техника для дома", "Климатическое оборудование (Кондиционеры)", "Аксессуары к электронике"] 
             } 
         },
         "Нерухомість": { 
@@ -728,7 +728,7 @@
         buildFormCategories();
     }
 
-    function updateStatus(status) {
+    function updateStatus(status, errorMsg = "") {
         const badge = document.getElementById('statusBadge');
         if (!badge) return;
         const dot = badge.querySelector('.dot');
@@ -739,10 +739,15 @@
             dot.className = 'dot dot-cloud';
             if (textUk) textUk.innerText = 'Cloud';
             if (textRu) textRu.innerText = 'Cloud';
+            badge.title = "";
         } else if (status === 'local') {
             dot.className = 'dot dot-local';
             if (textUk) textUk.innerText = 'Local';
             if (textRu) textRu.innerText = 'Local';
+            if (errorMsg) {
+                badge.title = errorMsg;
+                console.error("Firebase Connection Error:", errorMsg);
+            }
         } else {
             dot.className = 'dot dot-sync';
             if (textUk) textUk.innerText = 'Підключення...';
@@ -1152,8 +1157,8 @@
         setTimeout(() => toast.classList.remove('show'), 3000);
     }
 
-    function fallbackToLocal() {
-        updateStatus('local');
+    function fallbackToLocal(reason = "") {
+        updateStatus('local', reason);
         document.getElementById('loadingIndicator').style.display = 'none';
         let localAds = JSON.parse(localStorage.getItem('nik-ads'));
         ads = localAds ? localAds : [];
@@ -1166,15 +1171,15 @@
     // --- FIREBASE INITIALIZATION LOGIC ---
     async function startApp() {
         try {
-            const configString = typeof __firebase_config !== 'undefined' ? __firebase_config : null;
+            const configData = typeof __firebase_config !== 'undefined' ? __firebase_config : null;
             
-            if (configString && configString !== "{}" && (typeof configString === 'object' || (typeof configString === 'string' && configString.trim() !== ""))) {
+            if (configData) {
                 let firebaseConfig;
                 try {
-                    firebaseConfig = typeof configString === 'object' ? configString : JSON.parse(configString);
+                    // Handle both object and string JSON formats
+                    firebaseConfig = typeof configData === 'string' ? JSON.parse(configData) : configData;
                 } catch(e) {
-                    console.warn("Config parsing failed:", e);
-                    fallbackToLocal();
+                    fallbackToLocal("Config JSON Parse error");
                     return;
                 }
                 
@@ -1185,33 +1190,36 @@
                     appId = typeof __app_id !== 'undefined' ? __app_id : 'default-app-id';
                     useFirebase = true;
                     
-                    // Auth FIRST and await it (RULE 3)
-                    if (typeof __initial_auth_token !== 'undefined' && __initial_auth_token) {
-                        await signInWithCustomToken(auth, __initial_auth_token);
-                    } else {
-                        await signInAnonymously(auth);
+                    // Auth FIRST (RULE 3)
+                    try {
+                        if (typeof __initial_auth_token !== 'undefined' && __initial_auth_token) {
+                            await signInWithCustomToken(auth, __initial_auth_token);
+                        } else {
+                            await signInAnonymously(auth);
+                        }
+                    } catch (authError) {
+                        fallbackToLocal("Auth Error: " + authError.message + ". Check if Anonymous Auth is enabled in Firebase Console.");
+                        return;
                     }
 
-                    // Listen for auth state
+                    // Auth State Monitor
                     onAuthStateChanged(auth, (user) => {
                         currentUser = user;
                         if (user) {
                             updateStatus('cloud');
                             setupRealtimeListener();
                         } else {
-                            // If user becomes null after initial sign in
-                            updateStatus('local');
+                            updateStatus('local', "No authenticated user session.");
                         }
                     });
                 } else {
-                    fallbackToLocal();
+                    fallbackToLocal("Firebase Config or API Key missing.");
                 }
             } else {
-                fallbackToLocal();
+                fallbackToLocal("Environment Config (__firebase_config) not found.");
             }
         } catch (e) {
-            console.error("Firebase start error:", e);
-            fallbackToLocal();
+            fallbackToLocal("Initialization failed: " + e.message);
         }
     }
 
@@ -1220,10 +1228,10 @@
         
         document.getElementById('loadingIndicator').style.display = 'block';
 
-        // Path following RULE 1
+        // Path (RULE 1)
         const adsRef = collection(db, 'artifacts', appId, 'public', 'data', 'nikolaev_ads');
         
-        // No complex queries (RULE 2)
+        // Simple Query (RULE 2)
         onSnapshot(adsRef, (snapshot) => {
             ads = [];
             snapshot.forEach((doc) => {
@@ -1234,9 +1242,13 @@
             ads.sort((a, b) => a.id - b.id);
             searchAds(false);
         }, (error) => {
-            console.error("Firestore snapshot error:", error);
-            // If permissions fail, fallback
-            fallbackToLocal();
+            console.error("Firestore onSnapshot error:", error);
+            // Permissions issue or wrong path?
+            if (error.code === 'permission-denied') {
+                fallbackToLocal("Permission Denied. Check Firestore Rules.");
+            } else {
+                fallbackToLocal("DB Sync error: " + error.message);
+            }
         });
     }
 
