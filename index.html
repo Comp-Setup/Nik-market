@@ -44,9 +44,11 @@
             flex-direction: column;
         }
 
+        /* Language Toggle Logic in CSS */
         body.lang-uk .ru { display: none !important; }
         body.lang-ru .uk { display: none !important; }
 
+        /* HEADER */
         header {
             background-color: var(--surface);
             box-shadow: 0 4px 20px rgba(0,0,0,0.05);
@@ -77,6 +79,7 @@
             cursor: pointer;
         }
 
+        /* Статус підключення */
         .conn-status { 
             font-size: 10px; 
             padding: 4px 10px; 
@@ -108,6 +111,7 @@
             align-items: center;
         }
 
+        /* BUTTONS */
         .btn {
             padding: 10px 20px;
             border-radius: 30px;
@@ -151,6 +155,7 @@
             transform: translateY(-2px);
         }
 
+        /* MAIN HERO */
         .hero {
             text-align: center;
             padding: 40px 20px 30px;
@@ -184,6 +189,7 @@
             box-shadow: 0 0 0 4px rgba(71, 118, 230, 0.1);
         }
 
+        /* CATEGORIES */
         .categories-wrapper { max-width: 1200px; margin: 0 auto 20px auto; padding: 0 20px; }
         .categories-list {
             display: flex; gap: 15px; overflow-x: auto; padding: 15px 5px;
@@ -215,6 +221,7 @@
         }
         .category-item.active span { color: var(--primary); }
 
+        /* ADS GRID */
         .container { max-width: 1200px; margin: 0 auto; padding: 20px; flex: 1; }
         .section-title { margin-bottom: 25px; font-size: 22px; display: flex; justify-content: space-between; align-items: center; }
         #activeCategoryLabel { font-size: 16px; color: var(--primary); font-weight: normal; margin-left: 10px; }
@@ -227,6 +234,7 @@
 
         .ads-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 25px; }
 
+        /* AD CARD */
         .ad-card {
             background: var(--surface); border-radius: var(--radius); overflow: hidden;
             box-shadow: var(--shadow); transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
@@ -257,6 +265,7 @@
             border-radius: 6px; font-size: 11px; font-weight: bold; display: inline-block; margin-bottom: 10px;
         }
 
+        /* --- DETAILED AD VIEW --- */
         .ad-details-container {
             background: var(--surface);
             border-radius: var(--radius);
@@ -295,6 +304,7 @@
             flex-direction: column;
         }
 
+        /* --- LIGHTBOX (ZOOM) MODAL --- */
         .lightbox-overlay {
             position: fixed; top: 0; left: 0; width: 100%; height: 100%;
             background: rgba(0, 0, 0, 0.95); z-index: 2000;
@@ -312,6 +322,7 @@
             cursor: zoom-out;
         }
 
+        /* MODAL FORM */
         .modal-overlay {
             position: fixed; top: 0; left: 0; width: 100%; height: 100%;
             background: rgba(0, 0, 0, 0.6); backdrop-filter: blur(5px);
@@ -343,6 +354,7 @@
         .form-control:focus { border-color: var(--primary); }
         textarea.form-control { resize: vertical; min-height: 100px; }
 
+        /* Price Input Wrapper */
         .price-input-wrapper { position: relative; display: flex; align-items: center; }
         .price-input-wrapper input { padding-right: 50px; }
         .price-input-wrapper .currency-label { position: absolute; right: 15px; color: var(--text-muted); font-weight: 600; pointer-events: none; }
@@ -368,10 +380,11 @@
         .toast {
             position: fixed; bottom: 20px; right: 20px; background: linear-gradient(135deg, #00b09b, #96c93d);
             color: white; padding: 15px 25px; border-radius: 10px; font-weight: bold;
-            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2); transform: translateX(120%); transition: 0.4s; z-index: 2000;
+            box-shadow: 0 10px 20px rgba(0,0,0,0.2); transform: translateX(120%); transition: 0.4s; z-index: 2000;
         }
         .toast.show { transform: translateX(0); }
         
+        /* Loading indicator for DB */
         #loadingIndicator {
             text-align: center;
             padding: 40px;
@@ -380,6 +393,7 @@
             grid-column: 1/-1;
         }
 
+        /* Error box UI */
         .error-msg {
             display: none;
             background: #ffebee;
@@ -458,7 +472,7 @@
     </div>
 
     <div class="container">
-        <!-- UI error message container -->
+        <!-- Persistent UI error message container & Debug Panel -->
         <div id="uiErrorBox" class="error-msg"></div>
         <div id="debugPanel" class="debug-panel"></div>
 
@@ -482,6 +496,7 @@
                     Увімкнути Local Mode (Працювати без хмари)
                 </button>
             </div>
+            <!-- Cards generated dynamically via JavaScript -->
         </div>
     </div>
 </div>
@@ -610,7 +625,7 @@
 
     // --- FIREBASE CONFIGURATION ---
     const HARDCODED_CONFIG = {
-        apiKey: "AIzaSyDlWrxWsxfFx54n0ixKICEVl2f-uyqssL8", 
+        apiKey: "AIzaSyDIWrxWsxfFx54nOiXkICEVl2f-uyqssL8", 
         authDomain: "nik--market.firebaseapp.com",
         projectId: "nik--market",
         storageBucket: "nik--market.firebasestorage.app",
@@ -618,7 +633,7 @@
         appId: "1:165947840731:web:1bfc394a4bc5c458a1d4fe"
     };
 
-    // Global Handlers
+    // --- 1. ATTACH FUNCTIONS TO GLOBAL WINDOW OBJECT ---
     window.toggleLang = toggleLang;
     window.openModal = openModal;
     window.closeModal = closeModal;
@@ -636,7 +651,7 @@
     window.openLightbox = openLightbox;
     window.fallbackToLocal = fallbackToLocal;
 
-    // State
+    // --- 2. GLOBAL STATE VARIABLES ---
     let ads = []; 
     let currentUser = null;
     let useFirebase = false;
@@ -644,6 +659,7 @@
     let currentCategoryFilter = '';
     let compressedBase64Image = '';
     let isListenerStarted = false;
+    let isInitialAuthTryComplete = false;
 
     const CATEGORIES = {
         "Свіжі": { icon: "🔥", uk: "Свіжі оголошення", ru: "Свежие объявления", sub: { uk:[], ru:[] } },
@@ -651,7 +667,7 @@
             icon: "⚽", uk: "Хобі, спорт і відпочинок", ru: "Хобби, спорт и отдых", 
             sub: { 
                 uk: ["Колекціонування та антикваріат", "Спорт, фітнес та активний відпочинок", "Велосипеди та екіпірування", "Мілітарія та тактичне спорядження", "Дрони, коптери та аксесуари", "Книги, комікси та журнали", "Музика, фільми та вініл", "Квитки на концерти та події", "Пошук компанії для подорожей", "Музичні інструменти та звук", "Настільні ігри та пазли", "Риболовля та полювання", "Матеріали для рукоділля", "Інші захоплення"],
-                ru: ["Коллекционирование и антиквариат", "Спорт, фитнес и отдых", "Велосипеды и экипировка", "Милитария и тактическое снаряжение", "Дроны, коптеры и аксессуары", "Книги, комиксы и журналы", "Музыка, фильмы и винил", "Билеты на концерты и события", "Поиск компании для путешествий", "Музыкальные инструменты и звук", "Настольные игры и пазлы", "Рибалка и охота", "Материалы для рукоделия", "Другие увлечения"]
+                ru: ["Коллекционирование и антиквариат", "Спорт, фитнес и активный отдых", "Велосипеды и экипировка", "Милитария и тактическое снаряжение", "Дроны, коптеры и аксессуары", "Книги, комиксы и журналы", "Музыка, фильмы и винил", "Билеты на концерты и события", "Поиск компании для путешествий", "Музыкальные инструменты и звук", "Настольные игры и пазлы", "Рыбалка и охота", "Материалы для рукоделия", "Другие увлечения"]
             } 
         },
         "Електроніка": { 
@@ -665,13 +681,13 @@
             icon: "🏠", uk: "Нерухомість", ru: "Недвижимость", 
             sub: { 
                 uk: ["Оренда квартир (довгострокова)", "Оренда квартир (подобово)", "Продаж квартир", "Оренда будинків та котеджів", "Продаж будинків та дач", "Продаж землі та ділянок", "Оренда кімнат", "Продаж кімнат", "Оренда комерційної нерухомості", "Продаж комерційної нерухомості", "Оренда гаражів та паркінгів", "Продаж гаражів", "Нерухомість за кордоном"], 
-                ru: ["Aренда квартир (долгосрочная)", "Аренда квартир (посуточно)", "Продажа квартир", "Аренда домов и коттеджей", "Продажа домов и дач", "Продажа земли и участков", "Аренда комнат", "Продажа комнат", "Аренда коммерческой недвижимости", "Продажа коммерческой недвижимости", "Аренда гаражей и паркингов", "Продажа гаражей", "Недвижимость за рубежом"] 
+                ru: ["Аренда квартир (долгосрочная)", "Аренда квартир (посуточно)", "Продажа квартир", "Аренда домов и коттеджей", "Продажа домов и дач", "Продажа земли и участков", "Аренда комнат", "Продажа комнат", "Аренда коммерческой недвижимости", "Продажа коммерческой недвижимости", "Аренда гаражей и паркингов", "Продажа гаражей", "Недвижимость за рубежом"] 
             } 
         },
         "Транспорт": { 
             icon: "🚗", uk: "Транспорт", ru: "Транспорт", 
             sub: { 
-                uk: ["Легкові автомобілі", "Мотоцикли та скутери", "Вантажні автомобілі", "Автобуси та мікроавтобуси", "Сільгосптехніка (Трактори, комбайни)", "Спецтехніка (Екскаватори, крани)", "Водний транспорт (Лодки, яхти)", "Причепи та напівпричепи", "Повітряний транспорт", "Електротранспорт (Самокати, гіроборди)", "Автобудинки та трейлери", "Інший транспорт"], 
+                uk: ["Легкові автомобілі", "Мотоцикли та скутери", "Вантажні автомобілі", "Автобуси та мікроавтобуси", "Сільгосптехніка (Трактори, комбайни)", "Спецтехніка (Екскаватори, крани)", "Водний транспорт (Човни, яхти)", "Причепи та напівпричепи", "Повітряний транспорт", "Електротранспорт (Самокати, гіроборди)", "Автобудинки та трейлери", "Інший транспорт"], 
                 ru: ["Легковые автомобили", "Мотоциклы и скутеры", "Грузовые автомобили", "Автобусы и микроавтобусы", "Сельхозтехника (Тракторы, комбайны)", "Спецтехника (Экскаваторы, краны)", "Водный транспорт (Лодки, яхты)", "Прицепы и полуприцепы", "Воздушный транспорт", "Электротранспорт (Самокаты, гироборды)", "Автодома и трейлеры", "Другой транспорт"] 
             } 
         },
@@ -679,14 +695,14 @@
             icon: "⚙️", uk: "Запчастини", ru: "Запчасти", 
             sub: { 
                 uk: ["Автозапчастини", "Запчастини для мототехніки", "Запчастини для спецтехніки", "Шини та диски", "Акумулятори автомобільні", "Автозвук та электроніка", "Кузовні деталі", "Двигуни та компоненти", "Оптика та світло", "Салон та інтер'єр", "Тюнінг та аксесуари", "Автохімія та масла", "GPS-навигаторы та відеореєстратори", "Інструменти для СТО"], 
-                ru: ["Автозапчасти", "Запчасти для мототехники", "Запчасти для спецтехники", "Шины и диски", "Аккумуляторы автомобильные", "Автозвук и электроника", "Кузовные детали", "Двигатели и компоненты", "Оптика и свет", "Салон и интерьер", "Тюнинг и аксессуары", "Автохимикаты и масла", "GPS-навигаторы и видеорегистраторы", "Инструменты для СТО"] 
+                ru: ["Автозапчасти", "Запчасти для мототехники", "Запчасти для спецтехники", "Шины и диски", "Аккумуляторы автомобильные", "Автозвук и электроника", "Кузовные детали", "Двигатели и компоненты", "Оптика и свет", "Салон и интерьер", "Тюнинг и аксессуары", "Автохимия и масла", "GPS-навигаторы и видеорегистраторы", "Инструменты для СТО"] 
             } 
         },
         "Робота": { 
             icon: "💼", uk: "Робота", ru: "Работа", 
             sub: { 
                 uk: ["Роздрібна торгівля / Продажі", "Логістика / Склад / Доставка", "Будівництво / Архітектура", "IT / Телекомунікації", "Без досвіду / Студенти", "Ресторанний бізнес / Кулінарія", "Готельно-туристичний бізнес", "Виробництво / Робітничі спеціальності", "Охорона / Безпека", "Медицина / Фармація", "Освіта / Наука", "Краса / Фітнес / Спорт", "Бухгалтерія / Фінанси", "Маркетинг / Реклама / PR", "HR / Управління персоналом", "Віддалена робота / Фріланс"], 
-                ru: ["Розничная торговля / Продажи", "Логистика / Склад / Доставка", "Строительство / Архитектура", "IT / Телекоммуникации", "Без опыта / Студенты", "Ресторанный бизнес / Кулинария", "Гостиничный бизнес / Кулинария", "Производство / Рабочие специальности", "Охрана / Безопасность", "Медицина / Фармация", "Образование / Наука", "Краса / Фитнес / Спорт", "Бухгалтерия / Финансы", "Маркетинг / Реклама / PR", "HR / Управление персоналом", "Удаленная работа / Фриланс"] 
+                ru: ["Розничная торговля / Продажи", "Логистика / Склад / Доставка", "Строительство / Архитектура", "IT / Телекоммуникации", "Без опыта / Студенты", "Ресторанный бизнес / Кулинария", "Гостиничный бизнес / Кулинария", "Производство / Рабочие специальности", "Охрана / Безопасность", "Медицина / Фармация", "Образование / Наука", "Красота / Фитнес / Спорт", "Бухгалтерия / Финансы", "Маркетинг / Реклама / PR", "HR / Управление персоналом", "Удаленная работа / Фриланс"] 
             } 
         },
         "Тварини": { 
@@ -727,7 +743,7 @@
         "Їжа": { 
             icon: "🦞", uk: "Їжа та Продукти", ru: "Еда и Продукты", 
             sub: { 
-                uk: ["М'ясо та ковбасні вироби", "Морепродукти та риба", "Раки свіжі та варені", "Овочі, фрукты та ягоди", "Молочні продукти", "Яйця", "Крупи та бакалія", "Мед та продукты бджільництва", "Домашня випічка та солодощі", "Напої (Соки, вода)", "Фермерські продукти", "Горіхи та сухофрукти"], 
+                uk: ["М'ясо та ковбасні вироби", "Морепродукти та риба", "Раки свіжі та варені", "Овочі, фрукты та ягоди", "Молочні продукти", "Яйця", "Крупи та бакалія", "Мед та продукти бджільництва", "Домашня випічка та солодощі", "Напої (Соки, вода)", "Фермерські продукти", "Горіхи та сухофрукти"], 
                 ru: ["Мясо и колбасные изделия", "Морепродукты и рыба", "Раки свежие и вареные", "Овощи, фрукты и ягоды", "Молочные продукты", "Яйца", "Крупы и бакалея", "Мед и продукты пчеловодства", "Домашняя выпечка и сладости", "Напитки (Соки, вода)", "Фермерские продукты", "Орехи и сухофрукты"] 
             } 
         },
@@ -740,7 +756,7 @@
         }
     };
 
-    // UI Logic
+    // --- 3. UI FUNCTIONS ---
     let currentLang = localStorage.getItem('nik-lang') || 'uk';
     const langToggle = document.getElementById('langToggle');
     const themeToggle = document.getElementById('themeToggle');
@@ -755,7 +771,7 @@
         buildFormCategories();
     }
 
-    function updateStatus(status) {
+    function updateStatus(status, errorMsg = "") {
         const badge = document.getElementById('statusBadge');
         if (!badge) return;
         const dot = badge.querySelector('.dot');
@@ -766,14 +782,19 @@
             dot.className = 'dot dot-cloud';
             if (textUk) textUk.innerText = 'Cloud';
             if (textRu) textRu.innerText = 'Cloud';
+            badge.title = "Підключено до хмари";
         } else if (status === 'local') {
             dot.className = 'dot dot-local';
             if (textUk) textUk.innerText = 'Local';
             if (textRu) textRu.innerText = 'Local';
+            if (errorMsg) {
+                badge.title = "Причина: " + errorMsg;
+            }
         } else if (status === 'sync') {
             dot.className = 'dot dot-sync';
             if (textUk) textUk.innerText = 'Синхронізація...';
             if (textRu) textRu.innerText = 'Подключение...';
+            badge.title = "Спроба з'єднання з Firebase";
         }
     }
 
@@ -784,7 +805,9 @@
         buildCategoriesBar();
         buildFormCategories();
         renderAds(); 
-        if(document.getElementById('detailsView').style.display === 'block') closeAdDetails();
+        if(document.getElementById('detailsView').style.display === 'block') {
+            closeAdDetails(); 
+        }
     }
 
     function applyLanguage() {
@@ -794,9 +817,13 @@
 
     themeToggle.addEventListener('click', () => {
         document.body.classList.toggle('dark-theme');
-        const isDark = document.body.classList.contains('dark-theme');
-        localStorage.setItem('nik-theme', isDark ? 'dark' : 'light');
-        themeToggle.innerText = isDark ? '☀️' : '🌙';
+        if(document.body.classList.contains('dark-theme')) {
+            localStorage.setItem('nik-theme', 'dark');
+            themeToggle.innerText = '☀️';
+        } else {
+            localStorage.setItem('nik-theme', 'light');
+            themeToggle.innerText = '🌙';
+        }
     });
 
     function buildCategoriesBar() {
@@ -828,6 +855,7 @@
         const catKey = document.getElementById('adCategory').value;
         const subSelect = document.getElementById('adSubcategory');
         subSelect.innerHTML = `<option value="">${currentLang === 'uk' ? 'Оберіть підкатегорію...' : 'Выберите подкатегорию...'}</option>`;
+        
         if (catKey && CATEGORIES[catKey].sub[currentLang]) {
             CATEGORIES[catKey].sub[currentLang].forEach(sub => {
                 const option = document.createElement('option');
@@ -843,12 +871,16 @@
 
     function renderAds(adsToRender = ads) {
         const loader = document.getElementById('loadingIndicator');
-        if (loader) loader.style.display = 'none';
-        container.innerHTML = ''; 
-        if (adsToRender.length === 0) {
-            container.innerHTML += `<p style="grid-column: 1/-1; text-align:center; color: var(--text-muted); padding: 50px;">${currentLang === 'uk' ? 'Оголошень не знайдено.' : 'Объявлений не найдено.'}</p>`;
+        const loaderHTML = loader ? loader.outerHTML : '';
+        
+        container.innerHTML = loaderHTML; 
+        
+        if (adsToRender.length === 0 && (!loader || loader.style.display === 'none')) {
+            container.innerHTML += `<p style="grid-column: 1/-1; text-align:center; color: var(--text-muted); padding: 50px;">${currentLang === 'uk' ? 'Оголошень не знайдено. Будьте першим!' : 'Объявлений не найдено. Будьте первым!'}</p>`;
         }
+
         adsCount.innerText = `${adsToRender.length} ${currentLang === 'uk' ? 'оголошень' : 'объявлений'}`;
+
         [...adsToRender].reverse().forEach(ad => {
             const card = document.createElement('div');
             card.className = 'ad-card';
@@ -856,19 +888,26 @@
             
             let imageHTML = '';
             if (ad.image && (ad.image.startsWith('data:image') || ad.image.startsWith('http'))) {
-                imageHTML = `<img src="${ad.image}" class="ad-image" onerror="this.src='data:image/svg+xml;utf8,<svg xmlns=\\'http://www.w3.org/2000/svg\\' width=\\'100%\\' height=\\'100%\\'><rect width=\\'100%\\' height=\\'100%\\' fill=\\'%23e0e0e0\\'/><text x=\\'50%\\' y=\\'50%\\' font-size=\\'40\\' text-anchor=\\'middle\\' dy=\\'.3em\\'>📦</text></svg>'">`;
+                imageHTML = `<img src="${ad.image}" class="ad-image" alt="${ad.title}" onerror="this.src='data:image/svg+xml;utf8,<svg xmlns=\\'http://www.w3.org/2000/svg\\' width=\\'100%\\' height=\\'100%\\'><rect width=\\'100%\\' height=\\'100%\\' fill=\\'%23e0e0e0\\'/><text x=\\'50%\\' y=\\'50%\\' font-size=\\'40\\' text-anchor=\\'middle\\' dy=\\'.3em\\'>📦</text></svg>'">`;
             } else {
-                imageHTML = `<div class="ad-image" style="font-size: 60px;">${CATEGORIES[ad.category]?.icon || '📦'}</div>`;
+                let icon = CATEGORIES[ad.category] ? CATEGORIES[ad.category].icon : '📦';
+                imageHTML = `<div class="ad-image" style="font-size: 60px;">${icon}</div>`;
             }
+
+            const catName = CATEGORIES[ad.category] ? CATEGORIES[ad.category][currentLang] : ad.category;
+            const subName = ad.subcategory ? ` › ${ad.subcategory}` : '';
 
             card.innerHTML = `
                 ${imageHTML}
                 <div class="ad-content">
-                    <div style="margin-bottom: 5px;"><span class="category-badge">${CATEGORIES[ad.category]?.[currentLang] || ad.category}</span></div>
+                    <div style="margin-bottom: 5px;"><span class="category-badge">${catName}${subName}</span></div>
                     <div class="ad-title">${ad.title}</div>
                     <div class="ad-price">${ad.price}</div>
                     <div class="ad-desc">${ad.desc || ''}</div>
-                    <div class="ad-meta"><span>📍 ${ad.location}</span><span>⏱ ${ad.date ? ad.date.split(',')[0] : ''}</span></div>
+                    <div class="ad-meta">
+                        <span>📍 ${ad.location}</span>
+                        <span>⏱ ${ad.date.split(',')[0]}</span>
+                    </div>
                 </div>
             `;
             container.appendChild(card);
@@ -878,6 +917,7 @@
     function openAdDetails(id) {
         const ad = ads.find(a => a.id === id);
         if (!ad) return;
+
         document.getElementById('mainView').style.display = 'none';
         document.getElementById('detailsView').style.display = 'block';
         window.scrollTo(0, 0);
@@ -886,35 +926,47 @@
         const subName = ad.subcategory ? ` › ${ad.subcategory}` : '';
         const descLabel = currentLang === 'uk' ? 'Опис:' : 'Описание:';
         const contactsLabel = currentLang === 'uk' ? 'Контакти:' : 'Контакты:';
+        const enlargeHint = currentLang === 'uk' ? '🔍 Збільшити' : '🔍 Увеличить';
+
+        const hasImage = ad.image && (ad.image.startsWith('data:image') || ad.image.startsWith('http'));
         
         let imageHTML = '';
-        if (ad.image && (ad.image.startsWith('data:image') || ad.image.startsWith('http'))) {
-            imageHTML = `<img src="${ad.image}" alt="${ad.title}">`;
+        if (hasImage) {
+            imageHTML = `<img src="${ad.image}" alt="${ad.title}">
+                         <div style="position: absolute; bottom: 15px; right: 15px; background: rgba(0,0,0,0.6); color: white; padding: 8px 15px; border-radius: 20px; font-size: 13px; pointer-events: none; backdrop-filter: blur(4px); box-shadow: 0 4px 10px rgba(0,0,0,0.3);">${enlargeHint}</div>`;
         } else {
             let icon = CATEGORIES[ad.category] ? CATEGORIES[ad.category].icon : '📦';
-            imageHTML = `<div style="font-size: 100px;">${icon}</div>`;
+            imageHTML = `<div style="font-size: 120px;">${icon}</div>`;
         }
+
+        const clickAction = hasImage ? `onclick="openLightbox('${ad.image}')"` : '';
+        const cursorStyle = hasImage ? 'cursor: zoom-in;' : 'cursor: default;';
 
         const detailsHTML = `
             <div class="ad-details-container">
-                <div class="ad-details-image-wrapper" onclick="openLightbox('${ad.image}')">
+                <div class="ad-details-image-wrapper" ${clickAction} style="${cursorStyle}">
                     ${imageHTML}
                 </div>
+                
                 <div class="ad-details-info">
                     <div style="margin-bottom: 15px;"><span class="category-badge" style="font-size: 13px; padding: 6px 12px;">${catName}${subName}</span></div>
-                    <h2 style="margin-bottom: 15px;">${ad.title}</h2>
+                    <h2 style="margin-bottom: 15px; font-size: 26px; line-height: 1.3;">${ad.title}</h2>
                     <div class="ad-price" style="font-size: 32px; margin-bottom: 25px;">${ad.price}</div>
+
                     <div style="margin-bottom: 30px;">
-                        <h4 style="margin-bottom: 10px;">${descLabel}</h4>
-                        <p style="white-space: pre-wrap; line-height: 1.6;">${ad.desc}</p>
+                        <h4 style="margin-bottom: 12px; font-size: 18px; border-bottom: 1px solid var(--border); padding-bottom: 8px;">${descLabel}</h4>
+                        <p style="white-space: pre-wrap; line-height: 1.6; color: var(--text); font-size: 15px;">${ad.desc || ''}</p>
                     </div>
-                    <div class="ad-contacts">
-                        <h4 style="margin-bottom: 10px;">${contactsLabel}</h4>
-                        <p>👤 <strong>${ad.name}</strong></p>
-                        <p>📞 <a href="tel:${ad.phone}" style="font-size: 18px;">${ad.phone}</a></p>
-                        ${ad.email ? `<p>📧 <a href="mailto:${ad.email}">${ad.email}</a></p>` : ''}
-                        <div style="margin-top: 15px; font-size: 14px; color: var(--text-muted);">
-                            <span>📍 ${ad.location}</span> | <span>⏱ ${ad.date}</span>
+
+                    <div class="ad-contacts" style="padding: 20px; font-size: 16px; background: var(--bg); border: 1px solid var(--border); box-shadow: inset 0 2px 5px rgba(0,0,0,0.02);">
+                        <h4 style="margin-bottom: 15px; font-size: 18px;">${contactsLabel}</h4>
+                        <div style="margin-bottom: 10px; display: flex; align-items: center; gap: 10px;">👤 <strong>${ad.name}</strong></div>
+                        <div style="margin-bottom: 10px; display: flex; align-items: center; gap: 10px;">📞 <a href="tel:${ad.phone}" style="font-size: 20px;">${ad.phone}</a></div>
+                        ${ad.email ? `<div style="margin-bottom: 10px; display: flex; align-items: center; gap: 10px;">📧 <a href="mailto:${ad.email}">${ad.email}</a></div>` : ''}
+                        
+                        <div style="margin-top: 20px; padding-top: 15px; border-top: 1px solid var(--border); color: var(--text-muted); font-size: 14px; display: flex; justify-content: space-between;">
+                            <span>📍 ${ad.location}</span>
+                            <span>⏱ ${ad.date}</span>
                         </div>
                     </div>
                 </div>
@@ -929,18 +981,34 @@
         window.scrollTo(0, 0);
     }
 
-    function openLightbox(img) { 
-        if(img && (img.startsWith('data:image') || img.startsWith('http'))) { 
-            document.getElementById('lightboxImg').src = img; 
-            document.getElementById('lightbox').classList.add('active'); 
-        } 
+    // --- LIGHTBOX CONTROLS ---
+    function openLightbox(imgSrc) {
+        if (!imgSrc) return;
+        const overlay = document.getElementById('lightbox');
+        const img = document.getElementById('lightboxImg');
+        img.src = imgSrc;
+        img.classList.remove('zoomed');
+        img.style.transformOrigin = 'center center';
+        overlay.classList.add('active');
     }
-    
-    function closeLightbox() { document.getElementById('lightbox').classList.remove('active'); }
-    
-    function toggleZoom() { document.getElementById('lightboxImg').classList.toggle('zoomed'); }
-    
-    function moveZoom(e) { 
+
+    function closeLightbox(e) {
+        if (e.target.id === 'lightbox' || e.target.className === 'modal-close' || e.target.closest('.modal-close')) {
+            document.getElementById('lightbox').classList.remove('active');
+        }
+    }
+
+    function toggleZoom(e) {
+        const img = e.currentTarget;
+        img.classList.toggle('zoomed');
+        if(img.classList.contains('zoomed')) {
+            moveZoom(e); 
+        } else {
+            img.style.transformOrigin = 'center center';
+        }
+    }
+
+    function moveZoom(e) {
         const img = e.currentTarget;
         if (!img.classList.contains('zoomed')) return;
         const rect = img.getBoundingClientRect();
@@ -949,48 +1017,72 @@
         img.style.transformOrigin = `${xPos}% ${yPos}%`;
     }
 
-    function searchAds() {
+    // --- SEARCH AND FILTERING ---
+    function searchAds(fromInput = false) {
         const query = document.getElementById('searchInput').value.toLowerCase().trim();
+        
+        if (fromInput && query.length > 0 && currentCategoryFilter && currentCategoryFilter !== 'Свіжі') {
+            clearCategoryFilter(true); 
+        }
+
         let filtered = ads.filter(ad => 
             ad.title.toLowerCase().includes(query) || 
             ad.location.toLowerCase().includes(query) ||
-            (ad.desc && ad.desc.toLowerCase().includes(query))
+            (ad.desc && ad.desc.toLowerCase().includes(query)) ||
+            (ad.category && ad.category.toLowerCase().includes(query)) ||
+            (ad.subcategory && ad.subcategory.toLowerCase().includes(query))
         );
+        
         if (currentCategoryFilter && currentCategoryFilter !== 'Свіжі') {
             filtered = filtered.filter(ad => ad.category === currentCategoryFilter);
         }
+        
         renderAds(filtered);
     }
 
-    function filterByCategory(key, el) {
-        document.querySelectorAll('.category-item').forEach(i => i.classList.remove('active'));
-        if (currentCategoryFilter === key) { clearCategoryFilter(); return; }
-        el.classList.add('active');
-        currentCategoryFilter = key;
-        document.getElementById('activeCategoryLabel').innerText = key === 'Свіжі' ? '' : `» ${CATEGORIES[key][currentLang]}`;
-        document.getElementById('clearFilterBtn').style.display = key === 'Свіжі' ? 'none' : 'inline-block';
+    function filterByCategory(categoryKey, element) {
+        document.querySelectorAll('.category-item').forEach(item => item.classList.remove('active'));
+        
+        if (currentCategoryFilter === categoryKey && categoryKey !== 'Свіжі') {
+            clearCategoryFilter();
+            return;
+        }
+
+        element.classList.add('active');
+        currentCategoryFilter = categoryKey;
+
+        if(categoryKey === 'Свіжі') {
+            document.getElementById('activeCategoryLabel').innerText = ``;
+            document.getElementById('clearFilterBtn').style.display = 'none';
+        } else {
+            const catName = CATEGORIES[categoryKey][currentLang];
+            document.getElementById('activeCategoryLabel').innerText = `» ${catName}`;
+            document.getElementById('clearFilterBtn').style.display = 'inline-block';
+        }
+        
         searchAds();
     }
 
-    function clearCategoryFilter() {
-        document.querySelectorAll('.category-item').forEach(i => i.classList.remove('active'));
+    function clearCategoryFilter(skipSearch = false) {
+        document.querySelectorAll('.category-item').forEach(item => item.classList.remove('active'));
         currentCategoryFilter = '';
         document.getElementById('activeCategoryLabel').innerText = '';
         document.getElementById('clearFilterBtn').style.display = 'none';
-        searchAds();
+        
+        const firstCat = document.querySelector('.category-item');
+        if(firstCat) firstCat.classList.add('active');
+        
+        if (!skipSearch) {
+            searchAds();
+        }
     }
 
-    function openModal() { document.getElementById('addModal').classList.add('active'); }
-    
-    function closeModal() { 
-        document.getElementById('addModal').classList.remove('active'); 
-        document.getElementById('adForm').reset(); 
-        document.getElementById('imagePreview').style.display = 'none'; 
-        compressedBase64Image = ''; 
-    }
-    
+    // --- FORM LOGIC ---
+    const modal = document.getElementById('addModal');
+
     function togglePhotoInput() {
-        const type = document.querySelector('input[name="photoType"]:checked').value;
+        const typeSelect = document.querySelector('input[name="photoType"]:checked');
+        const type = typeSelect ? typeSelect.value : 'upload';
         if (type === 'upload') {
             document.getElementById('uploadPhotoBlock').style.display = 'block';
             document.getElementById('urlPhotoBlock').style.display = 'none';
@@ -1000,179 +1092,279 @@
         }
     }
 
-    function previewAndCompressImage(e) {
-        const file = e.target.files[0];
+    function previewAndCompressImage(event) {
+        const file = event.target.files[0];
         if (!file) return;
+
         const reader = new FileReader();
         reader.readAsDataURL(file);
-        reader.onload = (ev) => {
+        
+        reader.onload = function(e) {
             const img = new Image();
-            img.src = ev.target.result;
-            img.onload = () => {
+            img.src = e.target.result;
+            
+            img.onload = function() {
                 const canvas = document.createElement('canvas');
-                const MAX_WIDTH = 800;
-                let scale = MAX_WIDTH / img.width;
-                if(scale > 1) scale = 1;
-                canvas.width = img.width * scale;
-                canvas.height = img.height * scale;
                 const ctx = canvas.getContext('2d');
-                ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+                
+                const MAX_WIDTH = 800; 
+                let width = img.width;
+                let height = img.height;
+
+                if (width > MAX_WIDTH) {
+                    height = height * (MAX_WIDTH / width);
+                    width = MAX_WIDTH;
+                }
+
+                canvas.width = width;
+                canvas.height = height;
+                ctx.drawImage(img, 0, 0, width, height);
+
                 compressedBase64Image = canvas.toDataURL('image/jpeg', 0.7);
-                const prev = document.getElementById('imagePreview');
-                prev.src = compressedBase64Image;
-                prev.style.display = 'block';
-            };
-        };
+                
+                const preview = document.getElementById('imagePreview');
+                preview.src = compressedBase64Image;
+                preview.style.display = 'block';
+            }
+        }
     }
+
+    function openModal() {
+        modal.classList.add('active');
+        
+        const selectCat = document.getElementById('adCategory');
+        if (currentCategoryFilter && currentCategoryFilter !== 'Свіжі') {
+            selectCat.value = currentCategoryFilter;
+            updateSubcategories(); 
+        }
+    }
+
+    function closeModal() {
+        modal.classList.remove('active');
+        document.getElementById('adForm').reset();
+        document.getElementById('imagePreview').style.display = 'none';
+        document.getElementById('adSubcategory').innerHTML = `<option value="">${currentLang === 'uk' ? 'Оберіть підкатегорію...' : 'Выберите подкатегорию...'}</option>`;
+        compressedBase64Image = '';
+        togglePhotoInput();
+    }
+
+    modal.addEventListener('click', function(e) {
+        if (e.target === modal) closeModal();
+    });
 
     async function submitAd(e) {
         e.preventDefault();
-        if (!currentUser && useFirebase) {
-            showDebug("Помилка: Ви не авторизовані для запису.");
-            return;
-        }
-        const type = document.querySelector('input[name="photoType"]:checked').value;
-        const photo = type === 'upload' ? compressedBase64Image : document.getElementById('adImage').value;
-        
+
+        const typeSelect = document.querySelector('input[name="photoType"]:checked');
+        const photoType = typeSelect ? typeSelect.value : 'upload';
+        let finalImage = photoType === 'upload' ? compressedBase64Image : document.getElementById('adImage').value;
+        const priceValue = document.getElementById('adPrice').value + ' грн';
+
         const newAd = {
             id: Date.now(),
             title: document.getElementById('adTitle').value,
-            price: document.getElementById('adPrice').value + ' грн',
+            price: priceValue,
             category: document.getElementById('adCategory').value,
             subcategory: document.getElementById('adSubcategory').value,
             desc: document.getElementById('adDesc').value,
             name: document.getElementById('adName').value,
             phone: document.getElementById('adPhone').value,
-            email: document.getElementById('adEmail').value || '',
+            email: document.getElementById('adEmail').value,
             location: document.getElementById('adLocation').value,
-            image: photo,
+            image: finalImage,
             date: new Date().toLocaleString()
         };
+
         try {
             if (useFirebase && currentUser) {
-                await setDoc(doc(db, 'artifacts', appId, 'public', 'data', 'nikolaev_ads', newAd.id.toString()), newAd);
+                // Rule 1: Strict artifacts/{appId}/public/data/ path
+                const adRef = doc(db, 'artifacts', appId, 'public', 'data', 'nikolaev_ads', newAd.id.toString());
+                await setDoc(adRef, newAd);
             } else {
                 ads.push(newAd);
-                if(ads.length > 100) ads.shift();
+                if(ads.length > 50) ads.shift(); 
                 localStorage.setItem('nik-ads', JSON.stringify(ads));
                 renderAds();
             }
+            
             closeModal();
-            const t = document.getElementById('toastMsg'); t.classList.add('show'); setTimeout(() => t.classList.remove('show'), 3000);
-        } catch (err) { 
-            console.error("Save Error:", err);
-            showDebug("Помилка збереження: " + err.message);
+            showToast();
+            clearCategoryFilter(); 
+        } catch (error) {
+            console.error("Submit Error:", error);
+            alert(currentLang === 'uk' ? 'Помилка публікації. ' + error.message : 'Ошибка публикации. ' + error.message);
         }
     }
 
-    // --- FIREBASE LOGIC ---
+    function showToast() {
+        const toast = document.getElementById('toastMsg');
+        toast.classList.add('show');
+        setTimeout(() => toast.classList.remove('show'), 3000);
+    }
+
+    function fallbackToLocal(reason = "") {
+        console.warn("Falling back to Local mode:", reason);
+        updateStatus('local', reason);
+        const loader = document.getElementById('loadingIndicator');
+        if (loader) loader.style.display = 'none';
+        let localAds = JSON.parse(localStorage.getItem('nik-ads'));
+        ads = localAds ? localAds : [];
+        renderAds(ads);
+    }
+
+    function showError(html) {
+        const box = document.getElementById('uiErrorBox');
+        if (box) {
+            box.innerHTML = html;
+            box.style.display = 'block';
+        }
+    }
+
+    function hideError() {
+        const box = document.getElementById('uiErrorBox');
+        if (box) box.style.display = 'none';
+    }
 
     function showDebug(msg) {
         const p = document.getElementById('debugPanel');
-        p.innerHTML = "<strong>ДІАГНОСТИКА ХМАРИ:</strong> " + msg;
-        p.style.display = 'block';
+        if (p) {
+            p.innerHTML = "<strong>ДІАГНОСТИКА ХМАРИ:</strong> " + msg;
+            p.style.display = 'block';
+        }
     }
 
-    function fallbackToLocal() {
-        updateStatus('local');
-        useFirebase = false;
-        const loader = document.getElementById('loadingIndicator');
-        if (loader) loader.style.display = 'none';
-        ads = JSON.parse(localStorage.getItem('nik-ads')) || [];
-        renderAds();
+    // --- FIREBASE BOOTSTRAP LOGIC ---
+
+    // Deterministic Configuration Resolution
+    let firebaseConfig = HARDCODED_CONFIG;
+    if (typeof __firebase_config !== 'undefined' && __firebase_config) {
+        try {
+            const parsed = typeof __firebase_config === 'string' ? JSON.parse(__firebase_config) : __firebase_config;
+            if (parsed && parsed.apiKey && parsed.apiKey.length > 10) {
+                firebaseConfig = parsed;
+            }
+        } catch(e) { 
+            console.error("Firebase: Error parsing __firebase_config.", e); 
+        }
     }
+    
+    // Global ID Resolution
+    appId = typeof __app_id !== 'undefined' ? __app_id : HARDCODED_CONFIG.projectId;
 
     async function startApp() {
         initSettings();
-        updateStatus('sync');
-
-        // Отримуємо динамічний appId та конфіг з оточення
-        appId = typeof __app_id !== 'undefined' ? __app_id : HARDCODED_CONFIG.projectId;
-        let firebaseConfig = HARDCODED_CONFIG;
-        if (typeof __firebase_config !== 'undefined' && __firebase_config) {
-            try {
-                firebaseConfig = JSON.parse(__firebase_config);
-            } catch(e) {}
-        }
-
+        clearCategoryFilter(true);
+        updateStatus('sync'); 
+        
         try {
-            const app = getApps().length === 0 ? initializeApp(firebaseConfig) : getApps()[0];
+            const existingApps = getApps();
+            let app;
+            if (existingApps.length === 0) {
+                app = initializeApp(firebaseConfig);
+            } else {
+                app = existingApps[0];
+            }
             auth = getAuth(app);
             db = getFirestore(app);
             useFirebase = true;
+            
+            // Rule 3: Auth Before Queries - Guarding with await
+            const initAuth = async () => {
+                try {
+                    if (typeof __initial_auth_token !== 'undefined' && __initial_auth_token) {
+                        await signInWithCustomToken(auth, __initial_auth_token);
+                    } else {
+                        await signInAnonymously(auth);
+                    }
+                    isInitialAuthTryComplete = true;
+                } catch (err) {
+                    console.error("Firebase Auth Failure:", err);
+                    isInitialAuthTryComplete = true;
+                    // Specific error detection for API KEY issues
+                    if (err.code === 'auth/api-key-not-valid') {
+                        showError(`
+                            <strong>Помилка ключа API (auth/api-key-not-valid).</strong><br>
+                            Будь ласка, відкрийте проект в Google Cloud Console і переконайтеся, що в розділі "APIs & Services -> Credentials" для вашого ключа встановлено: <br>
+                            1. API restrictions: <strong>Don't restrict key</strong> (або додайте "Identity Toolkit API").
+                        `);
+                        fallbackToLocal("Ключ API недійсний. Перевірте консоль Google Cloud.");
+                    }
+                }
+            };
 
-            // Налаштовуємо слухач авторизації
             onAuthStateChanged(auth, (user) => {
                 if (user) {
                     currentUser = user;
                     updateStatus('cloud');
-                    // Запускаємо слухач бази ТІЛЬКИ після успішного входу
-                    if (!isListenerStarted) { 
-                        setupRealtimeListener(); 
-                        isListenerStarted = true; 
+                    if (!isListenerStarted) {
+                        setupRealtimeListener();
+                        isListenerStarted = true;
+                    }
+                } else {
+                    if (isInitialAuthTryComplete) {
+                        setTimeout(() => {
+                            if (!auth.currentUser) fallbackToLocal("User not authenticated.");
+                        }, 2000);
                     }
                 }
             });
 
-            // Виконуємо вхід
-            try {
-                if (typeof __initial_auth_token !== 'undefined' && __initial_auth_token) {
-                    await signInWithCustomToken(auth, __initial_auth_token);
-                } else {
-                    await signInAnonymously(auth);
-                }
-            } catch (authErr) {
-                console.error("Auth Error:", authErr);
-                if (authErr.message.includes("400")) {
-                    showDebug(`ПОМИЛКА 400: Доступ до хмари відхилено. <br><br><strong>РІШЕННЯ:</strong> <br>1. Зайдіть у Firebase Console -> Authentication -> Sign-in method. <br>2. Увімкніть (Enable) метод <strong>Anonymous</strong>.`);
-                } else {
-                    showDebug("Помилка входу: " + authErr.message);
-                }
-                fallbackToLocal();
-                return;
-            }
+            await initAuth();
 
             // Таймер для переходу в локальний режим, якщо хмара не відповіла
-            setTimeout(() => { 
+            setTimeout(() => {
                 if (!isListenerStarted && useFirebase) {
-                    document.getElementById('forceLocalBtn').style.display = 'block';
-                    showDebug("Тривале очікування Firestore. Перевірте, чи ви натиснули кнопку <strong>PUBLISH</strong> (Опублікувати) в розділі Rules консолі Firebase.");
-                } 
+                    const btn = document.getElementById('forceLocalBtn');
+                    if(btn) btn.style.display = 'inline-block';
+                }
             }, 8000);
 
-        } catch (err) {
-            console.error("Firebase Init Error:", err);
-            showDebug("Помилка ініціалізації: " + err.message);
-            fallbackToLocal();
+        } catch (e) {
+            console.error("Critical Start Error:", e);
+            fallbackToLocal(e.message);
         }
     }
 
     function setupRealtimeListener() {
-        if (!currentUser) return;
+        if (!auth.currentUser || !useFirebase) return;
         
-        // Шлях ОБОВ'ЯЗКОВО повинен відповідати правилам середовища: /artifacts/{appId}/public/data/{collection}
+        const loader = document.getElementById('loadingIndicator');
+        if (loader) loader.style.display = 'block';
+        
         const adsRef = collection(db, 'artifacts', appId, 'public', 'data', 'nikolaev_ads');
         
-        onSnapshot(adsRef, (snap) => {
+        onSnapshot(adsRef, (snapshot) => {
             ads = [];
-            snap.forEach(d => ads.push(d.data()));
-            ads.sort((a,b) => a.id - b.id);
-            renderAds();
-        }, (err) => { 
-            console.error("Firestore Snapshot Error:", err); 
-            const diagnosticInfo = `
-                <br>UID: ${currentUser?.uid || 'Немає'}
-                <br>Path: /artifacts/${appId}/public/data/nikolaev_ads
-                <br>Помилка: ${err.message}
-                <br><br><strong>ВАЖЛИВО:</strong> Судячи зі скриншоту, ти не натиснув кнопку <strong>Publish</strong>. Натисни її, щоб правила активувалися!
-            `;
-            showDebug(`Firestore Error: ${err.code} ${diagnosticInfo}`);
-            // Якщо це перше завантаження і помилка прав — переходимо в локал
-            if (ads.length === 0) fallbackToLocal();
+            snapshot.forEach((doc) => {
+                ads.push(doc.data());
+            });
+            
+            const ldr = document.getElementById('loadingIndicator');
+            if (ldr) ldr.style.display = 'none';
+            
+            ads.sort((a, b) => a.id - b.id);
+            
+            searchAds(false);
+            hideError();
+        }, (error) => {
+            console.error("Firestore Error:", error);
+            if (error.code === 'permission-denied') {
+                showError(`
+                    <strong>Помилка прав доступу (Permission Denied).</strong><br>
+                    Можливі причини:<br>
+                    1. У розділі Authentication (Sign-in method) не активовано "Anonymous".<br>
+                    2. Ключ API обмежений у Google Cloud Console (додайте "Cloud Firestore API" у список дозволених).
+                `);
+                fallbackToLocal("Відмовлено в доступі.");
+            } else {
+                fallbackToLocal(error.message);
+            }
         });
     }
 
-    window.addEventListener('load', startApp);
+    window.addEventListener('load', () => {
+        setTimeout(startApp, 100);
+    });
 </script>
 </body>
 </html>
