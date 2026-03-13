@@ -861,7 +861,7 @@
         "Бізнес та Послуги": { 
             icon: "🤝", uk: "Бізнес та Послуги", ru: "Бизнес и Услуги", 
             sub: { 
-                uk: ["Ремонт та обслуговування авто", "Б'юті-сфера та здоров'я", "Послуги няні та доглядальниці", "Майстер на годину та побут", "Прибирання та клінінг", "Репетиторство та тренування", "Вантажоперевезення та логистика", "Оренда спецтехніки", "Фотосесії та відеозйомка", "Аніматори та ведення свят", "Ремонт цифрової та побутової техніки", "Будівельні та оздоблювальні роботи", "Продаж та оренда бізнес-обладнання", "Юридичні та бухгалтерські послуги", "Дизайн, IT та фріланс", "Грумінг та послуги для тварин", "Сировина, матеріали та переробка", "Туристичні послуги та візи", "Інші професійні послуги"],
+                uk: ["Ремонт та обслуговування авто", "Б'юті-сфера та здоров'я", "Послуги няні та доглядальниці", "Майстер на годину та побут", "Прибирання та клінінг", "Репетиторство та тренування", "Вантажоперевезення та логістика", "Оренда спецтехніки", "Фотосесії та відеозйомка", "Аніматори та ведення свят", "Ремонт цифрової та побутової техніки", "Будівельні та оздоблювальні роботи", "Продаж та оренда бізнес-обладнання", "Юридичні та бухгалтерські послуги", "Дизайн, IT та фріланс", "Грумінг та послуги для тварин", "Сировина, матеріали та переробка", "Туристичні послуги та візи", "Інші професійні послуги"],
                 ru: ["Ремонт и обслуживание авто", "Бьюти-сфера и здоровье", "Услуги няни и сиделки", "Мастер на час и быт", "Уборка и клининг", "Репетиторство и тренировки", "Грузоперевозки и логистика", "Аренда спецтехники", "Фотосессии и видеосъемка", "Аниматоры и проведение праздников", "Ремонт цифровой и бытовой техники", "Строительные и отделочные работы", "Продажа и аренда бизнес-оборудования", "Юридические и бухгалтерские услуги", "Дизайн, IT и фриланс", "Груминг и услуги для животных", "Сырье, материалы и переработка", "Туристические услуги и визы", "Другие профессиональные услуги"]
             } 
         },
@@ -869,7 +869,7 @@
             icon: "👕", uk: "Мода і стиль", ru: "Мода и стиль", 
             sub: { 
                 uk: ["Жіночий одяг", "Чоловічий одяг", "Жіноче взуття", "Чоловіче взуття", "Спортивний одяг та взуття", "Сумки та рюкзаки", "Годинники", "Ювелірні вироби та біжутерія", "Аксесуари (Ремені, краватки)", "Головні убори", "Спецодяг та уніформа", "Подарунки та сувеніри", "Весільний одяг та аксесуари"], 
-                ru: ["Женская одежда", "Мужская одежда", "Женская обувь", "Мужская обувь", "Спортивная одежда и обувь", "Сумки и рюкзаки", "Часы", "Ювелирные изделия и бижутерия", "Аксессуары (Ремни, галстуки)", "Головные уборы", "Спецодежда и универсальная", "Подарки и сувениры", "Свадебная одежда и аксессуары"] 
+                ru: ["Женская одежда", "Мужская одежда", "Женская обувь", "Мужская обувь", "Спортивная одежда и обувь", "Сумки и рюкзаки", "Часы", "Ювелирные изделия и бижутерия", "Аксессуары (Ремни, галстуки)", "Головные уборы", "Спецодежда и униформа", "Подарки и сувениры", "Свадебная одежда и аксессуары"] 
             } 
         },
         "Діти": { 
@@ -942,11 +942,8 @@
         currentView = viewName;
         localStorage.setItem('nik-current-view', viewName); // Зберігаємо вкладку при оновленні сторінки
         
-        // Очищаємо поле пошуку при вході в кабінет або адмін-панель, щоб не фільтрувало результати
-        if (viewName === 'admin' || viewName === 'cabinet') {
-            document.getElementById('searchInput').value = '';
-        }
-
+        // ВАЖЛИВО: Замість closeAdDetails(true) просто перемикаємо видимість контейнерів,
+        // щоб уникнути помилки "Maximum call stack size exceeded" (нескінченної рекурсії)
         document.getElementById('mainView').style.display = 'block';
         document.getElementById('detailsView').style.display = 'none';
         
@@ -1027,8 +1024,11 @@
     }
 
     async function logout() {
+        currentUser = null; // Одразу очищаємо поточного користувача
+        renderAds(); // Оновлюємо UI миттєво, щоб зникли кнопки
         await signOut(auth);
         try { await signInAnonymously(auth); } catch(e){} 
+        currentUser = auth.currentUser; // Оновлюємо на анонімного
         updateHeaderAuth();
         switchView('main');
         showToast(currentLang === 'uk' ? 'Ви вийшли з акаунту' : 'Вы вышли из аккаунта');
@@ -1169,29 +1169,29 @@
         const loaderHTML = loader ? loader.outerHTML : '';
         container.innerHTML = loaderHTML; 
 
-        // Filtering based on active view
-        let filtered = [...adsToRender];
+        // Filtering for Cabinet/Admin
+        let filtered = adsToRender;
         if (currentView === 'main') {
             filtered = filtered.filter(ad => ad.status === 'approved' || !ad.status); 
         } else if (currentView === 'cabinet') {
+            // Безпечна перевірка: щоб уникнути помилок якщо uid немає
             if (currentUser && !currentUser.isAnonymous) {
                 filtered = filtered.filter(ad => ad.userId === currentUser.uid);
             } else {
-                filtered = [];
+                filtered = []; // Не показуємо нічого, якщо юзер не авторизований
             }
         } else if (currentView === 'admin') {
-            // В адмін-панелі показуємо абсолютно все, сортуючи очікуючі вгору
-            filtered.sort((a, b) => {
+            // Безпечне сортування: нічого не видаляємо, просто сортуємо (нові/очікуючі зверху)
+            filtered = [...filtered].sort((a, b) => {
                 const statusA = a.status || 'approved'; 
                 const statusB = b.status || 'approved';
                 if (statusA === 'pending' && statusB !== 'pending') return -1;
                 if (statusA !== 'pending' && statusB === 'pending') return 1;
-                return (Number(b.id) || 0) - (Number(a.id) || 0); 
+                return (b.id || 0) - (a.id || 0); 
             });
         }
 
-        const queryInput = document.getElementById('searchInput');
-        const query = queryInput ? queryInput.value.toLowerCase().trim() : '';
+        const query = document.getElementById('searchInput').value.toLowerCase().trim();
         if (query.length > 0) {
             filtered = filtered.filter(ad => 
                 ad.title.toLowerCase().includes(query) || 
@@ -1201,8 +1201,6 @@
                 (ad.subcategory && ad.subcategory.toLowerCase().includes(query))
             );
         }
-        
-        // В адмін-панелі категорійний фільтр скидаємо (clearCategoryFilter робить це), але якщо користувач обрав - фільтруємо
         if (currentCategoryFilter && currentCategoryFilter !== 'Свіжі') {
             filtered = filtered.filter(ad => ad.category === currentCategoryFilter);
         }
@@ -1238,6 +1236,7 @@
                 else statusHTML = `<div class="status-badge status-approved">Опубліковано</div>`;
             }
 
+            // БЕЗПЕКА: Кнопки з'являються ТІЛЬКИ для авторизованих власників або адміна
             let actionsHTML = '';
             if (currentUser && !currentUser.isAnonymous && (ad.userId === currentUser.uid || isAdmin())) {
                 actionsHTML += `<div class="card-actions" onclick="event.preventDefault(); event.stopPropagation();">`;
@@ -1255,7 +1254,7 @@
 
             card.innerHTML = `
                 ${statusHTML}
-                <a href="?id=${ad.id}" target="_blank" style="flex:1; display:flex; flex-direction:column; text-decoration:none; color:inherit;">
+                <a href="?id=${ad.id}" onclick="event.preventDefault(); openAdDetails(${ad.id});" style="flex:1; display:flex; flex-direction:column; text-decoration:none; color:inherit;">
                     ${imageHTML}
                     <div class="ad-content">
                         <div style="margin-bottom: 5px;"><span class="category-badge">${catName}${subName}</span></div>
@@ -1264,7 +1263,7 @@
                         <div class="ad-desc">${ad.desc || ''}</div>
                         <div class="ad-meta">
                             <span>📍 ${ad.location}</span>
-                            <span>⏱ ${ad.date ? ad.date.split(',')[0] : ''}</span>
+                            <span>⏱ ${ad.date.split(',')[0]}</span>
                         </div>
                     </div>
                 </a>
@@ -1310,6 +1309,7 @@
         const clickAction = hasImage ? `onclick="openLightbox('${ad.image}')"` : '';
         const cursorStyle = hasImage ? 'cursor: zoom-in;' : 'cursor: default;';
 
+        // БЕЗПЕКА: Додаємо кнопки керування ТІЛЬКИ для авторизованих власників або адміна
         let actionsHTML = '';
         if (currentUser && !currentUser.isAnonymous && (ad.userId === currentUser.uid || isAdmin())) {
             actionsHTML = `<div style="margin-top: 20px; display: flex; gap: 10px; border-top: 1px solid var(--border); padding-top: 20px; flex-wrap: wrap;">`;
@@ -1358,7 +1358,7 @@
     }
 
     function closeAdDetails(skipPushState = false) {
-        switchView(currentView); 
+        switchView(currentView); // Перемикає відображення на головний вигляд або кабінет/адмінку
         window.scrollTo(0, 0);
 
         document.title = 'Оголошення м. Миколаїв | Міні-дошка оголошень';
@@ -1540,7 +1540,7 @@
         
         document.getElementById('modalTitle').innerHTML = currentLang==='uk'?'<span class="uk">Редагування оголошення</span>':'<span class="ru">Редактирование</span>';
         document.getElementById('adTitle').value = ad.title;
-        document.getElementById('adPrice').value = parseInt(ad.price) || 0;
+        document.getElementById('adPrice').value = parseInt(ad.price);
         document.getElementById('adCategory').value = ad.category;
         updateSubcategories();
         document.getElementById('adSubcategory').value = ad.subcategory || '';
@@ -1603,16 +1603,18 @@
             location: document.getElementById('adLocation').value,
             image: finalImage,
             userId: currentUser.uid,
-            authorEmail: currentUser.email || 'anon@anon.com'
+            authorEmail: currentUser.email
         };
 
         try {
             if (editingAdId) {
+                // Оновлення
                 const adRef = doc(db, 'artifacts', appId, 'public', 'data', 'nikolaev_ads', editingAdId.toString());
                 if(!isAdmin()) adData.status = 'pending'; 
                 await updateDoc(adRef, adData);
                 showToast(currentLang === 'uk' ? 'Оголошення оновлено!' : 'Объявление обновлено!');
             } else {
+                // Створення нового
                 adData.id = Date.now();
                 adData.date = new Date().toLocaleString();
                 adData.status = isAdmin() ? 'approved' : 'pending';
@@ -1644,8 +1646,8 @@
         updateStatus('local', reason);
         const loader = document.getElementById('loadingIndicator');
         if (loader) loader.style.display = 'none';
-        let localAds = JSON.parse(localStorage.getItem('nik-ads')) || [];
-        ads = localAds;
+        let localAds = JSON.parse(localStorage.getItem('nik-ads'));
+        ads = localAds ? localAds : [];
         renderAds(ads);
     }
 
@@ -1662,15 +1664,30 @@
         if (box) box.style.display = 'none';
     }
 
+    function showDebug(msg) {
+        const p = document.getElementById('debugPanel');
+        if (p) {
+            p.innerHTML = "<strong>ДІАГНОСТИКА ХМАРИ:</strong> " + msg;
+            p.style.display = 'block';
+        }
+    }
+
     // --- FIREBASE BOOTSTRAP LOGIC ---
+
+    // Deterministic Configuration Resolution
     let firebaseConfig = HARDCODED_CONFIG;
     if (typeof __firebase_config !== 'undefined' && __firebase_config) {
         try {
             const parsed = typeof __firebase_config === 'string' ? JSON.parse(__firebase_config) : __firebase_config;
-            if (parsed && parsed.apiKey && parsed.apiKey.length > 10) firebaseConfig = parsed;
-        } catch(e) {}
+            if (parsed && parsed.apiKey && parsed.apiKey.length > 10) {
+                firebaseConfig = parsed;
+            }
+        } catch(e) { 
+            console.error("Firebase: Error parsing __firebase_config.", e); 
+        }
     }
     
+    // Global ID Resolution
     appId = typeof __app_id !== 'undefined' ? __app_id : HARDCODED_CONFIG.projectId;
 
     async function startApp() {
@@ -1680,14 +1697,20 @@
         
         try {
             const existingApps = getApps();
-            let app = existingApps.length === 0 ? initializeApp(firebaseConfig) : existingApps[0];
+            let app;
+            if (existingApps.length === 0) {
+                app = initializeApp(firebaseConfig);
+            } else {
+                app = existingApps[0];
+            }
             auth = getAuth(app);
             db = getFirestore(app);
             useFirebase = true;
             
+            // Rule 3: Auth Before Queries - Guarding with await
             const initAuth = async () => {
                 try {
-                    await auth.authStateReady();
+                    await auth.authStateReady(); // Очікуємо відновлення попередньої сесії з кешу
                     if (!auth.currentUser) {
                         if (typeof __initial_auth_token !== 'undefined' && __initial_auth_token) {
                             await signInWithCustomToken(auth, __initial_auth_token);
@@ -1697,33 +1720,51 @@
                     }
                     isInitialAuthTryComplete = true;
                 } catch (err) {
+                    console.error("Firebase Auth Failure:", err);
                     isInitialAuthTryComplete = true;
-                    fallbackToLocal(err.message);
+                    if (err.code === 'auth/api-key-not-valid') {
+                        showError(`
+                            <strong>Помилка ключа API (auth/api-key-not-valid).</strong><br>
+                            Будь ласка, відкрийте проект в Google Cloud Console і переконайтеся, що в розділі "APIs & Services -> Credentials" для вашого ключа встановлено: <br>
+                            1. API restrictions: <strong>Don't restrict key</strong> (або додайте "Identity Toolkit API").
+                        `);
+                        fallbackToLocal("Ключ API недійсний. Перевірте консоль Google Cloud.");
+                    }
                 }
             };
 
             onAuthStateChanged(auth, (user) => {
-                currentUser = user;
-                updateHeaderAuth();
+                currentUser = user; // Завжди оновлюємо поточного юзера
+                updateHeaderAuth(); // Оновлюємо шапку незалежно від статусу
                 if (user) {
                     updateStatus('cloud');
+                    
+                    // БЕЗПЕЧНЕ ВІДНОВЛЕННЯ ВКЛАДКИ (після оновлення сторінки)
                     const savedView = localStorage.getItem('nik-current-view');
                     if (savedView === 'admin' && isAdmin()) {
                         switchView('admin');
                     } else if (savedView === 'cabinet' && !user.isAnonymous) {
                         switchView('cabinet');
                     } else {
-                        switchView('main');
+                        switchView('main'); // Безпечно повертаємо на головну, якщо нема прав
                     }
 
                     if (!isListenerStarted) {
                         setupRealtimeListener();
                         isListenerStarted = true;
                     }
+                } else {
+                    if (isInitialAuthTryComplete) {
+                        setTimeout(() => {
+                            if (!auth.currentUser) fallbackToLocal("User not authenticated.");
+                        }, 2000);
+                    }
                 }
             });
 
             await initAuth();
+
+            // Таймер для переходу в локальний режим, якщо хмара не відповіла
             setTimeout(() => {
                 if (!isListenerStarted && useFirebase) {
                     const btn = document.getElementById('forceLocalBtn');
@@ -1732,36 +1773,51 @@
             }, 8000);
 
         } catch (e) {
+            console.error("Critical Start Error:", e);
             fallbackToLocal(e.message);
         }
     }
 
     function setupRealtimeListener() {
         if (!auth.currentUser || !useFirebase) return;
+        
         const loader = document.getElementById('loadingIndicator');
         if (loader) loader.style.display = 'block';
         
         const adsRef = collection(db, 'artifacts', appId, 'public', 'data', 'nikolaev_ads');
+        
         onSnapshot(adsRef, (snapshot) => {
-            const newAds = [];
-            snapshot.forEach((doc) => newAds.push(doc.data()));
-            ads = newAds;
+            ads = [];
+            snapshot.forEach((doc) => {
+                ads.push(doc.data());
+            });
             
             const ldr = document.getElementById('loadingIndicator');
             if (ldr) ldr.style.display = 'none';
             
-            // Сортування по ID (нові зверху) за замовчуванням
-            ads.sort((a, b) => (Number(b.id) || 0) - (Number(a.id) || 0));
+            ads.sort((a, b) => a.id - b.id);
             
-            // Завжди перемальовуємо при отриманні свіжих даних
-            renderAds(ads);
+            renderAds();
             hideError();
         }, (error) => {
-            fallbackToLocal(error.message);
+            console.error("Firestore Error:", error);
+            if (error.code === 'permission-denied') {
+                showError(`
+                    <strong>Помилка прав доступу (Permission Denied).</strong><br>
+                    Можливі причини:<br>
+                    1. У розділі Authentication (Sign-in method) не активовано "Anonymous" або "Email/Password".<br>
+                    2. Ключ API обмежений у Google Cloud Console.
+                `);
+                fallbackToLocal("Відмовлено в доступі.");
+            } else {
+                fallbackToLocal(error.message);
+            }
         });
     }
 
-    window.addEventListener('load', () => setTimeout(startApp, 100));
+    window.addEventListener('load', () => {
+        setTimeout(startApp, 100);
+    });
 </script>
 </body>
 </html>
