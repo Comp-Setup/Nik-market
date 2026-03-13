@@ -15,6 +15,9 @@
             --border: #e0e0e0;
             --shadow: 0 10px 30px rgba(0, 0, 0, 0.08);
             --radius: 16px;
+            --success: #28a745;
+            --warning: #ffc107;
+            --danger: #dc3545;
         }
 
         body.dark-theme {
@@ -65,6 +68,8 @@
             display: flex;
             justify-content: space-between;
             align-items: center;
+            flex-wrap: wrap;
+            gap: 15px;
         }
 
         .logo-box { display: flex; align-items: center; gap: 15px; }
@@ -97,7 +102,7 @@
         .conn-status .dot { width: 8px; height: 8px; border-radius: 50%; display: inline-block; }
         .dot-cloud { background: #00c853; box-shadow: 0 0 6px #00c853; }
         .dot-local { background: #ff3d00; box-shadow: 0 0 6px #ff3d00; }
-        .dot-sync { background: #4776E6; box-shadow: 0 0 6px #4776E6; animation: pulse 1.5s infinite; }
+        .dot-sync { background: var(--warning); box-shadow: 0 0 6px var(--warning); animation: pulse 1.5s infinite; }
 
         @keyframes pulse {
             0% { opacity: 1; }
@@ -109,6 +114,7 @@
             display: flex;
             gap: 10px;
             align-items: center;
+            flex-wrap: wrap;
         }
 
         /* BUTTONS */
@@ -133,6 +139,19 @@
             transform: translateY(-2px);
             box-shadow: 0 8px 25px rgba(71, 118, 230, 0.5);
         }
+        
+        .btn-outline {
+            background: transparent;
+            color: var(--primary);
+            border: 1px solid var(--primary);
+        }
+        .btn-outline:hover {
+            background: rgba(71, 118, 230, 0.1);
+        }
+
+        .btn-danger { background: var(--danger); color: white; }
+        .btn-success { background: var(--success); color: white; }
+        .btn-warning { background: var(--warning); color: #333; }
 
         .btn-icon {
             background: var(--surface);
@@ -240,6 +259,7 @@
             box-shadow: var(--shadow); transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
             border: 1px solid var(--border); display: flex; flex-direction: column;
             cursor: pointer;
+            position: relative;
         }
         .ad-card:hover { transform: translateY(-5px); border-color: var(--primary); box-shadow: 0 15px 35px rgba(0,0,0,0.1); }
         .ad-image {
@@ -259,11 +279,30 @@
         }
         .ad-contacts a { color: var(--primary); font-weight: bold; text-decoration: none; }
 
-        .ad-meta { display: flex; justify-content: space-between; font-size: 12px; color: var(--text-muted); border-top: 1px solid var(--border); padding-top: 15px; }
+        .ad-meta { display: flex; justify-content: space-between; font-size: 12px; color: var(--text-muted); border-top: 1px solid var(--border); padding-top: 15px; align-items: center; }
         .category-badge {
             background: rgba(71, 118, 230, 0.1); color: var(--primary); padding: 4px 8px;
             border-radius: 6px; font-size: 11px; font-weight: bold; display: inline-block; margin-bottom: 10px;
         }
+
+        /* Status & Action Badges */
+        .status-badge {
+            position: absolute; top: 10px; right: 10px; padding: 5px 10px; border-radius: 20px;
+            font-size: 11px; font-weight: bold; color: white; z-index: 10;
+        }
+        .status-pending { background: var(--warning); color: #333; }
+        .status-approved { background: var(--success); }
+        .status-rejected { background: var(--danger); }
+
+        .card-actions {
+            display: flex; gap: 5px; margin-top: 10px; border-top: 1px solid var(--border); padding-top: 10px;
+        }
+        .card-actions button {
+            flex: 1; padding: 6px; font-size: 12px; border-radius: 6px; cursor: pointer; border: none; font-weight: bold;
+        }
+        .btn-edit { background: var(--primary); color: white; }
+        .btn-del { background: var(--danger); color: white; }
+        .btn-appr { background: var(--success); color: white; }
 
         /* --- DETAILED AD VIEW --- */
         .ad-details-container {
@@ -419,6 +458,8 @@
             word-break: break-all;
         }
 
+        #cabinetHero, #adminHero { display: none; }
+
         @media (max-width: 768px) {
             .hero h1 { font-size: 28px; }
             .search-bar, .form-row { flex-direction: column; gap: 0; }
@@ -432,7 +473,7 @@
 <header>
     <div class="nav-container">
         <div class="logo-box">
-            <a class="logo" onclick="closeAdDetails()">NIK-MARKET</a>
+            <a class="logo" onclick="switchView('main')">NIK-MARKET</a>
             <div id="statusBadge" class="conn-status">
                 <span class="dot dot-sync"></span>
                 <span class="uk">Підключення...</span><span class="ru">Подключение...</span>
@@ -441,7 +482,11 @@
         <div class="header-actions">
             <button class="btn-icon" id="langToggle" onclick="toggleLang()" title="Змінити мову / Сменить язык">RU</button>
             <button class="btn-icon" id="themeToggle" title="Змінити тему / Сменить тему">🌙</button>
-            <button class="btn btn-primary" onclick="openModal()">
+            
+            <button class="btn btn-outline" id="cabinetBtn" onclick="openCabinet()">
+                <span class="uk">👤 Увійти / Кабінет</span><span class="ru">👤 Войти / Кабинет</span>
+            </button>
+            <button class="btn btn-primary" onclick="openAddModal()">
                 <span class="uk">+ Подати оголошення</span><span class="ru">+ Подать объявление</span>
             </button>
         </div>
@@ -449,7 +494,7 @@
 </header>
 
 <div id="mainView">
-    <div class="hero">
+    <div class="hero" id="mainHero">
         <h1>
             <span class="uk">Оголошення м. Миколаїв</span><span class="ru">Объявления г. Николаев</span>
         </h1>
@@ -461,6 +506,29 @@
             <input type="text" id="searchInput" class="search-input" placeholder="Що шукаєте? / Что ищете?" oninput="searchAds(true)">
             <button class="btn btn-primary" onclick="searchAds(true)">
                 <span class="uk">Знайти</span><span class="ru">Найти</span>
+            </button>
+        </div>
+    </div>
+
+    <div class="hero" id="cabinetHero" style="background: rgba(71, 118, 230, 0.1);">
+        <h1><span class="uk">Особистий кабінет</span><span class="ru">Личный кабинет</span></h1>
+        <p id="cabinetUserEmail" style="font-weight: bold; color: var(--primary);"></p>
+        <div style="display: flex; gap: 10px; justify-content: center; margin-top: 15px;">
+            <button class="btn btn-primary" id="adminPanelBtn" style="display: none; background: var(--danger);" onclick="switchView('admin')">
+                <span class="uk">🛡️ Адмін-Панель</span><span class="ru">🛡️ Админ-Панель</span>
+            </button>
+            <button class="btn btn-outline" onclick="logout()">
+                <span class="uk">🚪 Вийти з акаунту</span><span class="ru">🚪 Выйти из аккаунта</span>
+            </button>
+        </div>
+    </div>
+
+    <div class="hero" id="adminHero" style="background: rgba(220, 53, 69, 0.1);">
+        <h1 style="color: var(--danger);"><span class="uk">🛡️ Панель Адміністратора</span><span class="ru">🛡️ Панель Администратора</span></h1>
+        <p><span class="uk">Модерація та керування всіма оголошеннями</span><span class="ru">Модерация и управление всеми объявлениями</span></p>
+        <div style="display: flex; gap: 10px; justify-content: center; margin-top: 15px;">
+            <button class="btn btn-primary" onclick="switchView('cabinet')">
+                <span class="uk">← Назад у кабінет</span><span class="ru">← Назад в кабинет</span>
             </button>
         </div>
     </div>
@@ -478,7 +546,7 @@
 
         <div class="section-title">
             <div style="display: flex; align-items: center; flex-wrap: wrap;">
-                <h3>
+                <h3 id="sectionTitleText">
                     <span class="uk">Оголошення</span><span class="ru">Объявления</span>
                 </h3>
                 <span id="activeCategoryLabel"></span>
@@ -516,10 +584,52 @@
     <img src="" id="lightboxImg" class="lightbox-img" onclick="toggleZoom(event)" onmousemove="moveZoom(event)" title="Натисніть для збільшення">
 </div>
 
+<!-- AUTH MODAL -->
+<div class="modal-overlay" id="authModal">
+    <div class="modal-box" style="max-width: 400px;">
+        <span class="modal-close" onclick="closeAuthModal()">&times;</span>
+        <h2 style="margin-bottom: 20px; text-align: center;">
+            <span class="uk">Вхід / Реєстрація</span><span class="ru">Вход / Регистрация</span>
+        </h2>
+        <p style="text-align: center; color: var(--text-muted); font-size: 13px; margin-bottom: 20px;">
+            <span class="uk">Введіть номер телефону та пароль. Email необов'язковий.</span>
+            <span class="ru">Введите номер телефона и пароль. Email необязателен.</span>
+        </p>
+
+        <div class="form-group">
+            <label><span class="uk">Телефон (обов'язково) *</span><span class="ru">Телефон (обязательно) *</span></label>
+            <div style="display: flex; align-items: center; border: 1px solid var(--border); border-radius: 10px; background: var(--bg); overflow: hidden;">
+                <span style="padding: 12px 15px; background: rgba(0,0,0,0.05); font-weight: bold; border-right: 1px solid var(--border); color: var(--text);">+380</span>
+                <input type="tel" id="authPhone" class="form-control" style="border: none; border-radius: 0; outline: none; flex: 1;" placeholder="501234567" maxlength="9" oninput="this.value = this.value.replace(/[^0-9]/g, '')">
+            </div>
+        </div>
+
+        <div class="form-group">
+            <label><span class="uk">Email (необов'язково)</span><span class="ru">Email (необязательно)</span></label>
+            <input type="email" id="authUserEmail" class="form-control" placeholder="your@email.com (або залиште пустим)">
+        </div>
+
+        <div class="form-group">
+            <label><span class="uk">Пароль *</span><span class="ru">Пароль *</span></label>
+            <input type="password" id="authPassword" class="form-control" placeholder="••••••••">
+        </div>
+
+        <div style="display: flex; gap: 10px; margin-top: 25px;">
+            <button class="btn btn-primary" style="flex: 1;" onclick="processAuth('login')">
+                <span class="uk">Увійти</span><span class="ru">Войти</span>
+            </button>
+            <button class="btn btn-outline" style="flex: 1;" onclick="processAuth('register')">
+                <span class="uk">Реєстрація</span><span class="ru">Регистрация</span>
+            </button>
+        </div>
+    </div>
+</div>
+
+<!-- AD MODAL -->
 <div class="modal-overlay" id="addModal">
     <div class="modal-box">
         <span class="modal-close" onclick="closeModal()">&times;</span>
-        <h2 style="margin-bottom: 20px;">
+        <h2 style="margin-bottom: 20px;" id="modalTitle">
             <span class="uk">Нове оголошення</span><span class="ru">Новое объявление</span>
         </h2>
         
@@ -566,7 +676,10 @@
                 </div>
                 <div class="form-group">
                     <label><span class="uk">Телефон *</span><span class="ru">Телефон *</span></label>
-                    <input type="tel" id="adPhone" class="form-control" required placeholder="+380...">
+                    <div style="display: flex; align-items: center; border: 1px solid var(--border); border-radius: 10px; background: var(--bg); overflow: hidden;">
+                        <span style="padding: 12px 15px; background: rgba(0,0,0,0.05); font-weight: bold; border-right: 1px solid var(--border); color: var(--text);">+380</span>
+                        <input type="tel" id="adPhone" class="form-control" style="border: none; border-radius: 0; outline: none; flex: 1;" required placeholder="501234567" maxlength="9" oninput="this.value = this.value.replace(/[^0-9]/g, '')">
+                    </div>
                 </div>
             </div>
 
@@ -608,20 +721,20 @@
             </div>
             
             <button type="submit" class="btn btn-primary" style="width: 100%; margin-top: 10px; padding: 15px; font-size: 16px;">
-                <span class="uk">Опублікувати оголошення</span><span class="ru">Опубликовать объявление</span>
+                <span class="uk">Зберегти оголошення</span><span class="ru">Сохранить объявление</span>
             </button>
         </form>
     </div>
 </div>
 
 <div class="toast" id="toastMsg">
-    <span class="uk">Оголошення успішно додано!</span><span class="ru">Объявление успешно добавлено!</span>
+    Повідомлення
 </div>
 
 <script type="module">
     import { initializeApp, getApps } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
-    import { getAuth, signInAnonymously, signInWithCustomToken, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
-    import { getFirestore, collection, onSnapshot, setDoc, doc } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+    import { getAuth, signInAnonymously, signInWithCustomToken, onAuthStateChanged, createUserWithEmailAndPassword, signInWithEmailAndPassword, signOut } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
+    import { getFirestore, collection, onSnapshot, setDoc, doc, updateDoc, deleteDoc } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
 
     // --- FIREBASE CONFIGURATION ---
     const HARDCODED_CONFIG = {
@@ -633,9 +746,12 @@
         appId: "1:165947840731:web:1bfc394a4bc5c458a1d4fe"
     };
 
+    // ВАЖЛИВО: Дані адміністратора
+    const ADMIN_EMAIL = "Novikov666kherson@gmail.com"; 
+
     // --- 1. ATTACH FUNCTIONS TO GLOBAL WINDOW OBJECT ---
     window.toggleLang = toggleLang;
-    window.openModal = openModal;
+    window.openAddModal = openAddModal;
     window.closeModal = closeModal;
     window.submitAd = submitAd;
     window.togglePhotoInput = togglePhotoInput;
@@ -650,6 +766,18 @@
     window.updateSubcategories = updateSubcategories;
     window.openLightbox = openLightbox;
     window.fallbackToLocal = fallbackToLocal;
+    
+    // Нові функції для кабінету та модерації
+    window.openAuthModal = openAuthModal;
+    window.closeAuthModal = closeAuthModal;
+    window.processAuth = processAuth;
+    window.logout = logout;
+    window.openCabinet = openCabinet;
+    window.switchView = switchView;
+    window.editAd = editAd;
+    window.deleteAd = deleteAd;
+    window.approveAd = approveAd;
+    window.rejectAd = rejectAd;
 
     // --- 2. GLOBAL STATE VARIABLES ---
     let ads = []; 
@@ -661,6 +789,8 @@
     let isListenerStarted = false;
     let isInitialAuthTryComplete = false;
     let initialUrlChecked = false; // Flag for checking direct links
+    let currentView = 'main'; // 'main', 'cabinet', 'admin'
+    let editingAdId = null;
 
     const CATEGORIES = {
         "Свіжі": { icon: "🔥", uk: "Свіжі оголошення", ru: "Свежие объявления", sub: { uk:[], ru:[] } },
@@ -799,6 +929,116 @@
         }
     }
 
+    // --- РОУТИНГ ВИГЛЯДІВ (Головна / Кабінет / Адмін) ---
+    function switchView(viewName) {
+        currentView = viewName;
+        document.getElementById('mainHero').style.display = viewName === 'main' ? 'block' : 'none';
+        document.getElementById('cabinetHero').style.display = viewName === 'cabinet' ? 'block' : 'none';
+        document.getElementById('adminHero').style.display = viewName === 'admin' ? 'block' : 'none';
+        
+        document.querySelector('.categories-wrapper').style.display = viewName === 'main' ? 'block' : 'none';
+        
+        const titleElem = document.getElementById('sectionTitleText');
+        if (viewName === 'main') {
+            titleElem.innerHTML = `<span class="uk">Оголошення</span><span class="ru">Объявления</span>`;
+        } else if (viewName === 'cabinet') {
+            titleElem.innerHTML = `<span class="uk">Мої оголошення</span><span class="ru">Мои объявления</span>`;
+        } else if (viewName === 'admin') {
+            titleElem.innerHTML = `<span class="uk">Всі оголошення бази</span><span class="ru">Все объявления базы</span>`;
+        }
+        
+        closeAdDetails(true);
+        clearCategoryFilter(true);
+        renderAds();
+        applyLanguage();
+    }
+
+    function isAdmin() {
+        return currentUser && currentUser.email === ADMIN_EMAIL.toLowerCase();
+    }
+
+    function openCabinet() {
+        if (!currentUser || currentUser.isAnonymous) {
+            openAuthModal();
+        } else {
+            let displayEmail = currentUser.email;
+            if(displayEmail.includes('@nikmarket.local')) {
+                displayEmail = "Телефон: " + displayEmail.split('@')[0];
+            }
+            document.getElementById('cabinetUserEmail').innerText = displayEmail;
+            document.getElementById('adminPanelBtn').style.display = isAdmin() ? 'inline-block' : 'none';
+            switchView('cabinet');
+        }
+    }
+
+    // --- АВТОРИЗАЦІЯ ---
+    function openAuthModal() { document.getElementById('authModal').classList.add('active'); }
+    function closeAuthModal() { document.getElementById('authModal').classList.remove('active'); }
+
+    async function processAuth(action) {
+        const phoneInput = document.getElementById('authPhone').value;
+        const emailInput = document.getElementById('authUserEmail').value.trim().toLowerCase();
+        let passInput = document.getElementById('authPassword').value;
+
+        if (phoneInput.length !== 9) return showToast(currentLang === 'uk' ? 'Введіть коректний номер (9 цифр)' : 'Введите корректный номер (9 цифр)', true);
+        if (!passInput) return showToast(currentLang === 'uk' ? 'Введіть пароль' : 'Введите пароль', true);
+
+        const fullPhone = "+380" + phoneInput;
+        let finalEmail = emailInput || (fullPhone + "@nikmarket.local");
+        
+        try {
+            if (action === 'login') {
+                await signInWithEmailAndPassword(auth, finalEmail, passInput);
+                showToast(currentLang === 'uk' ? 'Успішний вхід!' : 'Успешный вход!');
+            } else {
+                await createUserWithEmailAndPassword(auth, finalEmail, passInput);
+                showToast(currentLang === 'uk' ? 'Успішна реєстрація!' : 'Успешная регистрация!');
+            }
+            closeAuthModal();
+            updateHeaderAuth();
+            openCabinet();
+        } catch (err) {
+            console.error(err);
+            let msg = err.message;
+            if(err.code === 'auth/invalid-credential') msg = currentLang==='uk'?'Невірний номер/email або пароль':'Неверный номер/email или пароль';
+            if(err.code === 'auth/email-already-in-use') msg = currentLang==='uk'?'Акаунт вже існує! Спробуйте Увійти.':'Аккаунт уже существует! Попробуйте Войти.';
+            if(err.code === 'auth/operation-not-allowed') msg = currentLang==='uk' ? 'Помилка! Увімкніть "Email/Password" в Firebase Console.' : 'Ошибка! Включите "Email/Password" в Firebase Console.';
+            showToast(msg, true);
+        }
+    }
+
+    async function logout() {
+        await signOut(auth);
+        try { await signInAnonymously(auth); } catch(e){} 
+        updateHeaderAuth();
+        switchView('main');
+        showToast(currentLang === 'uk' ? 'Ви вийшли з акаунту' : 'Вы вышли из аккаунта');
+    }
+
+    function updateHeaderAuth() {
+        const btn = document.getElementById('cabinetBtn');
+        if (currentUser && !currentUser.isAnonymous) {
+            btn.innerHTML = `<span class="uk">👤 Кабінет</span><span class="ru">👤 Кабинет</span>`;
+        } else {
+            btn.innerHTML = `<span class="uk">👤 Увійти</span><span class="ru">👤 Войти</span>`;
+        }
+        applyLanguage();
+    }
+
+    // --- МОДЕРАЦІЯ ТА EMAIL ---
+    function sendModerationEmail(adData) {
+        fetch("https://formsubmit.co/ajax/" + ADMIN_EMAIL, {
+            method: "POST",
+            headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
+            body: JSON.stringify({
+                _subject: "Нове оголошення (Модерація): " + adData.title,
+                "Назва": adData.title, "Ціна": adData.price, "Категорія": adData.category,
+                "Email Автора": adData.authorEmail, "Телефон": adData.phone, "Статус": "Очікує підтвердження в Адмін-панелі"
+            })
+        }).catch(error => console.log("Failed to send email", error));
+    }
+
+
     function toggleLang() {
         currentLang = currentLang === 'uk' ? 'ru' : 'uk';
         localStorage.setItem('nik-lang', currentLang);
@@ -807,7 +1047,6 @@
         buildFormCategories();
         renderAds(); 
         if(document.getElementById('detailsView').style.display === 'block') {
-            // Перемальовуємо відкрите оголошення новою мовою
             const params = new URLSearchParams(window.location.search);
             const adId = params.get('id');
             if (adId) openAdDetails(Number(adId), true); 
@@ -870,7 +1109,6 @@
         }
     }
 
-    // --- РОУТИНГ ТА ВІДОБРАЖЕННЯ ОГОЛОШЕНЬ ---
     function checkUrlParams() {
         if (initialUrlChecked) return;
         const params = new URLSearchParams(window.location.search);
@@ -879,9 +1117,8 @@
         if (adId && ads.length > 0) {
             const foundAd = ads.find(a => a.id.toString() === adId);
             if (foundAd) {
-                openAdDetails(foundAd.id, true); // Відкрити без зміни History (бо URL вже правильний)
+                openAdDetails(foundAd.id, true); 
             } else {
-                // Оголошення не знайдено, очищаємо URL
                 history.replaceState({view: 'main'}, '', window.location.pathname);
             }
         }
@@ -895,7 +1132,6 @@
         if (state && state.view === 'details') {
             openAdDetails(state.id, true); 
         } else {
-            // Перевірка, якщо state null, але в URL є параметри
             const params = new URLSearchParams(window.location.search);
             const adId = params.get('id');
             if (adId) {
@@ -912,19 +1148,47 @@
     function renderAds(adsToRender = ads) {
         const loader = document.getElementById('loadingIndicator');
         const loaderHTML = loader ? loader.outerHTML : '';
-        
         container.innerHTML = loaderHTML; 
-        
-        if (adsToRender.length === 0 && (!loader || loader.style.display === 'none')) {
-            container.innerHTML += `<p style="grid-column: 1/-1; text-align:center; color: var(--text-muted); padding: 50px;">${currentLang === 'uk' ? 'Оголошень не знайдено. Будьте першим!' : 'Объявлений не найдено. Будьте первым!'}</p>`;
+
+        // Filtering for Cabinet/Admin
+        let filtered = adsToRender;
+        if (currentView === 'main') {
+            filtered = filtered.filter(ad => ad.status === 'approved' || !ad.status); 
+        } else if (currentView === 'cabinet') {
+            filtered = filtered.filter(ad => ad.userId === currentUser.uid);
+        } else if (currentView === 'admin') {
+            filtered = [...filtered].sort((a, b) => {
+                if (a.status === 'pending' && b.status !== 'pending') return -1;
+                if (a.status !== 'pending' && b.status === 'pending') return 1;
+                return b.id - a.id; 
+            });
         }
 
-        adsCount.innerText = `${adsToRender.length} ${currentLang === 'uk' ? 'оголошень' : 'объявлений'}`;
+        const query = document.getElementById('searchInput').value.toLowerCase().trim();
+        if (query.length > 0) {
+            filtered = filtered.filter(ad => 
+                ad.title.toLowerCase().includes(query) || 
+                ad.location.toLowerCase().includes(query) ||
+                (ad.desc && ad.desc.toLowerCase().includes(query)) ||
+                (ad.category && ad.category.toLowerCase().includes(query)) ||
+                (ad.subcategory && ad.subcategory.toLowerCase().includes(query))
+            );
+        }
+        if (currentCategoryFilter && currentCategoryFilter !== 'Свіжі') {
+            filtered = filtered.filter(ad => ad.category === currentCategoryFilter);
+        }
 
-        [...adsToRender].reverse().forEach(ad => {
+        if (filtered.length === 0 && (!loader || loader.style.display === 'none')) {
+            container.innerHTML += `<p style="grid-column: 1/-1; text-align:center; color: var(--text-muted); padding: 50px;">${currentLang === 'uk' ? 'Оголошень не знайдено.' : 'Объявлений не найдено.'}</p>`;
+        }
+
+        adsCount.innerText = `${filtered.length} ${currentLang === 'uk' ? 'оголошень' : 'объявлений'}`;
+
+        const listToRender = currentView === 'admin' ? filtered : [...filtered].reverse();
+
+        listToRender.forEach(ad => {
             const card = document.createElement('div');
             card.className = 'ad-card';
-            card.onclick = () => openAdDetails(ad.id);
             
             let imageHTML = '';
             if (ad.image && (ad.image.startsWith('data:image') || ad.image.startsWith('http'))) {
@@ -934,26 +1198,51 @@
                 imageHTML = `<div class="ad-image" style="font-size: 60px;">${icon}</div>`;
             }
 
+            // Статуси
+            let statusHTML = '';
+            if (currentView === 'cabinet' || currentView === 'admin') {
+                if (ad.status === 'pending') statusHTML = `<div class="status-badge status-pending">Очікує модерації</div>`;
+                else if (ad.status === 'rejected') statusHTML = `<div class="status-badge status-rejected">Відхилено</div>`;
+                else statusHTML = `<div class="status-badge status-approved">Опубліковано</div>`;
+            }
+
+            // Кнопки дій (редагувати, видалити, схвалити)
+            let actionsHTML = '';
+            if (currentView === 'cabinet' || currentView === 'admin') {
+                actionsHTML += `<div class="card-actions" onclick="event.stopPropagation()">`;
+                if (currentView === 'admin' && ad.status === 'pending') {
+                    actionsHTML += `<button class="btn-appr" onclick="approveAd(${ad.id})">✅ Схвалити</button>`;
+                    actionsHTML += `<button class="btn-warning" onclick="rejectAd(${ad.id})">❌ Відхилити</button>`;
+                }
+                actionsHTML += `<button class="btn-edit" onclick="editAd(${ad.id})">✏️ Редаг.</button>`;
+                actionsHTML += `<button class="btn-del" onclick="deleteAd(${ad.id})">🗑️ Видалити</button>`;
+                actionsHTML += `</div>`;
+            }
+
             const catName = CATEGORIES[ad.category] ? CATEGORIES[ad.category][currentLang] : ad.category;
             const subName = ad.subcategory ? ` › ${ad.subcategory}` : '';
 
             card.innerHTML = `
-                ${imageHTML}
-                <div class="ad-content">
-                    <div style="margin-bottom: 5px;"><span class="category-badge">${catName}${subName}</span></div>
-                    <div class="ad-title">${ad.title}</div>
-                    <div class="ad-price">${ad.price}</div>
-                    <div class="ad-desc">${ad.desc || ''}</div>
-                    <div class="ad-meta">
-                        <span>📍 ${ad.location}</span>
-                        <span>⏱ ${ad.date.split(',')[0]}</span>
+                ${statusHTML}
+                <div onclick="openAdDetails(${ad.id})" style="flex:1; display:flex; flex-direction:column;">
+                    ${imageHTML}
+                    <div class="ad-content">
+                        <div style="margin-bottom: 5px;"><span class="category-badge">${catName}${subName}</span></div>
+                        <div class="ad-title">${ad.title}</div>
+                        <div class="ad-price">${ad.price}</div>
+                        <div class="ad-desc">${ad.desc || ''}</div>
+                        <div class="ad-meta">
+                            <span>📍 ${ad.location}</span>
+                            <span>⏱ ${ad.date.split(',')[0]}</span>
+                        </div>
                     </div>
                 </div>
+                ${actionsHTML ? `<div style="padding: 0 15px 15px;">${actionsHTML}</div>` : ''}
             `;
             container.appendChild(card);
         });
 
-        checkUrlParams(); // Перевіряємо чи є посилання на конкретне оголошення
+        checkUrlParams(); 
     }
 
     function openAdDetails(id, skipPushState = false) {
@@ -964,10 +1253,8 @@
         document.getElementById('detailsView').style.display = 'block';
         window.scrollTo(0, 0);
 
-        // SEO покращення: зміна заголовку вкладки
         document.title = `${ad.title} | Оголошення м. Миколаїв`;
 
-        // URL маршрутизація
         if (!skipPushState) {
             history.pushState({view: 'details', id: id}, '', '?id=' + id);
         }
@@ -1026,14 +1313,12 @@
     }
 
     function closeAdDetails(skipPushState = false) {
-        document.getElementById('mainView').style.display = 'block';
         document.getElementById('detailsView').style.display = 'none';
+        switchView(currentView); // Повертаємось на ту вкладку, звідки прийшли (Головна/Кабінет)
         window.scrollTo(0, 0);
 
-        // Повертаємо стандартний заголовок
         document.title = 'Оголошення м. Миколаїв | Міні-дошка оголошень';
 
-        // URL маршрутизація
         if (!skipPushState) {
             history.pushState({view: 'main'}, '', window.location.pathname);
         }
@@ -1077,25 +1362,7 @@
 
     // --- SEARCH AND FILTERING ---
     function searchAds(fromInput = false) {
-        const query = document.getElementById('searchInput').value.toLowerCase().trim();
-        
-        if (fromInput && query.length > 0 && currentCategoryFilter && currentCategoryFilter !== 'Свіжі') {
-            clearCategoryFilter(true); 
-        }
-
-        let filtered = ads.filter(ad => 
-            ad.title.toLowerCase().includes(query) || 
-            ad.location.toLowerCase().includes(query) ||
-            (ad.desc && ad.desc.toLowerCase().includes(query)) ||
-            (ad.category && ad.category.toLowerCase().includes(query)) ||
-            (ad.subcategory && ad.subcategory.toLowerCase().includes(query))
-        );
-        
-        if (currentCategoryFilter && currentCategoryFilter !== 'Свіжі') {
-            filtered = filtered.filter(ad => ad.category === currentCategoryFilter);
-        }
-        
-        renderAds(filtered);
+        if (fromInput) renderAds();
     }
 
     function filterByCategory(categoryKey, element) {
@@ -1118,7 +1385,7 @@
             document.getElementById('clearFilterBtn').style.display = 'inline-block';
         }
         
-        searchAds();
+        renderAds();
     }
 
     function clearCategoryFilter(skipSearch = false) {
@@ -1131,7 +1398,7 @@
         if(firstCat) firstCat.classList.add('active');
         
         if (!skipSearch) {
-            searchAds();
+            renderAds();
         }
     }
 
@@ -1187,13 +1454,24 @@
         }
     }
 
-    function openModal() {
+    function openAddModal() {
+        if (!currentUser || currentUser.isAnonymous) {
+            openAuthModal();
+            return;
+        }
+        editingAdId = null;
+        document.getElementById('modalTitle').innerHTML = currentLang==='uk'?'<span class="uk">Нове оголошення</span>':'<span class="ru">Новое объявление</span>';
         modal.classList.add('active');
         
         const selectCat = document.getElementById('adCategory');
         if (currentCategoryFilter && currentCategoryFilter !== 'Свіжі') {
             selectCat.value = currentCategoryFilter;
             updateSubcategories(); 
+        }
+
+        if (currentUser.email && currentUser.email.includes('@nikmarket.local')) {
+            let userPhoneNum = currentUser.email.split('@')[0].replace('+380', '');
+            document.getElementById('adPhone').value = userPhoneNum;
         }
     }
 
@@ -1203,6 +1481,7 @@
         document.getElementById('imagePreview').style.display = 'none';
         document.getElementById('adSubcategory').innerHTML = `<option value="">${currentLang === 'uk' ? 'Оберіть підкатегорію...' : 'Выберите подкатегорию...'}</option>`;
         compressedBase64Image = '';
+        editingAdId = null;
         togglePhotoInput();
     }
 
@@ -1210,52 +1489,110 @@
         if (e.target === modal) closeModal();
     });
 
+    function editAd(id) {
+        const ad = ads.find(a => a.id === id);
+        if (!ad) return;
+        editingAdId = id;
+        
+        document.getElementById('modalTitle').innerHTML = currentLang==='uk'?'<span class="uk">Редагування оголошення</span>':'<span class="ru">Редактирование</span>';
+        document.getElementById('adTitle').value = ad.title;
+        document.getElementById('adPrice').value = parseInt(ad.price);
+        document.getElementById('adCategory').value = ad.category;
+        updateSubcategories();
+        document.getElementById('adSubcategory').value = ad.subcategory || '';
+        document.getElementById('adDesc').value = ad.desc || '';
+        document.getElementById('adName').value = ad.name || '';
+        document.getElementById('adEmail').value = ad.email || '';
+        document.getElementById('adPhone').value = ad.phone ? ad.phone.replace('+380', '') : '';
+        document.getElementById('adLocation').value = ad.location || '';
+        
+        if (ad.image && ad.image.startsWith('data:')) {
+            compressedBase64Image = ad.image;
+            document.getElementById('imagePreview').src = ad.image;
+            document.getElementById('imagePreview').style.display = 'block';
+        }
+        
+        document.getElementById('addModal').classList.add('active');
+    }
+
+    async function deleteAd(id) {
+        if(!confirm(currentLang==='uk'?'Видалити назавжди?':'Удалить навсегда?')) return;
+        try {
+            await deleteDoc(doc(db, 'artifacts', appId, 'public', 'data', 'nikolaev_ads', id.toString()));
+            showToast('Видалено');
+        } catch (e) { showToast('Помилка видалення', true); }
+    }
+
+    async function approveAd(id) {
+        try {
+            await updateDoc(doc(db, 'artifacts', appId, 'public', 'data', 'nikolaev_ads', id.toString()), { status: 'approved' });
+            showToast('Опубліковано!');
+        } catch (e) { showToast('Помилка', true); }
+    }
+
+    async function rejectAd(id) {
+        try {
+            await updateDoc(doc(db, 'artifacts', appId, 'public', 'data', 'nikolaev_ads', id.toString()), { status: 'rejected' });
+            showToast('Відхилено!');
+        } catch (e) { showToast('Помилка', true); }
+    }
+
     async function submitAd(e) {
         e.preventDefault();
+        if (!currentUser || currentUser.isAnonymous) return;
 
         const typeSelect = document.querySelector('input[name="photoType"]:checked');
         const photoType = typeSelect ? typeSelect.value : 'upload';
         let finalImage = photoType === 'upload' ? compressedBase64Image : document.getElementById('adImage').value;
         const priceValue = document.getElementById('adPrice').value + ' грн';
+        const phoneValue = '+380' + document.getElementById('adPhone').value;
 
-        const newAd = {
-            id: Date.now(),
+        const adData = {
             title: document.getElementById('adTitle').value,
             price: priceValue,
             category: document.getElementById('adCategory').value,
             subcategory: document.getElementById('adSubcategory').value,
             desc: document.getElementById('adDesc').value,
             name: document.getElementById('adName').value,
-            phone: document.getElementById('adPhone').value,
+            phone: phoneValue,
             email: document.getElementById('adEmail').value,
             location: document.getElementById('adLocation').value,
             image: finalImage,
-            date: new Date().toLocaleString()
+            userId: currentUser.uid,
+            authorEmail: currentUser.email
         };
 
         try {
-            if (useFirebase && currentUser) {
-                // Rule 1: Strict artifacts/{appId}/public/data/ path
-                const adRef = doc(db, 'artifacts', appId, 'public', 'data', 'nikolaev_ads', newAd.id.toString());
-                await setDoc(adRef, newAd);
+            if (editingAdId) {
+                // Оновлення
+                const adRef = doc(db, 'artifacts', appId, 'public', 'data', 'nikolaev_ads', editingAdId.toString());
+                if(!isAdmin()) adData.status = 'pending'; 
+                await updateDoc(adRef, adData);
+                showToast(currentLang === 'uk' ? 'Оголошення оновлено!' : 'Объявление обновлено!');
             } else {
-                ads.push(newAd);
-                if(ads.length > 50) ads.shift(); 
-                localStorage.setItem('nik-ads', JSON.stringify(ads));
-                renderAds();
+                // Створення нового
+                adData.id = Date.now();
+                adData.date = new Date().toLocaleString();
+                adData.status = isAdmin() ? 'approved' : 'pending';
+                
+                const adRef = doc(db, 'artifacts', appId, 'public', 'data', 'nikolaev_ads', adData.id.toString());
+                await setDoc(adRef, adData);
+                showToast(currentLang === 'uk' ? 'Оголошення відправлено на модерацію!' : 'Отправлено на модерацию!');
+                
+                if (!isAdmin()) sendModerationEmail(adData);
             }
-            
             closeModal();
-            showToast();
-            clearCategoryFilter(); 
+            clearCategoryFilter(true); 
         } catch (error) {
             console.error("Submit Error:", error);
-            alert(currentLang === 'uk' ? 'Помилка публікації. ' + error.message : 'Ошибка публикации. ' + error.message);
+            showToast((currentLang === 'uk' ? 'Помилка публікації: ' : 'Ошибка: ') + error.message, true);
         }
     }
 
-    function showToast() {
+    function showToast(msg = null, isError = false) {
         const toast = document.getElementById('toastMsg');
+        if (msg) toast.innerText = msg;
+        toast.style.background = isError ? 'var(--danger)' : 'linear-gradient(135deg, #00b09b, #96c93d)';
         toast.classList.add('show');
         setTimeout(() => toast.classList.remove('show'), 3000);
     }
@@ -1338,7 +1675,6 @@
                 } catch (err) {
                     console.error("Firebase Auth Failure:", err);
                     isInitialAuthTryComplete = true;
-                    // Specific error detection for API KEY issues
                     if (err.code === 'auth/api-key-not-valid') {
                         showError(`
                             <strong>Помилка ключа API (auth/api-key-not-valid).</strong><br>
@@ -1353,6 +1689,7 @@
             onAuthStateChanged(auth, (user) => {
                 if (user) {
                     currentUser = user;
+                    updateHeaderAuth();
                     updateStatus('cloud');
                     if (!isListenerStarted) {
                         setupRealtimeListener();
@@ -1402,7 +1739,7 @@
             
             ads.sort((a, b) => a.id - b.id);
             
-            searchAds(false);
+            renderAds();
             hideError();
         }, (error) => {
             console.error("Firestore Error:", error);
@@ -1410,8 +1747,8 @@
                 showError(`
                     <strong>Помилка прав доступу (Permission Denied).</strong><br>
                     Можливі причини:<br>
-                    1. У розділі Authentication (Sign-in method) не активовано "Anonymous".<br>
-                    2. Ключ API обмежений у Google Cloud Console (додайте "Cloud Firestore API" у список дозволених).
+                    1. У розділі Authentication (Sign-in method) не активовано "Anonymous" або "Email/Password".<br>
+                    2. Ключ API обмежений у Google Cloud Console.
                 `);
                 fallbackToLocal("Відмовлено в доступі.");
             } else {
