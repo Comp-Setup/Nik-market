@@ -80,10 +80,29 @@
         }
 
         /* Статус підключення */
-        .conn-status { font-size: 10px; padding: 4px 10px; border-radius: 12px; display: flex; align-items: center; gap: 6px; font-weight: bold; background: var(--bg); border: 1px solid var(--border); }
+        .conn-status { 
+            font-size: 10px; 
+            padding: 4px 10px; 
+            border-radius: 12px; 
+            display: flex; 
+            align-items: center; 
+            gap: 6px; 
+            font-weight: bold; 
+            background: var(--bg); 
+            border: 1px solid var(--border); 
+            min-width: 90px;
+            justify-content: center;
+        }
         .conn-status .dot { width: 8px; height: 8px; border-radius: 50%; display: inline-block; }
         .dot-cloud { background: #00c853; box-shadow: 0 0 6px #00c853; }
         .dot-local { background: #ff3d00; box-shadow: 0 0 6px #ff3d00; }
+        .dot-sync { background: #4776E6; box-shadow: 0 0 6px #4776E6; animation: pulse 1.5s infinite; }
+
+        @keyframes pulse {
+            0% { opacity: 1; }
+            50% { opacity: 0.4; }
+            100% { opacity: 1; }
+        }
 
         .header-actions {
             display: flex;
@@ -389,8 +408,8 @@
         <div class="logo-box">
             <a class="logo" onclick="closeAdDetails()">NIK-MARKET</a>
             <div id="statusBadge" class="conn-status">
-                <span class="dot dot-local"></span>
-                <span class="uk">Local</span><span class="ru">Local</span>
+                <span class="dot dot-sync"></span>
+                <span class="uk">Підключення...</span><span class="ru">Подключение...</span>
             </div>
         </div>
         <div class="header-actions">
@@ -640,7 +659,7 @@
             icon: "💼", uk: "Робота", ru: "Работа", 
             sub: { 
                 uk: ["Роздрібна торгівля / Продажі", "Логістика / Склад / Доставка", "Будівництво / Архітектура", "IT / Телекомунікації", "Без досвіду / Студенти", "Ресторанний бізнес / Кулінарія", "Готельно-туристичний бізнес", "Виробництво / Робітничі спеціальності", "Охорона / Безпека", "Медицина / Фармація", "Освіта / Наука", "Краса / Фітнес / Спорт", "Бухгалтерія / Фінанси", "Маркетинг / Реклама / PR", "HR / Управління персоналом", "Віддалена робота / Фріланс"], 
-                ru: ["Розничная торговля / Продажи", "Логистика / Склад / Доставка", "Строительство / Архитектура", "IT / Телекоммуникации", "Без опыта / Студенты", "Ресторанный бизнес / Кулинария", "Гостиничный бизнес / Кулинария", "Производство / Рабочие специальности", "Охрана / Безопасность", "Медицина / Фармация", "Образование / Наука", "Красота / Фитнес / Спорт", "Бухгалтерия / Финансы", "Маркетинг / Реклама / PR", "HR / Управление персоналом", "Удаленная работа / Фриланс"] 
+                ru: ["Розничная торговля / Продажи", "Логистика / Склад / Доставка", "Строительство / Архитектура", "IT / Телекоммуникации", "Без опыта / Студенты", "Ресторанный бизнес / Кулинария", "Гостиничный бизнес / Кулинария", "Производство / Рабочие специальности", "Охрана / Безопасность", "Медицина / Фармация", "Образование / Наука", "Красота / Фитнес / Спорт", "Бухгалтерия / Финансы", "Маркетинг / Реклама / PR", "HR / Управление параллелью", "Удаленная работа / Фриланс"] 
             } 
         },
         "Тварини": { 
@@ -654,7 +673,7 @@
             icon: "🪴", uk: "Дім і Сад", ru: "Дом и Сад", 
             sub: { 
                 uk: ["Меблі для вітальні", "Меблі для спальні", "Кухонні меблі", "Садові та вуличні меблі", "Предмети інтер'єру та декор", "Кімнатні рослини", "Посуд та кухонне приладдя", "Садово-городній інвентар", "Насіння та саджанці", "Будівельні матеріали", "Оздоблювальні матеріали", "Інструменти (Електро та ручні)", "Сантехніка", "Освітлення", "Господарський інвентар / Побутова хімія"], 
-                ru: ["Мебель для гостиной", "Мебель для спальни", "Кухонная мебель", "Садовая и уличная мебель", "Предметы интерьера и декор", "Комнатные растения", "Посуда и кухонные принадлежности", "Садово-огородный инвентарь", "Семена и саженцы", "Строительные материалы", "Отделочные материалы", "Инструменты (Электро и ручные)", "Сантехника", "Освещение", "Хозяйственный инвентарь / Бытовая химия"] 
+                ru: ["Мебель для гостиной", "Мебель для спальни", "Кухонная мебель", "Садовая и уличная мебель", "Предметы интерьера и декор", "Комнатные растения", "Посуда и кухонные принадлежности", "Садово-огородный инвентарь", "Семена и саженцы", "Строительные материалы", "Отделочные материалы", "Инструменты (Эклектро и ручные)", "Сантехника", "Освещение", "Хозяйственный инвентарь / Бытовая химия"] 
             } 
         },
         "Бізнес та Послуги": { 
@@ -709,20 +728,25 @@
         buildFormCategories();
     }
 
-    function updateStatus(isCloud) {
+    function updateStatus(status) {
         const badge = document.getElementById('statusBadge');
         if (!badge) return;
         const dot = badge.querySelector('.dot');
         const textUk = badge.querySelector('.uk');
         const textRu = badge.querySelector('.ru');
-        if (isCloud) {
+        
+        if (status === 'cloud') {
             dot.className = 'dot dot-cloud';
             if (textUk) textUk.innerText = 'Cloud';
             if (textRu) textRu.innerText = 'Cloud';
-        } else {
+        } else if (status === 'local') {
             dot.className = 'dot dot-local';
             if (textUk) textUk.innerText = 'Local';
             if (textRu) textRu.innerText = 'Local';
+        } else {
+            dot.className = 'dot dot-sync';
+            if (textUk) textUk.innerText = 'Підключення...';
+            if (textRu) textRu.innerText = 'Подключение...';
         }
     }
 
@@ -1129,7 +1153,7 @@
     }
 
     function fallbackToLocal() {
-        updateStatus(false);
+        updateStatus('local');
         document.getElementById('loadingIndicator').style.display = 'none';
         let localAds = JSON.parse(localStorage.getItem('nik-ads'));
         ads = localAds ? localAds : [];
@@ -1143,9 +1167,14 @@
         const configString = typeof __firebase_config !== 'undefined' ? __firebase_config : null;
         
         if (configString && configString.trim() !== "" && configString !== "{}") {
-            const firebaseConfig = JSON.parse(configString);
+            let firebaseConfig;
+            try {
+                firebaseConfig = typeof configString === 'object' ? configString : JSON.parse(configString);
+            } catch(e) {
+                firebaseConfig = null;
+            }
             
-            if (firebaseConfig.apiKey) {
+            if (firebaseConfig && firebaseConfig.apiKey) {
                 const app = initializeApp(firebaseConfig);
                 auth = getAuth(app);
                 db = getFirestore(app);
@@ -1164,10 +1193,10 @@
                 onAuthStateChanged(auth, (user) => {
                     currentUser = user;
                     if (user) {
-                        updateStatus(true);
+                        updateStatus('cloud');
                         setupRealtimeListener();
                     } else {
-                        updateStatus(false);
+                        updateStatus('local');
                     }
                 });
             } else {
