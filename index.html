@@ -465,6 +465,12 @@
             .search-bar, .form-row { flex-direction: column; gap: 0; }
             .ad-details-container { flex-direction: column; gap: 20px; padding: 20px; }
             .ad-details-image-wrapper { min-height: 250px; }
+            
+            .nav-container { flex-direction: column; align-items: stretch; padding: 10px; gap: 15px; }
+            .logo-box { justify-content: space-between; }
+            .header-actions { justify-content: center; gap: 8px; flex-wrap: wrap; }
+            .btn { padding: 8px 14px; font-size: 13px; flex: 1; min-width: 140px; text-align: center; }
+            #langToggle, #themeToggle { flex: 0 0 auto; min-width: 40px; }
         }
     </style>
 </head>
@@ -1200,7 +1206,7 @@
 
             // Статуси
             let statusHTML = '';
-            if (currentView === 'cabinet' || currentView === 'admin') {
+            if (currentUser && (ad.userId === currentUser.uid || isAdmin())) {
                 if (ad.status === 'pending') statusHTML = `<div class="status-badge status-pending">Очікує модерації</div>`;
                 else if (ad.status === 'rejected') statusHTML = `<div class="status-badge status-rejected">Відхилено</div>`;
                 else statusHTML = `<div class="status-badge status-approved">Опубліковано</div>`;
@@ -1208,9 +1214,9 @@
 
             // Кнопки дій (редагувати, видалити, схвалити)
             let actionsHTML = '';
-            if (currentView === 'cabinet' || currentView === 'admin') {
-                actionsHTML += `<div class="card-actions" onclick="event.stopPropagation()">`;
-                if (currentView === 'admin' && ad.status === 'pending') {
+            if (currentUser && (ad.userId === currentUser.uid || isAdmin())) {
+                actionsHTML += `<div class="card-actions" onclick="event.preventDefault(); event.stopPropagation();">`;
+                if (isAdmin() && ad.status === 'pending') {
                     actionsHTML += `<button class="btn-appr" onclick="approveAd(${ad.id})">✅ Схвалити</button>`;
                     actionsHTML += `<button class="btn-warning" onclick="rejectAd(${ad.id})">❌ Відхилити</button>`;
                 }
@@ -1224,7 +1230,7 @@
 
             card.innerHTML = `
                 ${statusHTML}
-                <div onclick="openAdDetails(${ad.id})" style="flex:1; display:flex; flex-direction:column;">
+                <a href="?id=${ad.id}" target="_blank" style="flex:1; display:flex; flex-direction:column; text-decoration:none; color:inherit;">
                     ${imageHTML}
                     <div class="ad-content">
                         <div style="margin-bottom: 5px;"><span class="category-badge">${catName}${subName}</span></div>
@@ -1236,7 +1242,7 @@
                             <span>⏱ ${ad.date.split(',')[0]}</span>
                         </div>
                     </div>
-                </div>
+                </a>
                 ${actionsHTML ? `<div style="padding: 0 15px 15px;">${actionsHTML}</div>` : ''}
             `;
             container.appendChild(card);
@@ -1279,6 +1285,19 @@
         const clickAction = hasImage ? `onclick="openLightbox('${ad.image}')"` : '';
         const cursorStyle = hasImage ? 'cursor: zoom-in;' : 'cursor: default;';
 
+        // Додаємо кнопки керування прямо в середину оголошення
+        let actionsHTML = '';
+        if (currentUser && (ad.userId === currentUser.uid || isAdmin())) {
+            actionsHTML = `<div style="margin-top: 20px; display: flex; gap: 10px; border-top: 1px solid var(--border); padding-top: 20px; flex-wrap: wrap;">`;
+            if (isAdmin() && ad.status === 'pending') {
+                actionsHTML += `<button class="btn btn-success" style="flex:1; min-width: 120px;" onclick="approveAd(${ad.id}); closeAdDetails(true);">✅ Схвалити</button>`;
+                actionsHTML += `<button class="btn btn-warning" style="flex:1; min-width: 120px;" onclick="rejectAd(${ad.id}); closeAdDetails(true);">❌ Відхилити</button>`;
+            }
+            actionsHTML += `<button class="btn btn-primary" style="flex:1; min-width: 120px;" onclick="editAd(${ad.id})">✏️ Редагувати</button>`;
+            actionsHTML += `<button class="btn btn-danger" style="flex:1; min-width: 120px;" onclick="deleteAd(${ad.id}); closeAdDetails(true);">🗑️ Видалити</button>`;
+            actionsHTML += `</div>`;
+        }
+
         const detailsHTML = `
             <div class="ad-details-container">
                 <div class="ad-details-image-wrapper" ${clickAction} style="${cursorStyle}">
@@ -1305,6 +1324,8 @@
                             <span>📍 ${ad.location}</span>
                             <span>⏱ ${ad.date}</span>
                         </div>
+                        
+                        ${actionsHTML}
                     </div>
                 </div>
             </div>
