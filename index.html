@@ -1214,7 +1214,7 @@
 
             // Кнопки дій (редагувати, видалити, схвалити)
             let actionsHTML = '';
-            if (currentUser && (ad.userId === currentUser.uid || isAdmin())) {
+            if (currentUser && !currentUser.isAnonymous && (ad.userId === currentUser.uid || isAdmin())) {
                 actionsHTML += `<div class="card-actions" onclick="event.preventDefault(); event.stopPropagation();">`;
                 if (isAdmin() && ad.status === 'pending') {
                     actionsHTML += `<button class="btn-appr" onclick="approveAd(${ad.id})">✅ Схвалити</button>`;
@@ -1287,7 +1287,7 @@
 
         // Додаємо кнопки керування прямо в середину оголошення
         let actionsHTML = '';
-        if (currentUser && (ad.userId === currentUser.uid || isAdmin())) {
+        if (currentUser && !currentUser.isAnonymous && (ad.userId === currentUser.uid || isAdmin())) {
             actionsHTML = `<div style="margin-top: 20px; display: flex; gap: 10px; border-top: 1px solid var(--border); padding-top: 20px; flex-wrap: wrap;">`;
             if (isAdmin() && ad.status === 'pending') {
                 actionsHTML += `<button class="btn btn-success" style="flex:1; min-width: 120px;" onclick="approveAd(${ad.id}); closeAdDetails(true);">✅ Схвалити</button>`;
@@ -1687,10 +1687,13 @@
             // Rule 3: Auth Before Queries - Guarding with await
             const initAuth = async () => {
                 try {
-                    if (typeof __initial_auth_token !== 'undefined' && __initial_auth_token) {
-                        await signInWithCustomToken(auth, __initial_auth_token);
-                    } else {
-                        await signInAnonymously(auth);
+                    await auth.authStateReady(); // Очікуємо відновлення попередньої сесії з кешу
+                    if (!auth.currentUser) {
+                        if (typeof __initial_auth_token !== 'undefined' && __initial_auth_token) {
+                            await signInWithCustomToken(auth, __initial_auth_token);
+                        } else {
+                            await signInAnonymously(auth);
+                        }
                     }
                     isInitialAuthTryComplete = true;
                 } catch (err) {
