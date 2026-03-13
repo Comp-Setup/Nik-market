@@ -660,6 +660,7 @@
     let compressedBase64Image = '';
     let isListenerStarted = false;
     let isInitialAuthTryComplete = false;
+    let initialUrlChecked = false; // Flag for checking direct links
 
     const CATEGORIES = {
         "Свіжі": { icon: "🔥", uk: "Свіжі оголошення", ru: "Свежие объявления", sub: { uk:[], ru:[] } },
@@ -806,7 +807,10 @@
         buildFormCategories();
         renderAds(); 
         if(document.getElementById('detailsView').style.display === 'block') {
-            closeAdDetails(); 
+            // Перемальовуємо відкрите оголошення новою мовою
+            const params = new URLSearchParams(window.location.search);
+            const adId = params.get('id');
+            if (adId) openAdDetails(Number(adId), true); 
         }
     }
 
@@ -866,6 +870,42 @@
         }
     }
 
+    // --- РОУТИНГ ТА ВІДОБРАЖЕННЯ ОГОЛОШЕНЬ ---
+    function checkUrlParams() {
+        if (initialUrlChecked) return;
+        const params = new URLSearchParams(window.location.search);
+        const adId = params.get('id');
+        
+        if (adId && ads.length > 0) {
+            const foundAd = ads.find(a => a.id.toString() === adId);
+            if (foundAd) {
+                openAdDetails(foundAd.id, true); // Відкрити без зміни History (бо URL вже правильний)
+            } else {
+                // Оголошення не знайдено, очищаємо URL
+                history.replaceState({view: 'main'}, '', window.location.pathname);
+            }
+        }
+        if (ads.length > 0) {
+            initialUrlChecked = true;
+        }
+    }
+
+    window.addEventListener('popstate', (event) => {
+        const state = event.state;
+        if (state && state.view === 'details') {
+            openAdDetails(state.id, true); 
+        } else {
+            // Перевірка, якщо state null, але в URL є параметри
+            const params = new URLSearchParams(window.location.search);
+            const adId = params.get('id');
+            if (adId) {
+                openAdDetails(Number(adId), true);
+            } else {
+                closeAdDetails(true);
+            }
+        }
+    });
+
     const container = document.getElementById('adsContainer');
     const adsCount = document.getElementById('adsCount');
 
@@ -912,15 +952,25 @@
             `;
             container.appendChild(card);
         });
+
+        checkUrlParams(); // Перевіряємо чи є посилання на конкретне оголошення
     }
 
-    function openAdDetails(id) {
+    function openAdDetails(id, skipPushState = false) {
         const ad = ads.find(a => a.id === id);
         if (!ad) return;
 
         document.getElementById('mainView').style.display = 'none';
         document.getElementById('detailsView').style.display = 'block';
         window.scrollTo(0, 0);
+
+        // SEO покращення: зміна заголовку вкладки
+        document.title = `${ad.title} | Оголошення м. Миколаїв`;
+
+        // URL маршрутизація
+        if (!skipPushState) {
+            history.pushState({view: 'details', id: id}, '', '?id=' + id);
+        }
 
         const catName = CATEGORIES[ad.category] ? CATEGORIES[ad.category][currentLang] : ad.category;
         const subName = ad.subcategory ? ` › ${ad.subcategory}` : '';
@@ -975,10 +1025,18 @@
         document.getElementById('adDetailsContent').innerHTML = detailsHTML;
     }
 
-    function closeAdDetails() {
+    function closeAdDetails(skipPushState = false) {
         document.getElementById('mainView').style.display = 'block';
         document.getElementById('detailsView').style.display = 'none';
         window.scrollTo(0, 0);
+
+        // Повертаємо стандартний заголовок
+        document.title = 'Оголошення м. Миколаїв | Міні-дошка оголошень';
+
+        // URL маршрутизація
+        if (!skipPushState) {
+            history.pushState({view: 'main'}, '', window.location.pathname);
+        }
     }
 
     // --- LIGHTBOX CONTROLS ---
