@@ -251,6 +251,7 @@
         .ad-content { padding: 20px; display: flex; flex-direction: column; flex: 1; }
         .ad-price { font-size: 22px; font-weight: 800; color: var(--primary); margin-bottom: 5px; }
         .ad-title { font-size: 16px; font-weight: 600; margin-bottom: 5px; line-height: 1.4; }
+        .ad-title { font-size: 16px; font-weight: 600; margin-bottom: 5px; line-height: 1.4; }
         .ad-desc { font-size: 13px; color: var(--text-muted); margin-bottom: 15px; flex: 1; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
         
         .ad-contacts {
@@ -727,7 +728,7 @@
         "Їжа": { 
             icon: "🦞", uk: "Їжа та Продукти", ru: "Еда и Продукты", 
             sub: { 
-                uk: ["М'ясо та ковбасні вироби", "Морепродукти та риба", "Раки свіжі та варені", "Овочі, фрукти та ягоди", "Молочні продукти", "Яйця", "Крупи та бакалія", "Мед та продукти бджільництва", "Домашня випічка та солодощі", "Напої (Соки, вода)", "Фермерські продукти", "Горіхи та сухофрукти"], 
+                uk: ["М'ясо та ковбасні вироби", "Морепродукти та риба", "Раки свіжі та варені", "Овочі, фрукты та ягоди", "Молочні продукти", "Яйця", "Крупи та бакалія", "Мед та продукти бджільництва", "Домашня випічка та солодощі", "Напої (Соки, вода)", "Фермерські продукти", "Горіхи та сухофрукти"], 
                 ru: ["Мясо и колбасные изделия", "Морепродукты и рыба", "Раки свежие и вареные", "Овощи, фрукты и ягоды", "Молочные продукты", "Яйца", "Крупы и бакалея", "Мед и продукты пчеловодства", "Домашняя выпечка и сладости", "Напитки (Соки, вода)", "Фермерские продукты", "Орехи и сухофрукты"] 
             } 
         },
@@ -1208,28 +1209,28 @@
     }
 
     // --- FIREBASE INITIALIZATION LOGIC ---
+    // Инициализация ВНЕ асинхронной функции для стабильности SDK
+    let firebaseConfig = HARDCODED_CONFIG;
+    if (typeof __firebase_config !== 'undefined' && __firebase_config) {
+        try {
+            const canvasConfig = typeof __firebase_config === 'string' ? JSON.parse(__firebase_config) : __firebase_config;
+            if (canvasConfig && canvasConfig.apiKey && canvasConfig.apiKey.length > 5) {
+                firebaseConfig = canvasConfig;
+            }
+        } catch(e) { console.error("Config parse fail", e); }
+    }
+    
+    const app = initializeApp(firebaseConfig);
+    auth = getAuth(app);
+    db = getFirestore(app);
+    appId = typeof __app_id !== 'undefined' ? __app_id : 'nik-market';
+
     async function startApp() {
         initSettings();
         clearCategoryFilter(true);
         updateStatus('sync'); 
         
         try {
-            // Приоритизируем __app_id как источник appId для артефакта
-            appId = typeof __app_id !== 'undefined' ? __app_id : 'nik-market';
-
-            let firebaseConfig = HARDCODED_CONFIG;
-            if (typeof __firebase_config !== 'undefined' && __firebase_config) {
-                try {
-                    const canvasConfig = typeof __firebase_config === 'string' ? JSON.parse(__firebase_config) : __firebase_config;
-                    if (canvasConfig && canvasConfig.apiKey) firebaseConfig = canvasConfig;
-                } catch(e) {}
-            } else {
-                console.log("Firebase config not found in env, using hardcoded fallback.");
-            }
-            
-            const app = initializeApp(firebaseConfig);
-            auth = getAuth(app);
-            db = getFirestore(app);
             useFirebase = true;
             
             // ПРАВИЛО 3: Сначала вызываем авторизацию и ждем её
@@ -1248,7 +1249,7 @@
                 }
             };
 
-            // Только после попытки авторизации подписываемся на изменения состояния
+            // Подписываемся на изменения состояния, но с задержкой принятия решения о Local
             onAuthStateChanged(auth, (user) => {
                 if (user) {
                     currentUser = user;
@@ -1258,9 +1259,11 @@
                         isListenerStarted = true;
                     }
                 } else {
-                    // Исправление: ждем, пока initAuth завершится, прежде чем паниковать о Local
+                    // Если процесс входа уже был завершен, а пользователя все еще нет - тогда Local
                     if (isInitialAuthTryComplete) {
-                        fallbackToLocal("User not authenticated");
+                        setTimeout(() => {
+                            if (!auth.currentUser) fallbackToLocal("User not authenticated");
+                        }, 2000);
                     }
                 }
             });
@@ -1311,7 +1314,8 @@
         });
     }
 
-    startApp();
+    // Запуск приложения после полной загрузки DOM
+    window.addEventListener('load', startApp);
 </script>
 </body>
 </html>
