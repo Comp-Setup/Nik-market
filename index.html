@@ -608,18 +608,17 @@
     import { getAuth, signInAnonymously, signInWithCustomToken, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
     import { getFirestore, collection, onSnapshot, setDoc, doc } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
 
-    // --- НАЛАШТУВАННЯ ДЛЯ GITHUB ---
-    // Вставте сюди дані зі своєї консолі Firebase (Settings -> Your apps)
+    // --- НАЛАШТУВАННЯ ---
     const HARDCODED_CONFIG = {
-        apiKey: "", 
-        authDomain: "",
-        projectId: "",
-        storageBucket: "",
-        messagingSenderId: "",
-        appId: ""
+        apiKey: "AIzaSyDlWrxWsxfFx54n0ixKICEVl2f-uyqssL8", 
+        authDomain: "nik--market.firebaseapp.com",
+        projectId: "nik--market",
+        storageBucket: "nik--market.firebasestorage.app",
+        messagingSenderId: "165947840731",
+        appId: "1:165947840731:web:1bfc394a4bc5c458a1d4fe"
     };
 
-    // --- 1. ПРИВ'ЯЗКА ФУНКЦІЙ ДО WINDOW (ГАРАНТУЄ РОБОТУ КНОПОК) ---
+    // --- 1. ПРИВ'ЯЗКА ФУНКЦІЙ ДО WINDOW ---
     window.toggleLang = toggleLang;
     window.openModal = openModal;
     window.closeModal = closeModal;
@@ -645,7 +644,6 @@
     let compressedBase64Image = '';
     let isListenerStarted = false;
 
-    // --- ДАНІ КАТЕГОРІЙ ТА ПІДКАТЕГОРІЙ ---
     const CATEGORIES = {
         "Свіжі": { icon: "🔥", uk: "Свіжі оголошення", ru: "Свежие объявления", sub: { uk:[], ru:[] } },
         "Хобі": { 
@@ -658,7 +656,7 @@
         "Електроніка": { 
             icon: "📱", uk: "Електроніка", ru: "Электроника", 
             sub: { 
-                uk: ["Смартфони та телефони", "Ноутбуки та ультрабуки", "ПК та системні блоки", "Планшети та електронні книги", "Комплектуючі та деталі", "Монітори та проектори", "Периферія (миші, клавіатури)", "Телевізори та плазми", "Аудіотехніка та акустика", "Фото- та відеотехніка", "Ігрові приставки та консолі", "Смарт-годинники та фітнес-браслети", "Побутова техніка для кухні", "Побутова техніка для дому", "Кліматичне обладнання (Кондиціонери)", "Аксесуари до электроніки"], 
+                uk: ["Смартфони та телефони", "Ноутбуки та ультрабуки", "ПК та системні блоки", "Планшети та електронні книги", "Комплектуючі та деталі", "Монітори та проектори", "Периферія (миші, клавіатури)", "Телевізори та плазми", "Аудіотехніка та акустика", "Фото- та відеотехніка", "Ігрові приставки та консолі", "Смарт-годинники та фітнес-браслети", "Побутова техніка для кухни", "Побутова техніка для дому", "Кліматичне обладнання (Кондиціонери)", "Аксесуари до электроніки"], 
                 ru: ["Смартфоны и телефоны", "Ноутбуки и ультрабуки", "ПК и системные блоки", "Планшеты и электронные книги", "Комплектующие и детали", "Мониторы и проекты", "Периферия (мыши, клавиатуры)", "Телевизоры и плазмы", "Аудиосистема и акустика", "Фото- и видеотехника", "Игровые приставки и консоли", "Смарт-часы и фитнес-браслеты", "Бытовая техника для кухни", "Бытовая техника для дома", "Климатическое оборудование (Кондиционеры)", "Аксессуары к электронике"] 
             } 
         },
@@ -774,7 +772,6 @@
             if (textRu) textRu.innerText = 'Local';
             if (errorMsg) {
                 badge.title = "Причина: " + errorMsg;
-                console.warn("Status Local Reason:", errorMsg);
             }
         } else if (status === 'sync') {
             dot.className = 'dot dot-sync';
@@ -967,6 +964,7 @@
         window.scrollTo(0, 0);
     }
 
+    // --- LIGHTBOX (ZOOM) FUNCTIONS ---
     function openLightbox(imgSrc) {
         if (!imgSrc) return;
         const overlay = document.getElementById('lightbox');
@@ -978,7 +976,7 @@
     }
 
     function closeLightbox(e) {
-        if (e.target.id === 'lightbox' || e.target.className === 'modal-close') {
+        if (e.target.id === 'lightbox' || e.target.className === 'modal-close' || e.target.closest('.modal-close')) {
             document.getElementById('lightbox').classList.remove('active');
         }
     }
@@ -996,11 +994,9 @@
     function moveZoom(e) {
         const img = e.currentTarget;
         if (!img.classList.contains('zoomed')) return;
-
         const rect = img.getBoundingClientRect();
         const xPos = ((e.clientX - rect.left) / rect.width) * 100;
         const yPos = ((e.clientY - rect.top) / rect.height) * 100;
-
         img.style.transformOrigin = `${xPos}% ${yPos}%`;
     }
 
@@ -1162,7 +1158,7 @@
 
         try {
             if (useFirebase && currentUser) {
-                // Шлях згідно з правилами: artifacts/{appId}/public/data/nikolaev_ads/ID
+                // Путь должен строго соответствовать appId артефакта
                 const adRef = doc(db, 'artifacts', appId, 'public', 'data', 'nikolaev_ads', newAd.id.toString());
                 await setDoc(adRef, newAd);
             } else {
@@ -1190,10 +1186,11 @@
     function fallbackToLocal(reason = "") {
         console.warn("Falling back to Local mode:", reason);
         updateStatus('local', reason);
-        document.getElementById('loadingIndicator').style.display = 'none';
+        const loader = document.getElementById('loadingIndicator');
+        if (loader) loader.style.display = 'none';
         let localAds = JSON.parse(localStorage.getItem('nik-ads'));
         ads = localAds ? localAds : [];
-        renderAds();
+        renderAds(ads);
     }
 
     function showError(html) {
@@ -1216,58 +1213,65 @@
         updateStatus('sync'); 
         
         try {
-            // Пріоритет на HARDCODED_CONFIG для GitHub, потім Canvas змінні
-            let firebaseConfig = HARDCODED_CONFIG.apiKey ? HARDCODED_CONFIG : null;
-            if (!firebaseConfig && typeof __firebase_config !== 'undefined' && __firebase_config) {
+            // Приоритизируем __app_id как источник appId для артефакта
+            appId = typeof __app_id !== 'undefined' ? __app_id : 'nik-market';
+
+            let firebaseConfig = HARDCODED_CONFIG;
+            if (typeof __firebase_config !== 'undefined' && __firebase_config) {
                 try {
-                    firebaseConfig = typeof __firebase_config === 'string' ? JSON.parse(__firebase_config) : __firebase_config;
-                } catch(e) {
-                    fallbackToLocal("Помилка парсингу конфігурації.");
-                    return;
-                }
+                    const canvasConfig = typeof __firebase_config === 'string' ? JSON.parse(__firebase_config) : __firebase_config;
+                    if (canvasConfig && canvasConfig.apiKey) firebaseConfig = canvasConfig;
+                } catch(e) {}
             }
             
-            if (firebaseConfig && firebaseConfig.apiKey) {
-                const app = initializeApp(firebaseConfig);
-                auth = getAuth(app);
-                db = getFirestore(app);
-                appId = typeof __app_id !== 'undefined' ? __app_id : 'nik-market';
-                useFirebase = true;
-                
-                // Налаштування слухача стану авторизації (RULE 3)
-                onAuthStateChanged(auth, async (user) => {
-                    if (user) {
-                        currentUser = user;
-                        updateStatus('cloud');
-                        if (!isListenerStarted) {
-                            setupRealtimeListener();
-                            isListenerStarted = true;
-                        }
+            const app = initializeApp(firebaseConfig);
+            auth = getAuth(app);
+            db = getFirestore(app);
+            useFirebase = true;
+            
+            // ПРАВИЛО 3: Сначала вызываем авторизацию и ждем её
+            const initAuth = async () => {
+                try {
+                    if (typeof __initial_auth_token !== 'undefined' && __initial_auth_token) {
+                        await signInWithCustomToken(auth, __initial_auth_token);
                     } else {
-                        // Якщо не авторизовано - пробуємо увійти
-                        try {
-                            if (typeof __initial_auth_token !== 'undefined' && __initial_auth_token) {
-                                await signInWithCustomToken(auth, __initial_auth_token);
-                            } else {
-                                await signInAnonymously(auth);
-                            }
-                        } catch (err) {
-                            fallbackToLocal("Auth Error: " + err.message);
-                        }
+                        await signInAnonymously(auth);
                     }
-                });
-            } else {
-                fallbackToLocal("Конфігурація Firebase відсутня.");
-            }
+                } catch (err) {
+                    console.error("Auth init failed:", err);
+                    fallbackToLocal(err.message);
+                }
+            };
+
+            await initAuth();
+
+            // Только после попытки авторизации подписываемся на изменения состояния
+            onAuthStateChanged(auth, (user) => {
+                if (user) {
+                    currentUser = user;
+                    updateStatus('cloud');
+                    if (!isListenerStarted) {
+                        setupRealtimeListener();
+                        isListenerStarted = true;
+                    }
+                } else {
+                    fallbackToLocal("User not authenticated");
+                }
+            });
         } catch (e) {
-            fallbackToLocal("Помилка запуску: " + e.message);
+            console.error("Critical Start Error:", e);
+            fallbackToLocal(e.message);
         }
     }
 
     function setupRealtimeListener() {
+        // Защита от неавторизованного доступа
         if (!currentUser || !useFirebase) return;
         
-        document.getElementById('loadingIndicator').style.display = 'block';
+        const loader = document.getElementById('loadingIndicator');
+        if (loader) loader.style.display = 'block';
+        
+        // ПРАВИЛО 1: Используем строгий путь artifacts/{appId}/public/data/...
         const adsRef = collection(db, 'artifacts', appId, 'public', 'data', 'nikolaev_ads');
         
         onSnapshot(adsRef, (snapshot) => {
@@ -1276,28 +1280,29 @@
                 ads.push(doc.data());
             });
             
-            document.getElementById('loadingIndicator').style.display = 'none';
+            const ldr = document.getElementById('loadingIndicator');
+            if (ldr) ldr.style.display = 'none';
+            // Сортировка в JS памяти (ПРАВИЛО 2)
             ads.sort((a, b) => a.id - b.id);
             searchAds(false);
             hideError();
         }, (error) => {
-            console.error("Firestore Error:", error);
+            console.error("Firestore Permission/Snapshot Error:", error);
             if (error.code === 'permission-denied') {
                 showError(`
-                    <strong>Помилка доступу (Permission Denied).</strong><br>
-                    1. Увімкніть <strong>Anonymous Auth</strong> у Firebase Console.<br>
-                    2. Додайте домен <strong>comp-setup.github.io</strong> в Authorized Domains.<br>
-                    3. Перевірте правила (Rules): шлях має дозволяти читання <code>/artifacts/${appId}/public/data/nikolaev_ads</code>.
+                    <strong>Ошибка доступа (Permission Denied).</strong><br>
+                    1. Убедитесь, что Anonymous Auth включен.<br>
+                    2. Проверьте appId артефакта.<br>
+                    3. Запросы должны быть строго после авторизации.
                 `);
                 fallbackToLocal("Відмовлено в доступі.");
             } else {
-                fallbackToLocal("Помилка БД: " + error.message);
+                fallbackToLocal(error.message);
             }
         });
     }
 
     startApp();
-
 </script>
 </body>
 </html>
