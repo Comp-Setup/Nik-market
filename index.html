@@ -279,7 +279,7 @@
         }
         .ad-contacts a { color: var(--primary); font-weight: bold; text-decoration: none; }
 
-        .ad-meta { display: flex; justify-content: space-between; font-size: 12px; color: var(--text-muted); border-top: 1px solid var(--border); padding-top: 15px; align-items: center; }
+        .ad-meta { display: flex; justify-content: space-between; font-size: 12px; color: var(--text-muted); border-top: 1px solid var(--border); padding-top: 15px; align-items: center; flex-wrap: wrap;}
         .category-badge {
             background: rgba(71, 118, 230, 0.1); color: var(--primary); padding: 4px 8px;
             border-radius: 6px; font-size: 11px; font-weight: bold; display: inline-block; margin-bottom: 10px;
@@ -978,7 +978,7 @@
             openAuthModal();
         } else {
             let displayEmail = currentUser.email;
-            if(displayEmail.includes('@nikmarket.local')) {
+            if(displayEmail && displayEmail.includes('@nikmarket.local')) {
                 displayEmail = "Телефон: " + displayEmail.split('@')[0];
             }
             document.getElementById('cabinetUserEmail').innerText = displayEmail;
@@ -1024,13 +1024,17 @@
     }
 
     async function logout() {
-        currentUser = null; // Одразу очищаємо поточного користувача
-        renderAds(); // Оновлюємо UI миттєво, щоб зникли кнопки
+        currentUser = null; // Негайно очищаємо змінні, щоб приховати кнопки
+        document.getElementById('cabinetUserEmail').innerText = ''; // Очищаємо пошту/телефон
+        
+        // Змушуємо перехід до головної, щоб закрити детальне оголошення
+        switchView('main');
+        renderAds(); 
+        
         await signOut(auth);
         try { await signInAnonymously(auth); } catch(e){} 
-        currentUser = auth.currentUser; // Оновлюємо на анонімного
+        currentUser = auth.currentUser; 
         updateHeaderAuth();
-        switchView('main');
         showToast(currentLang === 'uk' ? 'Ви вийшли з акаунту' : 'Вы вышли из аккаунта');
     }
 
@@ -1068,7 +1072,7 @@
         if(document.getElementById('detailsView').style.display === 'block') {
             const params = new URLSearchParams(window.location.search);
             const adId = params.get('id');
-            if (adId) openAdDetails(Number(adId), true); 
+            if (adId) openAdDetails(adId, true); 
         }
     }
 
@@ -1134,7 +1138,7 @@
         const adId = params.get('id');
         
         if (adId && ads.length > 0) {
-            const foundAd = ads.find(a => a.id.toString() === adId);
+            const foundAd = ads.find(a => a.id.toString() === adId.toString());
             if (foundAd) {
                 openAdDetails(foundAd.id, true); 
             } else {
@@ -1154,7 +1158,7 @@
             const params = new URLSearchParams(window.location.search);
             const adId = params.get('id');
             if (adId) {
-                openAdDetails(Number(adId), true);
+                openAdDetails(adId, true);
             } else {
                 closeAdDetails(true);
             }
@@ -1187,7 +1191,7 @@
                 const statusB = b.status || 'approved';
                 if (statusA === 'pending' && statusB !== 'pending') return -1;
                 if (statusA !== 'pending' && statusB === 'pending') return 1;
-                return (b.id || 0) - (a.id || 0); 
+                return (Number(b.id) || 0) - (Number(a.id) || 0); 
             });
         }
 
@@ -1241,20 +1245,27 @@
             if (currentUser && !currentUser.isAnonymous && (ad.userId === currentUser.uid || isAdmin())) {
                 actionsHTML += `<div class="card-actions" onclick="event.preventDefault(); event.stopPropagation();">`;
                 if (isAdmin() && ad.status === 'pending') {
-                    actionsHTML += `<button class="btn-appr" onclick="approveAd(${ad.id})">✅ Схвалити</button>`;
-                    actionsHTML += `<button class="btn-warning" onclick="rejectAd(${ad.id})">❌ Відхилити</button>`;
+                    actionsHTML += `<button class="btn-appr" onclick="approveAd('${ad.id}')">✅ Схвалити</button>`;
+                    actionsHTML += `<button class="btn-warning" onclick="rejectAd('${ad.id}')">❌ Відхилити</button>`;
                 }
-                actionsHTML += `<button class="btn-edit" onclick="editAd(${ad.id})">✏️ Редаг.</button>`;
-                actionsHTML += `<button class="btn-del" onclick="deleteAd(${ad.id})">🗑️ Видалити</button>`;
+                actionsHTML += `<button class="btn-edit" onclick="editAd('${ad.id}')">✏️ Редаг.</button>`;
+                actionsHTML += `<button class="btn-del" onclick="deleteAd('${ad.id}')">🗑️ Видалити</button>`;
                 actionsHTML += `</div>`;
             }
 
             const catName = CATEGORIES[ad.category] ? CATEGORIES[ad.category][currentLang] : ad.category;
             const subName = ad.subcategory ? ` › ${ad.subcategory}` : '';
 
+            // Кількість переглядів (Тільки для власника/адміна)
+            let viewsHTML = '';
+            if (currentUser && !currentUser.isAnonymous && (ad.userId === currentUser.uid || isAdmin())) {
+                viewsHTML = `<span style="margin-left: 10px;" title="Перегляди">👁️ ${ad.views || 0}</span>`;
+            }
+
+            // БЕЗПЕЧНИЙ ВИКЛИК openAdDetails з рядковим ID
             card.innerHTML = `
                 ${statusHTML}
-                <a href="?id=${ad.id}" onclick="event.preventDefault(); openAdDetails(${ad.id});" style="flex:1; display:flex; flex-direction:column; text-decoration:none; color:inherit;">
+                <a href="?id=${ad.id}" onclick="event.preventDefault(); openAdDetails('${ad.id}');" style="flex:1; display:flex; flex-direction:column; text-decoration:none; color:inherit;">
                     ${imageHTML}
                     <div class="ad-content">
                         <div style="margin-bottom: 5px;"><span class="category-badge">${catName}${subName}</span></div>
@@ -1262,8 +1273,7 @@
                         <div class="ad-price">${ad.price}</div>
                         <div class="ad-desc">${ad.desc || ''}</div>
                         <div class="ad-meta">
-                            <span>📍 ${ad.location}</span>
-                            <span>⏱ ${ad.date.split(',')[0]}</span>
+                            <div><span>📍 ${ad.location}</span><span style="margin-left: 10px;">⏱ ${ad.date ? ad.date.split(',')[0] : ''}</span>${viewsHTML}</div>
                         </div>
                     </div>
                 </a>
@@ -1276,8 +1286,16 @@
     }
 
     function openAdDetails(id, skipPushState = false) {
-        const ad = ads.find(a => a.id === id);
+        // Завжди порівнюємо ID як рядок, щоб уникнути помилок типізації
+        const ad = ads.find(a => a.id.toString() === id.toString());
         if (!ad) return;
+
+        // Збільшуємо кількість переглядів (якщо це відкриває не сам власник і не адмін)
+        if (useFirebase && (!currentUser || currentUser.uid !== ad.userId) && !isAdmin()) {
+            const adRef = doc(db, 'artifacts', appId, 'public', 'data', 'nikolaev_ads', ad.id.toString());
+            updateDoc(adRef, { views: (ad.views || 0) + 1 }).catch(e => console.log(e));
+            ad.views = (ad.views || 0) + 1; // Оновлюємо локально для миттєвого відображення
+        }
 
         document.getElementById('mainView').style.display = 'none';
         document.getElementById('detailsView').style.display = 'block';
@@ -1314,12 +1332,18 @@
         if (currentUser && !currentUser.isAnonymous && (ad.userId === currentUser.uid || isAdmin())) {
             actionsHTML = `<div style="margin-top: 20px; display: flex; gap: 10px; border-top: 1px solid var(--border); padding-top: 20px; flex-wrap: wrap;">`;
             if (isAdmin() && ad.status === 'pending') {
-                actionsHTML += `<button class="btn btn-success" style="flex:1; min-width: 120px;" onclick="approveAd(${ad.id}); closeAdDetails(true);">✅ Схвалити</button>`;
-                actionsHTML += `<button class="btn btn-warning" style="flex:1; min-width: 120px;" onclick="rejectAd(${ad.id}); closeAdDetails(true);">❌ Відхилити</button>`;
+                actionsHTML += `<button class="btn btn-success" style="flex:1; min-width: 120px;" onclick="approveAd('${ad.id}'); closeAdDetails(true);">✅ Схвалити</button>`;
+                actionsHTML += `<button class="btn btn-warning" style="flex:1; min-width: 120px;" onclick="rejectAd('${ad.id}'); closeAdDetails(true);">❌ Відхилити</button>`;
             }
-            actionsHTML += `<button class="btn btn-primary" style="flex:1; min-width: 120px;" onclick="editAd(${ad.id})">✏️ Редагувати</button>`;
-            actionsHTML += `<button class="btn btn-danger" style="flex:1; min-width: 120px;" onclick="deleteAd(${ad.id}); closeAdDetails(true);">🗑️ Видалити</button>`;
+            actionsHTML += `<button class="btn btn-primary" style="flex:1; min-width: 120px;" onclick="editAd('${ad.id}')">✏️ Редагувати</button>`;
+            actionsHTML += `<button class="btn btn-danger" style="flex:1; min-width: 120px;" onclick="deleteAd('${ad.id}'); closeAdDetails(true);">🗑️ Видалити</button>`;
             actionsHTML += `</div>`;
+        }
+
+        // Відображення переглядів у повному екрані
+        let viewsHTML = '';
+        if (currentUser && !currentUser.isAnonymous && (ad.userId === currentUser.uid || isAdmin())) {
+            viewsHTML = `<span style="margin-left: 15px; font-weight: bold; color: var(--primary);">👁️ ${ad.views || 0} ${currentLang === 'uk' ? 'переглядів' : 'просмотров'}</span>`;
         }
 
         const detailsHTML = `
@@ -1344,9 +1368,9 @@
                         <div style="margin-bottom: 10px; display: flex; align-items: center; gap: 10px;">📞 <a href="tel:${ad.phone}" style="font-size: 20px;">${ad.phone}</a></div>
                         ${ad.email ? `<div style="margin-bottom: 10px; display: flex; align-items: center; gap: 10px;">📧 <a href="mailto:${ad.email}">${ad.email}</a></div>` : ''}
                         
-                        <div style="margin-top: 20px; padding-top: 15px; border-top: 1px solid var(--border); color: var(--text-muted); font-size: 14px; display: flex; justify-content: space-between;">
+                        <div style="margin-top: 20px; padding-top: 15px; border-top: 1px solid var(--border); color: var(--text-muted); font-size: 14px; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap;">
                             <span>📍 ${ad.location}</span>
-                            <span>⏱ ${ad.date}</span>
+                            <div><span>⏱ ${ad.date ? ad.date : ''}</span>${viewsHTML}</div>
                         </div>
                         
                         ${actionsHTML}
@@ -1534,7 +1558,7 @@
     });
 
     function editAd(id) {
-        const ad = ads.find(a => a.id === id);
+        const ad = ads.find(a => a.id.toString() === id.toString());
         if (!ad) return;
         editingAdId = id;
         
@@ -1618,6 +1642,7 @@
                 adData.id = Date.now();
                 adData.date = new Date().toLocaleString();
                 adData.status = isAdmin() ? 'approved' : 'pending';
+                adData.views = 0; // Початкові перегляди
                 
                 const adRef = doc(db, 'artifacts', appId, 'public', 'data', 'nikolaev_ads', adData.id.toString());
                 await setDoc(adRef, adData);
@@ -1744,7 +1769,7 @@
                     if (savedView === 'admin' && isAdmin()) {
                         switchView('admin');
                     } else if (savedView === 'cabinet' && !user.isAnonymous) {
-                        switchView('cabinet');
+                        openCabinet(); // Використовуємо openCabinet() замість switchView, щоб правильно відображався номер
                     } else {
                         switchView('main'); // Безпечно повертаємо на головну, якщо нема прав
                     }
