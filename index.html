@@ -766,6 +766,7 @@
     window.clearCategoryFilter = clearCategoryFilter;
     window.filterByCategory = filterByCategory;
     window.closeAdDetails = closeAdDetails;
+    window.openAdDetails = openAdDetails;
     window.closeLightbox = closeLightbox;
     window.toggleZoom = toggleZoom;
     window.moveZoom = moveZoom;
@@ -976,11 +977,11 @@
         if (!currentUser || currentUser.isAnonymous) {
             openAuthModal();
         } else {
-            let displayEmail = currentUser.email;
+            let displayEmail = currentUser.email || "";
             if(displayEmail && displayEmail.includes('@nikmarket.local')) {
                 displayEmail = "Телефон: " + displayEmail.split('@')[0];
             }
-            document.getElementById('cabinetUserEmail').innerText = displayEmail;
+            document.getElementById('cabinetUserEmail').innerText = displayEmail || "Акаунт";
             document.getElementById('adminPanelBtn').style.display = isAdmin() ? 'inline-block' : 'none';
             switchView('cabinet');
         }
@@ -1183,12 +1184,8 @@
                 filtered = []; // Не показуємо нічого, якщо юзер не авторизований
             }
         } else if (currentView === 'admin') {
-            // Безпечне сортування: нічого не видаляємо, просто сортуємо (нові/очікуючі зверху)
+            // Безпечне сортування: нічого не видаляємо, просто сортуємо за ID (нові зверху)
             filtered = [...filtered].sort((a, b) => {
-                const statusA = a.status || 'approved'; 
-                const statusB = b.status || 'approved';
-                if (statusA === 'pending' && statusB !== 'pending') return -1;
-                if (statusA !== 'pending' && statusB === 'pending') return 1;
                 return (Number(b.id) || 0) - (Number(a.id) || 0); 
             });
         }
@@ -1226,7 +1223,7 @@
                 card.className = 'ad-card';
                 
                 let imageHTML = '';
-                if (ad.image && (ad.image.startsWith('data:image') || ad.image.startsWith('http'))) {
+                if (typeof ad.image === 'string' && (ad.image.startsWith('data:image') || ad.image.startsWith('http'))) {
                     imageHTML = `<img src="${ad.image}" class="ad-image" alt="${ad.title || 'Image'}" onerror="this.src='data:image/svg+xml;utf8,<svg xmlns=\\'http://www.w3.org/2000/svg\\' width=\\'100%\\' height=\\'100%\\'><rect width=\\'100%\\' height=\\'100%\\' fill=\\'%23e0e0e0\\'/><text x=\\'50%\\' y=\\'50%\\' font-size=\\'40\\' text-anchor=\\'middle\\' dy=\\'.3em\\'>📦</text></svg>'">`;
                 } else {
                     let icon = (ad.category && CATEGORIES[ad.category]) ? CATEGORIES[ad.category].icon : '📦';
@@ -1320,7 +1317,7 @@
             const contactsLabel = currentLang === 'uk' ? 'Контакти:' : 'Контакты:';
             const enlargeHint = currentLang === 'uk' ? '🔍 Збільшити' : '🔍 Увеличить';
 
-            const hasImage = ad.image && (ad.image.startsWith('data:image') || ad.image.startsWith('http'));
+            const hasImage = typeof ad.image === 'string' && (ad.image.startsWith('data:image') || ad.image.startsWith('http'));
             
             let imageHTML = '';
             if (hasImage) {
