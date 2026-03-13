@@ -651,7 +651,7 @@
         "Запчастини": { 
             icon: "⚙️", uk: "Запчастини", ru: "Запчасти", 
             sub: { 
-                uk: ["Автозапчастини", "Запчастини для мототехніки", "Запчастини для спецтехніки", "Шини та диски", "Акумулятори автомобільні", "Автозвук та электроніка", "Кузовні деталі", "Двигуни та компоненти", "Оптика та світло", "Салон та інтер'єр", "Тюнінг та аксесуари", "Автохімія та масла", "GPS-навігатори та відеореєстратори", "Інструменти для СТО"], 
+                uk: ["Автозапчастини", "Запчастини для мототехніки", "Запчастини для спецтехніки", "Шини та диски", "Акумулятори автомобільні", "Автозвук та электроніка", "Кузовні деталі", "Двигуни та компоненти", "Оптика та світло", "Салон та інтер'єр", "Тюнінг та аксесуари", "Автохімія та масла", "GPS-навигаторы та відеореєстратори", "Інструменти для СТО"], 
                 ru: ["Автозапчасти", "Запчасти для мототехники", "Запчасти для спецтехники", "Шины и диски", "Аккумуляторы автомобильные", "Автозвук и электроника", "Кузовные детали", "Двигатели и компоненты", "Оптика и свет", "Салон и интерьер", "Тюнинг и аксессуары", "Автохимия и масла", "GPS-навигаторы и видеорегистраторы", "Инструменты для СТО"] 
             } 
         },
@@ -687,7 +687,7 @@
             icon: "👕", uk: "Мода і стиль", ru: "Мода и стиль", 
             sub: { 
                 uk: ["Жіночий одяг", "Чоловічий одяг", "Жіноче взуття", "Чоловіче взуття", "Спортивний одяг та взуття", "Сумки та рюкзаки", "Годинники", "Ювелірні вироби та біжутерія", "Аксесуари (Ремені, краватки)", "Головні убори", "Спецодяг та уніформа", "Подарунки та сувеніри", "Весільний одяг та аксесуари"], 
-                ru: ["Женская одежда", "Мужская одежда", "Женская обувь", "Мужская обувь", "Спортивная одежда и обувь", "Сумки и рюкзаки", "Часы", "Ювелирные изделия и бижутерия", "Аксессуары (Ремни, галстуки)", "Головные уборы", "Спецодежда и униформа", "Подарки и сувениры", "Свадебная одежда и аксессуары"] 
+                ru: ["Женская одежда", "Мужская одежда", "Женская обувь", "Мужская обувь", "Спортивная одежда и обувь", "Сумки и рюкзаки", "Часы", "Ювелирные изделия и бижутерия", "Аксессуары (Ремни, галстуки)", "Головные уборы", "Спецодежда и универса", "Подарки и сувениры", "Свадебная одежда и аксессуары"] 
             } 
         },
         "Діти": { 
@@ -1163,51 +1163,56 @@
     initSettings();
     clearCategoryFilter(true);
 
-    try {
-        const configString = typeof __firebase_config !== 'undefined' ? __firebase_config : null;
-        
-        if (configString && configString.trim() !== "" && configString !== "{}") {
-            let firebaseConfig;
-            try {
-                firebaseConfig = typeof configString === 'object' ? configString : JSON.parse(configString);
-            } catch(e) {
-                firebaseConfig = null;
-            }
+    // --- FIREBASE INITIALIZATION LOGIC ---
+    async function startApp() {
+        try {
+            const configString = typeof __firebase_config !== 'undefined' ? __firebase_config : null;
             
-            if (firebaseConfig && firebaseConfig.apiKey) {
-                const app = initializeApp(firebaseConfig);
-                auth = getAuth(app);
-                db = getFirestore(app);
-                appId = typeof __app_id !== 'undefined' ? __app_id : 'default-app-id';
-                useFirebase = true;
+            if (configString && configString !== "{}" && (typeof configString === 'object' || (typeof configString === 'string' && configString.trim() !== ""))) {
+                let firebaseConfig;
+                try {
+                    firebaseConfig = typeof configString === 'object' ? configString : JSON.parse(configString);
+                } catch(e) {
+                    console.warn("Config parsing failed:", e);
+                    fallbackToLocal();
+                    return;
+                }
                 
-                const initAuth = async () => {
+                if (firebaseConfig && firebaseConfig.apiKey) {
+                    const app = initializeApp(firebaseConfig);
+                    auth = getAuth(app);
+                    db = getFirestore(app);
+                    appId = typeof __app_id !== 'undefined' ? __app_id : 'default-app-id';
+                    useFirebase = true;
+                    
+                    // Auth FIRST and await it (RULE 3)
                     if (typeof __initial_auth_token !== 'undefined' && __initial_auth_token) {
                         await signInWithCustomToken(auth, __initial_auth_token);
                     } else {
                         await signInAnonymously(auth);
                     }
-                };
-                initAuth();
 
-                onAuthStateChanged(auth, (user) => {
-                    currentUser = user;
-                    if (user) {
-                        updateStatus('cloud');
-                        setupRealtimeListener();
-                    } else {
-                        updateStatus('local');
-                    }
-                });
+                    // Listen for auth state
+                    onAuthStateChanged(auth, (user) => {
+                        currentUser = user;
+                        if (user) {
+                            updateStatus('cloud');
+                            setupRealtimeListener();
+                        } else {
+                            // If user becomes null after initial sign in
+                            updateStatus('local');
+                        }
+                    });
+                } else {
+                    fallbackToLocal();
+                }
             } else {
                 fallbackToLocal();
             }
-        } else {
+        } catch (e) {
+            console.error("Firebase start error:", e);
             fallbackToLocal();
         }
-    } catch (e) {
-        console.error("Firebase init error:", e);
-        fallbackToLocal();
     }
 
     function setupRealtimeListener() {
@@ -1215,7 +1220,10 @@
         
         document.getElementById('loadingIndicator').style.display = 'block';
 
+        // Path following RULE 1
         const adsRef = collection(db, 'artifacts', appId, 'public', 'data', 'nikolaev_ads');
+        
+        // No complex queries (RULE 2)
         onSnapshot(adsRef, (snapshot) => {
             ads = [];
             snapshot.forEach((doc) => {
@@ -1226,10 +1234,14 @@
             ads.sort((a, b) => a.id - b.id);
             searchAds(false);
         }, (error) => {
-            console.error("DB snap error:", error);
+            console.error("Firestore snapshot error:", error);
+            // If permissions fail, fallback
             fallbackToLocal();
         });
     }
+
+    // Start execution
+    startApp();
 
 </script>
 </body>
