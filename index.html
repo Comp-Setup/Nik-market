@@ -400,8 +400,9 @@
             border-radius: 10px;
             margin: 10px 0;
             font-family: monospace;
-            font-size: 11px;
-            border: 1px solid #c62828;
+            font-size: 12px;
+            border: 2px solid #c62828;
+            word-break: break-all;
         }
 
         @media (max-width: 768px) {
@@ -651,7 +652,7 @@
             icon: "⚽", uk: "Хобі, спорт і відпочинок", ru: "Хобби, спорт и отдых", 
             sub: { 
                 uk: ["Колекціонування та антикваріат", "Спорт, фітнес та активний відпочинок", "Велосипеди та екіпірування", "Мілітарія та тактичне спорядження", "Дрони, коптери та аксесуари", "Книги, комікси та журнали", "Музика, фільми та вініл", "Квитки на концерти та події", "Пошук компанії для подорожей", "Музичні інструменти та звук", "Настільні ігри та пазли", "Риболовля та полювання", "Матеріали для рукоділля", "Інші захоплення"],
-                ru: ["Коллекционирование и антиквариат", "Спорт, фитнес и отдых", "Велосипеды и экипировка", "Милитария и тактическое снаряжение", "Дроны, коптеры и аксессуары", "Книги, комиксы и журналы", "Музыка, фильмы и винил", "Билеты на концерты и события", "Поиск компании для путешествий", "Музыкальные инструменты и звук", "Настольные игры и пазлы", "Рыбалка и охота", "Материалы для рукоделия", "Другие увлечения"]
+                ru: ["Коллекционирование и антиквариат", "Спорт, фитнес и отдых", "Велосипеды и экипировка", "Милитария и тактическое снаряжение", "Дроны, коптеры и аксессуары", "Книги, комиксы и журналы", "Музыка, фильмы и винил", "Билеты на концерты и события", "Поиск компании для путешествий", "Музыкальные инструменты и звук", "Настольные игры и пазлы", "Рибалка и охота", "Материалы для рукоделия", "Другие увлечения"]
             } 
         },
         "Електроніка": { 
@@ -853,14 +854,22 @@
             const card = document.createElement('div');
             card.className = 'ad-card';
             card.onclick = () => openAdDetails(ad.id);
-            let imageHTML = ad.image && ad.image.startsWith('data:image') ? `<img src="${ad.image}" class="ad-image">` : `<div class="ad-image" style="font-size: 60px;">${CATEGORIES[ad.category]?.icon || '📦'}</div>`;
+            
+            let imageHTML = '';
+            if (ad.image && (ad.image.startsWith('data:image') || ad.image.startsWith('http'))) {
+                imageHTML = `<img src="${ad.image}" class="ad-image" onerror="this.src='data:image/svg+xml;utf8,<svg xmlns=\\'http://www.w3.org/2000/svg\\' width=\\'100%\\' height=\\'100%\\'><rect width=\\'100%\\' height=\\'100%\\' fill=\\'%23e0e0e0\\'/><text x=\\'50%\\' y=\\'50%\\' font-size=\\'40\\' text-anchor=\\'middle\\' dy=\\'.3em\\'>📦</text></svg>'">`;
+            } else {
+                imageHTML = `<div class="ad-image" style="font-size: 60px;">${CATEGORIES[ad.category]?.icon || '📦'}</div>`;
+            }
+
             card.innerHTML = `
                 ${imageHTML}
                 <div class="ad-content">
                     <div style="margin-bottom: 5px;"><span class="category-badge">${CATEGORIES[ad.category]?.[currentLang] || ad.category}</span></div>
                     <div class="ad-title">${ad.title}</div>
                     <div class="ad-price">${ad.price}</div>
-                    <div class="ad-meta"><span>📍 ${ad.location}</span><span>⏱ ${ad.date.split(',')[0]}</span></div>
+                    <div class="ad-desc">${ad.desc || ''}</div>
+                    <div class="ad-meta"><span>📍 ${ad.location}</span><span>⏱ ${ad.date ? ad.date.split(',')[0] : ''}</span></div>
                 </div>
             `;
             container.appendChild(card);
@@ -872,19 +881,42 @@
         if (!ad) return;
         document.getElementById('mainView').style.display = 'none';
         document.getElementById('detailsView').style.display = 'block';
+        window.scrollTo(0, 0);
+
+        const catName = CATEGORIES[ad.category] ? CATEGORIES[ad.category][currentLang] : ad.category;
+        const subName = ad.subcategory ? ` › ${ad.subcategory}` : '';
+        const descLabel = currentLang === 'uk' ? 'Опис:' : 'Описание:';
+        const contactsLabel = currentLang === 'uk' ? 'Контакти:' : 'Контакты:';
+        
+        let imageHTML = '';
+        if (ad.image && (ad.image.startsWith('data:image') || ad.image.startsWith('http'))) {
+            imageHTML = `<img src="${ad.image}" alt="${ad.title}">`;
+        } else {
+            let icon = CATEGORIES[ad.category] ? CATEGORIES[ad.category].icon : '📦';
+            imageHTML = `<div style="font-size: 100px;">${icon}</div>`;
+        }
+
         const detailsHTML = `
             <div class="ad-details-container">
                 <div class="ad-details-image-wrapper" onclick="openLightbox('${ad.image}')">
-                    ${ad.image ? `<img src="${ad.image}">` : `<div style="font-size: 100px;">📦</div>`}
+                    ${imageHTML}
                 </div>
                 <div class="ad-details-info">
-                    <h2>${ad.title}</h2>
-                    <div class="ad-price" style="font-size: 28px;">${ad.price}</div>
-                    <p style="white-space: pre-wrap; margin: 20px 0;">${ad.desc}</p>
+                    <div style="margin-bottom: 15px;"><span class="category-badge" style="font-size: 13px; padding: 6px 12px;">${catName}${subName}</span></div>
+                    <h2 style="margin-bottom: 15px;">${ad.title}</h2>
+                    <div class="ad-price" style="font-size: 32px; margin-bottom: 25px;">${ad.price}</div>
+                    <div style="margin-bottom: 30px;">
+                        <h4 style="margin-bottom: 10px;">${descLabel}</h4>
+                        <p style="white-space: pre-wrap; line-height: 1.6;">${ad.desc}</p>
+                    </div>
                     <div class="ad-contacts">
-                        <p>👤 ${ad.name}</p>
-                        <p>📞 <a href="tel:${ad.phone}">${ad.phone}</a></p>
-                        <p>📍 ${ad.location}</p>
+                        <h4 style="margin-bottom: 10px;">${contactsLabel}</h4>
+                        <p>👤 <strong>${ad.name}</strong></p>
+                        <p>📞 <a href="tel:${ad.phone}" style="font-size: 18px;">${ad.phone}</a></p>
+                        ${ad.email ? `<p>📧 <a href="mailto:${ad.email}">${ad.email}</a></p>` : ''}
+                        <div style="margin-top: 15px; font-size: 14px; color: var(--text-muted);">
+                            <span>📍 ${ad.location}</span> | <span>⏱ ${ad.date}</span>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -895,16 +927,36 @@
     function closeAdDetails() {
         document.getElementById('mainView').style.display = 'block';
         document.getElementById('detailsView').style.display = 'none';
+        window.scrollTo(0, 0);
     }
 
-    function openLightbox(img) { if(img) { document.getElementById('lightboxImg').src = img; document.getElementById('lightbox').classList.add('active'); } }
+    function openLightbox(img) { 
+        if(img && (img.startsWith('data:image') || img.startsWith('http'))) { 
+            document.getElementById('lightboxImg').src = img; 
+            document.getElementById('lightbox').classList.add('active'); 
+        } 
+    }
+    
     function closeLightbox() { document.getElementById('lightbox').classList.remove('active'); }
+    
     function toggleZoom() { document.getElementById('lightboxImg').classList.toggle('zoomed'); }
-    function moveZoom(e) { /* Logic omitted for brevity */ }
+    
+    function moveZoom(e) { 
+        const img = e.currentTarget;
+        if (!img.classList.contains('zoomed')) return;
+        const rect = img.getBoundingClientRect();
+        const xPos = ((e.clientX - rect.left) / rect.width) * 100;
+        const yPos = ((e.clientY - rect.top) / rect.height) * 100;
+        img.style.transformOrigin = `${xPos}% ${yPos}%`;
+    }
 
     function searchAds(fromInput = false) {
         const query = document.getElementById('searchInput').value.toLowerCase().trim();
-        let filtered = ads.filter(ad => ad.title.toLowerCase().includes(query) || ad.location.toLowerCase().includes(query));
+        let filtered = ads.filter(ad => 
+            ad.title.toLowerCase().includes(query) || 
+            ad.location.toLowerCase().includes(query) ||
+            (ad.desc && ad.desc.toLowerCase().includes(query))
+        );
         if (currentCategoryFilter && currentCategoryFilter !== 'Свіжі') {
             filtered = filtered.filter(ad => ad.category === currentCategoryFilter);
         }
@@ -930,8 +982,24 @@
     }
 
     function openModal() { document.getElementById('addModal').classList.add('active'); }
-    function closeModal() { document.getElementById('addModal').classList.remove('active'); document.getElementById('adForm').reset(); document.getElementById('imagePreview').style.display = 'none'; compressedBase64Image = ''; }
-    function togglePhotoInput() { /* Handled via CSS usually, but can toggle blocks here */ }
+    
+    function closeModal() { 
+        document.getElementById('addModal').classList.remove('active'); 
+        document.getElementById('adForm').reset(); 
+        document.getElementById('imagePreview').style.display = 'none'; 
+        compressedBase64Image = ''; 
+    }
+    
+    function togglePhotoInput() {
+        const type = document.querySelector('input[name="photoType"]:checked').value;
+        if (type === 'upload') {
+            document.getElementById('uploadPhotoBlock').style.display = 'block';
+            document.getElementById('urlPhotoBlock').style.display = 'none';
+        } else {
+            document.getElementById('uploadPhotoBlock').style.display = 'none';
+            document.getElementById('urlPhotoBlock').style.display = 'block';
+        }
+    }
 
     function previewAndCompressImage(e) {
         const file = e.target.files[0];
@@ -945,7 +1013,8 @@
                 const canvas = document.createElement('canvas');
                 const MAX_WIDTH = 800;
                 let scale = MAX_WIDTH / img.width;
-                canvas.width = MAX_WIDTH;
+                if(scale > 1) scale = 1;
+                canvas.width = img.width * scale;
                 canvas.height = img.height * scale;
                 const ctx = canvas.getContext('2d');
                 ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
@@ -959,6 +1028,9 @@
 
     async function submitAd(e) {
         e.preventDefault();
+        const type = document.querySelector('input[name="photoType"]:checked').value;
+        const photo = type === 'upload' ? compressedBase64Image : document.getElementById('adImage').value;
+        
         const newAd = {
             id: Date.now(),
             title: document.getElementById('adTitle').value,
@@ -968,8 +1040,9 @@
             desc: document.getElementById('adDesc').value,
             name: document.getElementById('adName').value,
             phone: document.getElementById('adPhone').value,
+            email: document.getElementById('adEmail').value || '',
             location: document.getElementById('adLocation').value,
-            image: compressedBase64Image,
+            image: photo,
             date: new Date().toLocaleString()
         };
         try {
@@ -977,6 +1050,7 @@
                 await setDoc(doc(db, 'artifacts', appId, 'public', 'data', 'nikolaev_ads', newAd.id.toString()), newAd);
             } else {
                 ads.push(newAd);
+                if(ads.length > 100) ads.shift();
                 localStorage.setItem('nik-ads', JSON.stringify(ads));
                 renderAds();
             }
@@ -989,7 +1063,7 @@
 
     function showDebug(msg) {
         const p = document.getElementById('debugPanel');
-        p.innerText = "DEBUG: " + msg;
+        p.innerHTML = "<strong>ДІАГНОСТИКА ХМАРИ:</strong> " + msg;
         p.style.display = 'block';
     }
 
@@ -1007,7 +1081,6 @@
         initSettings();
         updateStatus('sync');
 
-        // Robust config resolution
         let firebaseConfig = HARDCODED_CONFIG;
         if (typeof __firebase_config !== 'undefined' && __firebase_config) {
             try {
@@ -1017,8 +1090,12 @@
         }
         appId = typeof __app_id !== 'undefined' ? __app_id : 'nik-market';
 
-        // Hang detection
-        setTimeout(() => { if (!isListenerStarted) document.getElementById('forceLocalBtn').style.display = 'block'; }, 7000);
+        setTimeout(() => { 
+            if (!isListenerStarted) {
+                document.getElementById('forceLocalBtn').style.display = 'block';
+                if (!currentUser) showDebug("Синхронізація триває надто довго. Якщо Authentication в консолі Firebase вже увімкнена, спробуйте оновити сторінку.");
+            } 
+        }, 12000);
 
         try {
             const app = getApps().length === 0 ? initializeApp(firebaseConfig) : getApps()[0];
@@ -1032,11 +1109,10 @@
                     updateStatus('cloud');
                     if (!isListenerStarted) { setupRealtimeListener(); isListenerStarted = true; }
                 } else if (isInitialAuthTryComplete) {
-                    setTimeout(() => { if (!auth.currentUser) fallbackToLocal("Auth Timeout"); }, 3000);
+                    setTimeout(() => { if (!auth.currentUser) fallbackToLocal("Auth Timeout"); }, 5000);
                 }
             });
 
-            // Auth Priority
             try {
                 if (typeof __initial_auth_token !== 'undefined' && __initial_auth_token) {
                     await signInWithCustomToken(auth, __initial_auth_token);
@@ -1045,9 +1121,9 @@
                 }
             } catch (err) {
                 console.error("Auth Error:", err);
-                showDebug(`${err.code}: ${err.message}`);
+                showDebug(`Firebase Error: ${err.message} (${err.code})`);
                 if (err.code === 'auth/api-key-not-valid') {
-                    showDebug("API Ключ недійсний для цього проекту. Перевірте проект у Google Cloud.");
+                    showDebug("<strong>Критична помилка ключа:</strong> Схоже, сервіс авторизації не активовано. Зайдіть у Firebase Console -> Authentication і натисніть кнопку 'Get Started'.");
                 }
             } finally {
                 isInitialAuthTryComplete = true;
