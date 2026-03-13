@@ -1141,7 +1141,7 @@
             if (foundAd) {
                 openAdDetails(foundAd.id, true); 
             } else {
-                history.replaceState({view: 'main'}, '', window.location.pathname);
+                try { history.replaceState({view: 'main'}, '', window.location.pathname); } catch(e){}
             }
         }
         if (ads.length > 0) {
@@ -1213,8 +1213,6 @@
             </p>`;
         }
 
-        adsCount.innerText = `${filtered.length} ${currentLang === 'uk' ? 'оголошень' : 'объявлений'}`;
-
         const listToRender = currentView === 'admin' ? filtered : [...filtered].reverse();
 
         listToRender.forEach(ad => {
@@ -1239,9 +1237,10 @@
                 }
 
                 // БЕЗПЕКА: Кнопки з'являються ТІЛЬКИ для авторизованих власників або адміна
+                // ЗАХИСТ: try/catch в onclick кнопок для безпечного перехоплення подій
                 let actionsHTML = '';
                 if (currentUser && !currentUser.isAnonymous && (ad.userId === currentUser.uid || isAdmin())) {
-                    actionsHTML += `<div class="card-actions" onclick="event.preventDefault(); event.stopPropagation();">`;
+                    actionsHTML += `<div class="card-actions" onclick="try{event.preventDefault(); event.stopPropagation();}catch(e){}">`;
                     if (isAdmin() && ad.status === 'pending') {
                         actionsHTML += `<button class="btn-appr" onclick="approveAd('${ad.id}')">✅ Схвалити</button>`;
                         actionsHTML += `<button class="btn-warning" onclick="rejectAd('${ad.id}')">❌ Відхилити</button>`;
@@ -1305,10 +1304,11 @@
             document.getElementById('detailsView').style.display = 'block';
             window.scrollTo(0, 0);
 
-            document.title = `${ad.title || 'Оголошення'} | Оголошення м. Миколаїв`;
+            try { document.title = `${ad.title || 'Оголошення'} | Оголошення м. Миколаїв`; } catch(e){}
 
+            // ЗАХИСТ: Iframe може блокувати pushState, що раніше ламало перехід
             if (!skipPushState) {
-                history.pushState({view: 'details', id: id}, '', '?id=' + id);
+                try { history.pushState({view: 'details', id: id}, '', '?id=' + id); } catch(e) {}
             }
 
             const catName = (ad.category && CATEGORIES[ad.category]) ? CATEGORIES[ad.category][currentLang] : (ad.category || '');
@@ -1392,10 +1392,11 @@
         switchView(currentView); // Перемикає відображення на головний вигляд або кабінет/адмінку
         window.scrollTo(0, 0);
 
-        document.title = 'Оголошення м. Миколаїв | Міні-дошка оголошень';
+        try { document.title = 'Оголошення м. Миколаїв | Міні-дошка оголошень'; } catch(e){}
 
+        // ЗАХИСТ: Iframe може блокувати pushState, що раніше ламало перехід назад
         if (!skipPushState) {
-            history.pushState({view: 'main'}, '', window.location.pathname);
+            try { history.pushState({view: 'main'}, '', window.location.pathname); } catch(e) {}
         }
     }
 
@@ -1591,7 +1592,9 @@
     }
 
     async function deleteAd(id) {
-        if(!confirm(currentLang==='uk'?'Видалити назавжди?':'Удалить навсегда?')) return;
+        // ЗАХИСТ: Iframe блокує confirm(), що викликало помилку і зупиняло рендер.
+        // Загорнуто в безпечний блок try...catch, щоб функція видалення не ламалася.
+        try { if(window.confirm && !window.confirm(currentLang==='uk'?'Видалити назавжди?':'Удалить навсегда?')) return; } catch(e){}
         try {
             await deleteDoc(doc(db, 'artifacts', appId, 'public', 'data', 'nikolaev_ads', String(id)));
             showToast('Видалено');
