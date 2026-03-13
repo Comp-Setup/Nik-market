@@ -742,7 +742,7 @@
     import { getAuth, signInAnonymously, signInWithCustomToken, onAuthStateChanged, createUserWithEmailAndPassword, signInWithEmailAndPassword, signOut } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
     import { getFirestore, collection, onSnapshot, setDoc, doc, updateDoc, deleteDoc } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
 
-    // --- FIREBASE CONFIGURATION ---
+    // --- FIREBASE CONFIGURATION (DYNAMIC PRIORITY) ---
     const HARDCODED_CONFIG = {
         apiKey: "AIzaSyDIWrxWsxfFx54nOiXkICEVl2f-uyqssL8", 
         authDomain: "nik--market.firebaseapp.com",
@@ -752,41 +752,18 @@
         appId: "1:165947840731:web:1bfc394a4bc5c458a1d4fe"
     };
 
-    // ВАЖЛИВО: Дані адміністратора
+    let firebaseConfig = HARDCODED_CONFIG;
+    if (typeof __firebase_config !== 'undefined' && __firebase_config) {
+        try {
+            firebaseConfig = JSON.parse(__firebase_config);
+        } catch (e) {
+            console.error("Config parsing error", e);
+        }
+    }
+
     const ADMIN_EMAIL = "Novikov666kherson@gmail.com"; 
 
-    // --- 1. ATTACH FUNCTIONS TO GLOBAL WINDOW OBJECT ---
-    window.toggleLang = toggleLang;
-    window.openAddModal = openAddModal;
-    window.closeModal = closeModal;
-    window.submitAd = submitAd;
-    window.togglePhotoInput = togglePhotoInput;
-    window.previewAndCompressImage = previewAndCompressImage;
-    window.searchAds = searchAds;
-    window.clearCategoryFilter = clearCategoryFilter;
-    window.filterByCategory = filterByCategory;
-    window.closeAdDetails = closeAdDetails;
-    window.openAdDetails = openAdDetails;
-    window.closeLightbox = closeLightbox;
-    window.toggleZoom = toggleZoom;
-    window.moveZoom = moveZoom;
-    window.updateSubcategories = updateSubcategories;
-    window.openLightbox = openLightbox;
-    window.fallbackToLocal = fallbackToLocal;
-    
-    // Нові функції для кабінету та модерації
-    window.openAuthModal = openAuthModal;
-    window.closeAuthModal = closeAuthModal;
-    window.processAuth = processAuth;
-    window.logout = logout;
-    window.openCabinet = openCabinet;
-    window.switchView = switchView;
-    window.editAd = editAd;
-    window.deleteAd = deleteAd;
-    window.approveAd = approveAd;
-    window.rejectAd = rejectAd;
-
-    // --- 2. GLOBAL STATE VARIABLES ---
+    // --- 1. GLOBAL STATE & ATTACHMENT ---
     let ads = []; 
     let currentUser = null;
     let useFirebase = false;
@@ -794,19 +771,18 @@
     let currentCategoryFilter = '';
     let compressedBase64Image = '';
     let isListenerStarted = false;
-    let isInitialAuthTryComplete = false;
-    let initialUrlChecked = false; // Flag for checking direct links
-    
-    // Запам'ятовуємо останню відкриту вкладку (Щоб не викидало при оновленні)
-    let currentView = localStorage.getItem('nik-current-view') || 'main'; // 'main', 'cabinet', 'admin'
+    let initialUrlChecked = false;
+    let currentView = localStorage.getItem('nik-current-view') || 'main'; 
     let editingAdId = null;
+    let currentLang = localStorage.getItem('nik-lang') || 'uk';
 
+    // Categories
     const CATEGORIES = {
         "Свіжі": { icon: "🔥", uk: "Свіжі оголошення", ru: "Свежие объявления", sub: { uk:[], ru:[] } },
         "Хобі": { 
             icon: "⚽", uk: "Хобі, спорт і відпочинок", ru: "Хобби, спорт и отдых", 
             sub: { 
-                uk: ["Колекціонування та антикваріат", "Спорт, фітнес та активний відпочинок", "Велосипеди та екіпірування", "Мільїтарія та тактичне спорядження", "Дрони, коптери та аксесуари", "Книги, комікси та журнали", "Музика, фільми та вініл", "Квитки на концерти та події", "Пошук компанії для подорожей", "Музичні інструменти та звук", "Настільні ігри та пазли", "Риболовля та полювання", "Матеріали для рукоділля", "Інші захоплення"],
+                uk: ["Колекціонування та антикваріат", "Спорт, фітнес та активний відпочинок", "Велосипеди та екіпірування", "Мілітарія та тактичне спорядження", "Дрони, коптери та аксесуари", "Книги, комікси та журнали", "Музика, фільми та вініл", "Квитки на концерти та події", "Пошук компанії для подорожей", "Музичні інструменти та звук", "Настільні ігри та пазли", "Риболовля та полювання", "Матеріали для рукоділля", "Інші захоплення"],
                 ru: ["Коллекционирование и антиквариат", "Спорт, фитнес и активный отдых", "Велосипеды и экипировка", "Милитария и тактическое снаряжение", "Дроны, коптеры и аксессуары", "Книги, комиксы и журналы", "Музыка, фильмы и винил", "Билеты на концерты и события", "Поиск компании для путешествий", "Музыкальные инструменты и звук", "Настольные игры и пазлы", "Рыбалка и охота", "Материалы для рукоделия", "Другие увлечения"]
             } 
         },
@@ -821,7 +797,7 @@
             icon: "🏠", uk: "Нерухомість", ru: "Недвижимость", 
             sub: { 
                 uk: ["Оренда квартир (довгострокова)", "Оренда квартир (подобово)", "Продаж квартир", "Оренда будинків та котеджів", "Продаж будинків та дач", "Продаж землі та ділянок", "Оренда кімнат", "Продаж кімнат", "Оренда комерційної нерухомості", "Продаж комерційної нерухомості", "Оренда гаражів та паркінгів", "Продаж гаражів", "Нерухомість за кордоном"], 
-                ru: ["Аренда квартир (долгосрочная)", "Аренда квартир (посуточно)", "Продажа квартир", "Аренда домов и коттеджей", "Продажа домов и дач", "Продажа земли и участков", "Аренда комнат", "Продажа комнат", "Аренда коммерческой недвижимости", "Продажа коммерческой недвижимости", "Аренда гаражей и паркингов", "Продажа гаражей", "Недвижимость за рубежом"] 
+                ru: ["Aренда квартир (долгосрочная)", "Aренда квартир (посуточно)", "Продажа квартир", "Aренда домов и коттеджей", "Продажа домов и дач", "Продажа земли и участков", "Aренда комнат", "Продажа комнат", "Aренда коммерческой недвижимости", "Продажа коммерческой недвижимости", "Aренда гаражей и паркингов", "Продажа гаражей", "Недвижимость за рубежом"] 
             } 
         },
         "Транспорт": { 
@@ -870,7 +846,7 @@
             icon: "👕", uk: "Мода і стиль", ru: "Мода и стиль", 
             sub: { 
                 uk: ["Жіночий одяг", "Чоловічий одяг", "Жіноче взуття", "Чоловіче взуття", "Спортивний одяг та взуття", "Сумки та рюкзаки", "Годинники", "Ювелірні вироби та біжутерія", "Аксесуари (Ремені, краватки)", "Головні убори", "Спецодяг та уніформа", "Подарунки та сувеніри", "Весільний одяг та аксесуари"], 
-                ru: ["Женская одежда", "Мужская одежда", "Женская обувь", "Мужская обувь", "Спортивная одежда и обувь", "Сумки и рюкзаки", "Часы", "Ювелирные изделия и бижутерия", "Аксессуары (Ремни, галстуки)", "Головные уборы", "Спецодежда и униформа", "Подарки и сувениры", "Свадебная одежда и аксессуары"] 
+                ru: ["Женская одежда", "Мужская одежда", "Женская обувь", "Мужская обувь", "Спортивная одежда и обувь", "Сумки и рюкзаки", "Часы", "Ювелирные изделия и бижутерия", "Аксессуары (Ремни, галстуки)", "Головные уборы", "Спецодежда и универсальная одежда", "Подарки и сувениры", "Свадебная одежда и аксессуары"] 
             } 
         },
         "Діти": { 
@@ -896,169 +872,15 @@
         }
     };
 
-    // --- 3. UI FUNCTIONS ---
-    let currentLang = localStorage.getItem('nik-lang') || 'uk';
-    const langToggle = document.getElementById('langToggle');
-    const themeToggle = document.getElementById('themeToggle');
-
-    function initSettings() {
-        if(localStorage.getItem('nik-theme') === 'dark') {
-            document.body.classList.add('dark-theme');
-            themeToggle.innerText = '☀️';
-        }
-        applyLanguage();
-        buildCategoriesBar();
-        buildFormCategories();
+    // UI Functions
+    function openAuthModal() { 
+        const modal = document.getElementById('authModal');
+        if (modal) modal.classList.add('active'); 
     }
-
-    function updateStatus(status, errorMsg = "") {
-        const badge = document.getElementById('statusBadge');
-        if (!badge) return;
-        const dot = badge.querySelector('.dot');
-        const textUk = badge.querySelector('.uk');
-        const textRu = badge.querySelector('.ru');
-        
-        if (status === 'cloud') {
-            dot.className = 'dot dot-cloud';
-            if (textUk) textUk.innerText = 'Cloud';
-            if (textRu) textRu.innerText = 'Cloud';
-            badge.title = "Підключено до хмари";
-        } else if (status === 'local') {
-            dot.className = 'dot dot-local';
-            if (textUk) textUk.innerText = 'Local';
-            if (textRu) textRu.innerText = 'Local';
-            if (errorMsg) {
-                badge.title = "Причина: " + errorMsg;
-            }
-        } else if (status === 'sync') {
-            dot.className = 'dot dot-sync';
-            if (textUk) textUk.innerText = 'Синхронізація...';
-            if (textRu) textRu.innerText = 'Подключение...';
-            badge.title = "Спроба з'єднання з Firebase";
-        }
-    }
-
-    // --- РОУТИНГ ВИГЛЯДІВ (Головна / Кабінет / Адмін) ---
-    function switchView(viewName) {
-        currentView = viewName;
-        localStorage.setItem('nik-current-view', viewName); // Зберігаємо вкладку при оновленні сторінки
-        
-        // ВАЖЛИВО: Замість closeAdDetails(true) просто перемикаємо видимість контейнерів
-        document.getElementById('mainView').style.display = 'block';
-        document.getElementById('detailsView').style.display = 'none';
-        
-        document.getElementById('mainHero').style.display = viewName === 'main' ? 'block' : 'none';
-        document.getElementById('cabinetHero').style.display = viewName === 'cabinet' ? 'block' : 'none';
-        document.getElementById('adminHero').style.display = viewName === 'admin' ? 'block' : 'none';
-        
-        document.querySelector('.categories-wrapper').style.display = viewName === 'main' ? 'block' : 'none';
-        
-        const titleElem = document.getElementById('sectionTitleText');
-        if (viewName === 'main') {
-            titleElem.innerHTML = `<span class="uk">Оголошення</span><span class="ru">Объявления</span>`;
-        } else if (viewName === 'cabinet') {
-            titleElem.innerHTML = `<span class="uk">Мої оголошення</span><span class="ru">Мои объявления</span>`;
-        } else if (viewName === 'admin') {
-            titleElem.innerHTML = `<span class="uk">Всі оголошення бази</span><span class="ru">Все объявления базы</span>`;
-        }
-        
-        clearCategoryFilter(true);
-        renderAds();
-        applyLanguage();
-    }
-
-    function isAdmin() {
-        if (!currentUser || currentUser.isAnonymous || !currentUser.email) return false;
-        // Надійна перевірка ігноруючи регістр і пробіли
-        return currentUser.email.trim().toLowerCase() === ADMIN_EMAIL.trim().toLowerCase();
-    }
-
-    function openCabinet() {
-        if (!currentUser || currentUser.isAnonymous) {
-            openAuthModal();
-        } else {
-            let displayEmail = currentUser.email || "";
-            if(displayEmail && displayEmail.includes('@nikmarket.local')) {
-                displayEmail = "Телефон: " + displayEmail.split('@')[0];
-            }
-            document.getElementById('cabinetUserEmail').innerText = displayEmail || "Акаунт";
-            document.getElementById('adminPanelBtn').style.display = isAdmin() ? 'inline-block' : 'none';
-            switchView('cabinet');
-        }
-    }
-
-    // --- АВТОРИЗАЦІЯ ---
-    function openAuthModal() { document.getElementById('authModal').classList.add('active'); }
-    function closeAuthModal() { document.getElementById('authModal').classList.remove('active'); }
-
-    async function processAuth(action) {
-        const phoneInput = document.getElementById('authPhone').value;
-        const emailInput = document.getElementById('authUserEmail').value.trim().toLowerCase();
-        let passInput = document.getElementById('authPassword').value;
-
-        if (phoneInput.length !== 9) return showToast(currentLang === 'uk' ? 'Введіть коректний номер (9 цифр)' : 'Введите корректный номер (9 цифр)', true);
-        if (!passInput) return showToast(currentLang === 'uk' ? 'Введіть пароль' : 'Введите пароль', true);
-
-        const fullPhone = "+380" + phoneInput;
-        let finalEmail = emailInput || (fullPhone + "@nikmarket.local");
-        
-        try {
-            if (action === 'login') {
-                await signInWithEmailAndPassword(auth, finalEmail, passInput);
-                showToast(currentLang === 'uk' ? 'Успішний вхід!' : 'Успешный вход!');
-            } else {
-                await createUserWithEmailAndPassword(auth, finalEmail, passInput);
-                showToast(currentLang === 'uk' ? 'Успішна реєстрація!' : 'Успешная регистрация!');
-            }
-            closeAuthModal();
-            updateHeaderAuth();
-            openCabinet();
-        } catch (err) {
-            console.error(err);
-            let msg = err.message;
-            if(err.code === 'auth/invalid-credential') msg = currentLang==='uk'?'Невірний номер/email або пароль':'Неверный номер/email или пароль';
-            if(err.code === 'auth/email-already-in-use') msg = currentLang==='uk'?'Акаунт вже існує! Спробуйте Увійти.':'Аккаунт уже существует! Попробуйте Войти.';
-            if(err.code === 'auth/operation-not-allowed') msg = currentLang==='uk' ? 'Помилка! Увімкніть "Email/Password" в Firebase Console.' : 'Ошибка! Включите "Email/Password" в Firebase Console.';
-            showToast(msg, true);
-        }
-    }
-
-    async function logout() {
-        currentUser = null; // Негайно очищаємо змінні, щоб приховати кнопки
-        document.getElementById('cabinetUserEmail').innerText = ''; // Очищаємо пошту/телефон
-        
-        // Змушуємо перехід до головної, щоб закрити детальне оголошення
-        switchView('main');
-        renderAds(); 
-        
-        await signOut(auth);
-        try { await signInAnonymously(auth); } catch(e){} 
-        currentUser = auth.currentUser; 
-        updateHeaderAuth();
-        showToast(currentLang === 'uk' ? 'Ви вийшли з акаунту' : 'Вы вышли из аккаунта');
-    }
-
-    function updateHeaderAuth() {
-        const btn = document.getElementById('cabinetBtn');
-        if (currentUser && !currentUser.isAnonymous) {
-            btn.innerHTML = `<span class="uk">👤 Кабінет</span><span class="ru">👤 Кабинет</span>`;
-        } else {
-            btn.innerHTML = `<span class="uk">👤 Увійти</span><span class="ru">👤 Войти</span>`;
-        }
-        applyLanguage();
-    }
-
-    // --- МОДЕРАЦІЯ ТА EMAIL ---
-    function sendModerationEmail(adData) {
-        fetch("https://formsubmit.co/ajax/" + ADMIN_EMAIL, {
-            method: "POST",
-            headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
-            body: JSON.stringify({
-                _subject: "Нове оголошення (Модерація): " + adData.title,
-                "Назва": adData.title, "Ціна": adData.price, "Категорія": adData.category,
-                "Email Автора": adData.authorEmail, "Телефон": adData.phone, "Статус": "Очікує підтвердження в Адмін-панелі"
-            })
-        }).catch(error => console.log("Failed to send email", error));
+    
+    function closeAuthModal() { 
+        const modal = document.getElementById('authModal');
+        if (modal) modal.classList.remove('active'); 
     }
 
     function toggleLang() {
@@ -1068,352 +890,301 @@
         buildCategoriesBar();
         buildFormCategories();
         renderAds(); 
-        if(document.getElementById('detailsView').style.display === 'block') {
-            const params = new URLSearchParams(window.location.search);
-            const adId = params.get('id');
-            if (adId) openAdDetails(adId, true); 
-        }
     }
 
     function applyLanguage() {
         document.body.className = `lang-${currentLang} ${document.body.classList.contains('dark-theme') ? 'dark-theme' : ''}`;
-        langToggle.innerText = currentLang === 'uk' ? 'RU' : 'УКР';
+        const langBtn = document.getElementById('langToggle');
+        if (langBtn) langBtn.innerText = currentLang === 'uk' ? 'RU' : 'УКР';
     }
-
-    themeToggle.addEventListener('click', () => {
-        document.body.classList.toggle('dark-theme');
-        if(document.body.classList.contains('dark-theme')) {
-            localStorage.setItem('nik-theme', 'dark');
-            themeToggle.innerText = '☀️';
-        } else {
-            localStorage.setItem('nik-theme', 'light');
-            themeToggle.innerText = '🌙';
-        }
-    });
 
     function buildCategoriesBar() {
         const bar = document.getElementById('categoriesBar');
+        if (!bar) return;
         bar.innerHTML = '';
         for (const [key, data] of Object.entries(CATEGORIES)) {
-            const name = data[currentLang];
             const div = document.createElement('div');
             div.className = `category-item ${currentCategoryFilter === key ? 'active' : ''}`;
             div.onclick = () => filterByCategory(key, div);
-            div.innerHTML = `<div class="cat-icon">${data.icon}</div><span>${name}</span>`;
+            div.innerHTML = `<div class="cat-icon">${data.icon}</div><span>${data[currentLang]}</span>`;
             bar.appendChild(div);
         }
     }
 
     function buildFormCategories() {
         const select = document.getElementById('adCategory');
-        select.innerHTML = `<option value="">${currentLang === 'uk' ? 'Оберіть категорію...' : 'Выберите категорию...'}</option>`;
+        if (!select) return;
+        select.innerHTML = `<option value="">${currentLang === 'uk' ? 'Обрати категорію...' : 'Выбрать категорию...'}</option>`;
         for (const [key, data] of Object.entries(CATEGORIES)) {
             if (key === 'Свіжі') continue; 
-            const option = document.createElement('option');
-            option.value = key;
-            option.innerText = data[currentLang];
-            select.appendChild(option);
+            const opt = document.createElement('option');
+            opt.value = key; opt.innerText = data[currentLang]; select.appendChild(opt);
         }
     }
 
     function updateSubcategories() {
-        const catKey = document.getElementById('adCategory').value;
-        const subSelect = document.getElementById('adSubcategory');
-        subSelect.innerHTML = `<option value="">${currentLang === 'uk' ? 'Оберіть підкатегорію...' : 'Выберите подкатегорию...'}</option>`;
-        
-        if (catKey && CATEGORIES[catKey].sub[currentLang]) {
-            CATEGORIES[catKey].sub[currentLang].forEach(sub => {
-                const option = document.createElement('option');
-                option.value = sub;
-                option.innerText = sub;
-                subSelect.appendChild(option);
+        const key = document.getElementById('adCategory').value;
+        const sub = document.getElementById('adSubcategory');
+        if (!sub) return;
+        sub.innerHTML = `<option value="">${currentLang === 'uk' ? 'Оберіть підкатегорію...' : 'Выберите подкатегорию...'}</option>`;
+        if (key && CATEGORIES[key].sub[currentLang]) {
+            CATEGORIES[key].sub[currentLang].forEach(s => {
+                const opt = document.createElement('option');
+                opt.value = s; opt.innerText = s; sub.appendChild(opt);
             });
         }
     }
-
-    function checkUrlParams() {
-        if (initialUrlChecked) return;
-        const params = new URLSearchParams(window.location.search);
-        const adId = params.get('id');
-        
-        if (adId && ads.length > 0) {
-            const foundAd = ads.find(a => String(a.id) === String(adId));
-            if (foundAd) {
-                openAdDetails(foundAd.id, true); 
-            } else {
-                try { history.replaceState({view: 'main'}, '', window.location.pathname); } catch(e){}
-            }
-        }
-        if (ads.length > 0) {
-            initialUrlChecked = true;
-        }
-    }
-
-    window.addEventListener('popstate', (event) => {
-        const state = event.state;
-        if (state && state.view === 'details') {
-            openAdDetails(state.id, true); 
-        } else {
-            const params = new URLSearchParams(window.location.search);
-            const adId = params.get('id');
-            if (adId) {
-                openAdDetails(adId, true);
-            } else {
-                closeAdDetails(true);
-            }
-        }
-    });
-
-    const container = document.getElementById('adsContainer');
-    const adsCount = document.getElementById('adsCount');
 
     function renderAds(adsToRender = ads) {
+        const container = document.getElementById('adsContainer');
         const loader = document.getElementById('loadingIndicator');
-        const loaderHTML = (loader && loader.style.display !== 'none') ? loader.outerHTML : '';
-        container.innerHTML = loaderHTML; 
+        if (!container) return;
+        
+        container.innerHTML = (loader && loader.style.display !== 'none') ? loader.outerHTML : '';
 
-        // Filtering for Cabinet/Admin
         let filtered = adsToRender;
         if (currentView === 'main') {
-            filtered = filtered.filter(ad => ad.status === 'approved' || !ad.status); 
+            filtered = adsToRender.filter(a => a.status === 'approved' || !a.status);
         } else if (currentView === 'cabinet') {
-            if (currentUser && !currentUser.isAnonymous) {
-                filtered = filtered.filter(ad => ad.userId === currentUser.uid);
-            } else {
-                filtered = []; 
-            }
+            filtered = (currentUser && !currentUser.isAnonymous) ? adsToRender.filter(a => a.userId === currentUser.uid) : [];
         } else if (currentView === 'admin') {
-            filtered = [...filtered].sort((a, b) => {
-                return (Number(b.id) || 0) - (Number(a.id) || 0); 
-            });
+            filtered = isAdmin() ? [...adsToRender].sort((a,b) => (Number(b.id) || 0) - (Number(a.id) || 0)) : [];
         }
 
-        const query = document.getElementById('searchInput').value.toLowerCase().trim();
-        if (query.length > 0) {
-            filtered = filtered.filter(ad => {
-                try {
-                    return (ad.title && ad.title.toLowerCase().includes(query)) || 
-                           (ad.location && ad.location.toLowerCase().includes(query)) ||
-                           (ad.desc && ad.desc.toLowerCase().includes(query)) ||
-                           (ad.category && ad.category.toLowerCase().includes(query)) ||
-                           (ad.subcategory && ad.subcategory.toLowerCase().includes(query));
-                } catch(e) { return false; }
-            });
-        }
-        if (currentCategoryFilter && currentCategoryFilter !== 'Свіжі') {
-            filtered = filtered.filter(ad => ad.category === currentCategoryFilter);
-        }
+        const qInput = document.getElementById('searchInput');
+        const q = qInput ? qInput.value.toLowerCase().trim() : "";
+        if (q) filtered = filtered.filter(a => a.title?.toLowerCase().includes(q) || a.desc?.toLowerCase().includes(q));
+        if (currentCategoryFilter && currentCategoryFilter !== 'Свіжі') filtered = filtered.filter(a => a.category === currentCategoryFilter);
+
+        const adsCountElem = document.getElementById('adsCount');
+        if (adsCountElem) adsCountElem.innerText = filtered.length;
 
         if (filtered.length === 0 && (!loader || loader.style.display === 'none')) {
-            container.innerHTML += `<p style="grid-column: 1/-1; text-align:center; color: var(--text-muted); padding: 50px;">
-                ${currentLang === 'uk' ? 'Оголошень не знайдено.' : 'Объявлений не найдено.'}
-                <br><span style="font-size: 11px; opacity: 0.5;">(База даних: ${appId})</span>
-            </p>`;
+            container.innerHTML += `<p style="grid-column: 1/-1; text-align:center; color: var(--text-muted); padding: 50px;">${currentLang==='uk'?'Порожньо':'Пусто'}</p>`;
         }
 
-        adsCount.innerText = `${filtered.length} ${currentLang === 'uk' ? 'оголошень' : 'объявлений'}`;
-
-        const listToRender = currentView === 'admin' ? filtered : [...filtered].reverse();
-
-        listToRender.forEach(ad => {
-            try {
-                const card = document.createElement('div');
-                card.className = 'ad-card';
-                
-                let imageHTML = '';
-                if (typeof ad.image === 'string' && (ad.image.startsWith('data:image') || ad.image.startsWith('http'))) {
-                    imageHTML = `<img src="${ad.image}" class="ad-image" alt="${ad.title || 'Image'}" onerror="this.src='data:image/svg+xml;utf8,<svg xmlns=\\'http://www.w3.org/2000/svg\\' width=\\'100%\\' height=\\'100%\\'><rect width=\\'100%\\' height=\\'100%\\' fill=\\'%23e0e0e0\\'/><text x=\\'50%\\' y=\\'50%\\' font-size=\\'40\\' text-anchor=\\'middle\\' dy=\\'.3em\\'>📦</text></svg>'">`;
-                } else {
-                    let icon = (ad.category && CATEGORIES[ad.category]) ? CATEGORIES[ad.category].icon : '📦';
-                    imageHTML = `<div class="ad-image" style="font-size: 60px;">${icon}</div>`;
-                }
-
-                let statusHTML = '';
-                if (currentUser && !currentUser.isAnonymous && (ad.userId === currentUser.uid || isAdmin())) {
-                    if (ad.status === 'pending') statusHTML = `<div class="status-badge status-pending">Очікує модерації</div>`;
-                    else if (ad.status === 'rejected') statusHTML = `<div class="status-badge status-rejected">Відхилено</div>`;
-                    else statusHTML = `<div class="status-badge status-approved">Опубліковано</div>`;
-                }
-
-                let actionsHTML = '';
-                if (currentUser && !currentUser.isAnonymous && (ad.userId === currentUser.uid || isAdmin())) {
-                    actionsHTML += `<div class="card-actions" onclick="try{event.preventDefault(); event.stopImmediatePropagation();}catch(e){}">`;
-                    if (isAdmin() && ad.status === 'pending') {
-                        actionsHTML += `<button class="btn-appr" onclick="try{event.stopImmediatePropagation();}catch(e){} approveAd('${ad.id}')">✅ Схвалити</button>`;
-                        actionsHTML += `<button class="btn-warning" onclick="try{event.stopImmediatePropagation();}catch(e){} rejectAd('${ad.id}')">❌ Відхилити</button>`;
-                    }
-                    actionsHTML += `<button class="btn-edit" onclick="try{event.stopImmediatePropagation();}catch(e){} editAd('${ad.id}')">✏️ Редаг.</button>`;
-                    actionsHTML += `<button class="btn-del" onclick="try{event.stopImmediatePropagation();}catch(e){} deleteAd('${ad.id}')">🗑️ Видалити</button>`;
-                    actionsHTML += `</div>`;
-                }
-
-                const catName = (ad.category && CATEGORIES[ad.category]) ? CATEGORIES[ad.category][currentLang] : (ad.category || '');
-                const subName = ad.subcategory ? ` › ${ad.subcategory}` : '';
-
-                let viewsHTML = '';
-                if (currentUser && !currentUser.isAnonymous && (ad.userId === currentUser.uid || isAdmin())) {
-                    viewsHTML = `<span style="margin-left: 10px;" title="Перегляди">👁️ ${ad.views || 0}</span>`;
-                }
-
-                card.innerHTML = `
-                    ${statusHTML}
-                    <a href="?id=${ad.id}" onclick="try{openAdDetails('${ad.id}'); event.preventDefault();}catch(e){} return false;" style="flex:1; display:flex; flex-direction:column; text-decoration:none; color:inherit;">
-                        ${imageHTML}
-                        <div class="ad-content">
-                            <div style="margin-bottom: 5px;"><span class="category-badge">${catName}${subName}</span></div>
-                            <div class="ad-title">${ad.title || ''}</div>
-                            <div class="ad-price">${ad.price || ''}</div>
-                            <div class="ad-desc">${ad.desc || ''}</div>
-                            <div class="ad-meta">
-                                <div><span>📍 ${ad.location || ''}</span><span style="margin-left: 10px;">⏱ ${ad.date ? String(ad.date).split(',')[0] : ''}</span>${viewsHTML}</div>
-                            </div>
-                        </div>
-                    </a>
-                    ${actionsHTML ? `<div style="padding: 0 15px 15px;">${actionsHTML}</div>` : ''}
-                `;
-                container.appendChild(card);
-            } catch (err) {
-                console.error("Помилка рендеру одного з оголошень", err);
-            }
-        });
-
-        checkUrlParams(); 
-    }
-
-    function openAdDetails(id, skipPushState = false) {
-        try {
-            const ad = ads.find(a => String(a.id) === String(id));
-            if (!ad) return;
-
-            try {
-                if (useFirebase && (!currentUser || currentUser.uid !== ad.userId) && !isAdmin()) {
-                    const adRef = doc(db, 'artifacts', appId, 'public', 'data', 'nikolaev_ads', String(ad.id));
-                    updateDoc(adRef, { views: (ad.views || 0) + 1 }).catch(e => console.log(e));
-                    ad.views = (ad.views || 0) + 1; 
-                }
-            } catch (err) { console.error("Помилка оновлення переглядів:", err); }
-
-            document.getElementById('mainView').style.display = 'none';
-            document.getElementById('detailsView').style.display = 'block';
-            window.scrollTo(0, 0);
-
-            try { document.title = `${ad.title || 'Оголошення'} | Оголошення м. Миколаїв`; } catch(e){}
-
-            if (!skipPushState) {
-                try { history.pushState({view: 'details', id: id}, '', '?id=' + id); } catch(e) {}
-            }
-
-            const catName = (ad.category && CATEGORIES[ad.category]) ? CATEGORIES[ad.category][currentLang] : (ad.category || '');
-            const subName = ad.subcategory ? ` › ${ad.subcategory}` : '';
-            const descLabel = currentLang === 'uk' ? 'Опис:' : 'Описание:';
-            const contactsLabel = currentLang === 'uk' ? 'Контакти:' : 'Контакты:';
-            const enlargeHint = currentLang === 'uk' ? '🔍 Збільшити' : '🔍 Увеличить';
-
-            const hasImage = typeof ad.image === 'string' && (ad.image.startsWith('data:image') || ad.image.startsWith('http'));
+        filtered.reverse().forEach(ad => {
+            const card = document.createElement('div');
+            card.className = 'ad-card';
+            card.onclick = () => openAdDetails(ad.id);
             
-            let imageHTML = '';
-            if (hasImage) {
-                imageHTML = `<img src="${ad.image}" alt="${ad.title || 'Image'}">
-                             <div style="position: absolute; bottom: 15px; right: 15px; background: rgba(0,0,0,0.6); color: white; padding: 8px 15px; border-radius: 20px; font-size: 13px; pointer-events: none; backdrop-filter: blur(4px); box-shadow: 0 4px 10px rgba(0,0,0,0.3);">${enlargeHint}</div>`;
-            } else {
-                let icon = (ad.category && CATEGORIES[ad.category]) ? CATEGORIES[ad.category].icon : '📦';
-                imageHTML = `<div style="font-size: 120px;">${icon}</div>`;
+            let imgHTML = ad.image ? `<img src="${ad.image}" class="ad-image" onerror="this.src='data:image/svg+xml;utf8,<svg xmlns=\\'http://www.w3.org/2000/svg\\' width=\\'100%\\' height=\\'100%\\'><rect width=\\'100%\\' height=\\'100%\\' fill=\\'%23eee\\'/></svg>'">` 
+                                  : `<div class="ad-image" style="font-size:60px">${CATEGORIES[ad.category]?.icon || '📦'}</div>`;
+            
+            let statusHTML = '';
+            if (currentUser && !currentUser.isAnonymous && (ad.userId === currentUser.uid || isAdmin())) {
+                const s = ad.status || 'pending';
+                statusHTML = `<div class="status-badge status-${s}">${s==='pending'?'Очікує':s==='rejected'?'Відхилено':'Активно'}</div>`;
             }
-
-            const clickAction = hasImage ? `onclick="openLightbox('${ad.image}')"` : '';
-            const cursorStyle = hasImage ? 'cursor: zoom-in;' : 'cursor: default;';
 
             let actionsHTML = '';
             if (currentUser && !currentUser.isAnonymous && (ad.userId === currentUser.uid || isAdmin())) {
-                actionsHTML = `<div style="margin-top: 20px; display: flex; gap: 10px; border-top: 1px solid var(--border); padding-top: 20px; flex-wrap: wrap;">`;
+                actionsHTML = `<div class="card-actions" onclick="event.stopPropagation()">`;
                 if (isAdmin() && ad.status === 'pending') {
-                    actionsHTML += `<button class="btn btn-success" style="flex:1; min-width: 120px;" onclick="approveAd('${ad.id}'); closeAdDetails(true);">✅ Схвалити</button>`;
-                    actionsHTML += `<button class="btn btn-warning" style="flex:1; min-width: 120px;" onclick="rejectAd('${ad.id}'); closeAdDetails(true);">❌ Відхилити</button>`;
+                    actionsHTML += `<button class="btn-appr" onclick="approveAd('${ad.id}')">✅ Схвалити</button>`;
+                    actionsHTML += `<button class="btn-warning" onclick="rejectAd('${ad.id}')">❌ Відхилити</button>`;
                 }
-                actionsHTML += `<button class="btn btn-primary" style="flex:1; min-width: 120px;" onclick="editAd('${ad.id}')">✏️ Редагувати</button>`;
-                actionsHTML += `<button class="btn btn-danger" style="flex:1; min-width: 120px;" onclick="deleteAd('${ad.id}'); closeAdDetails(true);">🗑️ Видалити</button>`;
-                actionsHTML += `</div>`;
+                actionsHTML += `<button class="btn-edit" onclick="editAd('${ad.id}')">✏️ Ред.</button>`;
+                actionsHTML += `<button class="btn-del" onclick="deleteAd('${ad.id}')">🗑️ Видалити</button></div>`;
             }
 
-            let viewsHTML = '';
-            if (currentUser && !currentUser.isAnonymous && (ad.userId === currentUser.uid || isAdmin())) {
-                viewsHTML = `<span style="margin-left: 15px; font-weight: bold; color: var(--primary);">👁️ ${ad.views || 0} ${currentLang === 'uk' ? 'переглядів' : 'просмотров'}</span>`;
-            }
-
-            const detailsHTML = `
-                <div class="ad-details-container">
-                    <div class="ad-details-image-wrapper" ${clickAction} style="${cursorStyle}">
-                        ${imageHTML}
-                    </div>
-                    
-                    <div class="ad-details-info">
-                        <div style="margin-bottom: 15px;"><span class="category-badge" style="font-size: 13px; padding: 6px 12px;">${catName}${subName}</span></div>
-                        <h2 style="margin-bottom: 15px; font-size: 26px; line-height: 1.3;">${ad.title || ''}</h2>
-                        <div class="ad-price" style="font-size: 32px; margin-bottom: 25px;">${ad.price || ''}</div>
-
-                        <div style="margin-bottom: 30px;">
-                            <h4 style="margin-bottom: 12px; font-size: 18px; border-bottom: 1px solid var(--border); padding-bottom: 8px;">${descLabel}</h4>
-                            <p style="white-space: pre-wrap; line-height: 1.6; color: var(--text); font-size: 15px;">${ad.desc || ''}</p>
-                        </div>
-
-                        <div class="ad-contacts" style="padding: 20px; font-size: 16px; background: var(--bg); border: 1px solid var(--border); box-shadow: inset 0 2px 5px rgba(0,0,0,0.02);">
-                            <h4 style="margin-bottom: 15px; font-size: 18px;">${contactsLabel}</h4>
-                            <div style="margin-bottom: 10px; display: flex; align-items: center; gap: 10px;">👤 <strong>${ad.name || ''}</strong></div>
-                            <div style="margin-bottom: 10px; display: flex; align-items: center; gap: 10px;">📞 <a href="tel:${ad.phone}" style="font-size: 20px;">${ad.phone || ''}</a></div>
-                            ${ad.email ? `<div style="margin-bottom: 10px; display: flex; align-items: center; gap: 10px;">📧 <a href="mailto:${ad.email}">${ad.email}</a></div>` : ''}
-                            
-                            <div style="margin-top: 20px; padding-top: 15px; border-top: 1px solid var(--border); color: var(--text-muted); font-size: 14px; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap;">
-                                <span>📍 ${ad.location || ''}</span>
-                                <div><span>⏱ ${ad.date ? String(ad.date) : ''}</span>${viewsHTML}</div>
-                            </div>
-                            
-                            ${actionsHTML}
-                        </div>
-                    </div>
+            card.innerHTML = `
+                ${statusHTML}
+                ${imgHTML}
+                <div class="ad-content">
+                    <span class="category-badge">${CATEGORIES[ad.category]?.[currentLang] || ''}</span>
+                    <div class="ad-title">${ad.title || ''}</div>
+                    <div class="ad-price">${ad.price || ''}</div>
+                    <div class="ad-meta"><span>📍 ${ad.location || ''}</span></div>
+                    ${actionsHTML}
                 </div>
             `;
-            document.getElementById('adDetailsContent').innerHTML = detailsHTML;
-        } catch (err) {
-            console.error("Помилка завантаження деталей оголошення:", err);
-        }
+            container.appendChild(card);
+        });
+        checkUrlParams(); 
     }
 
-    function closeAdDetails(skipPushState = false) {
-        switchView(currentView); 
-        window.scrollTo(0, 0);
+    function openAdDetails(id, skipPush = false) {
+        const ad = ads.find(a => String(a.id) === String(id));
+        if (!ad) return;
+        document.getElementById('mainView').style.display = 'none';
+        document.getElementById('detailsView').style.display = 'block';
+        window.scrollTo(0,0);
 
-        try { document.title = 'Оголошення м. Миколаїв | Міні-дошка оголошень'; } catch(e){}
-
-        if (!skipPushState) {
-            try { history.pushState({view: 'main'}, '', window.location.pathname); } catch(e) {}
+        if (!skipPush) {
+            try { history.pushState({v:'details', id}, '', '?id=' + id); } catch(e){}
         }
+
+        const detailsContent = document.getElementById('adDetailsContent');
+        if (!detailsContent) return;
+
+        detailsContent.innerHTML = `
+            <div class="ad-details-container">
+                <div class="ad-details-image-wrapper" onclick="openLightbox('${ad.image}')">
+                    ${ad.image ? `<img src="${ad.image}">` : `<div style="font-size:100px">${CATEGORIES[ad.category]?.icon || '📦'}</div>`}
+                </div>
+                <div class="ad-details-info">
+                    <h2>${ad.title}</h2><div class="ad-price">${ad.price}</div>
+                    <p style="white-space:pre-wrap; margin:20px 0;">${ad.desc}</p>
+                    <div class="ad-contacts">
+                        <strong>📞 ${ad.phone}</strong><br>👤 ${ad.name}<br>📍 ${ad.location}
+                    </div>
+                </div>
+            </div>`;
     }
 
-    // --- LIGHTBOX CONTROLS ---
+    function closeAdDetails() {
+        switchView(currentView);
+        try { history.pushState({v:'main'}, '', window.location.pathname); } catch(e){}
+    }
+
+    function filterByCategory(cat, el) {
+        document.querySelectorAll('.category-item').forEach(i => i.classList.remove('active'));
+        if (currentCategoryFilter === cat) currentCategoryFilter = '';
+        else { currentCategoryFilter = cat; el.classList.add('active'); }
+        renderAds();
+    }
+
+    function clearCategoryFilter() { currentCategoryFilter = ''; renderAds(); }
+    function searchAds() { renderAds(); }
+
+    function togglePhotoInput() {
+        const checkedInput = document.querySelector('input[name="photoType"]:checked');
+        const type = checkedInput ? checkedInput.value : "upload";
+        document.getElementById('uploadPhotoBlock').style.display = type === 'upload' ? 'block' : 'none';
+        document.getElementById('urlPhotoBlock').style.display = type === 'url' ? 'block' : 'none';
+    }
+
+    function previewAndCompressImage(e) {
+        const file = e.target.files[0]; if (!file) return;
+        const reader = new FileReader();
+        reader.onload = (re) => {
+            const img = new Image();
+            img.onload = () => {
+                const canvas = document.createElement('canvas'); const ctx = canvas.getContext('2d');
+                canvas.width = 800; canvas.height = img.height * (800 / img.width);
+                ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+                compressedBase64Image = canvas.toDataURL('image/jpeg', 0.7);
+                const prev = document.getElementById('imagePreview');
+                if (prev) {
+                    prev.src = compressedBase64Image;
+                    prev.style.display = 'block';
+                }
+            };
+            img.src = re.target.result;
+        };
+        reader.readAsDataURL(file);
+    }
+
+    function openAddModal() {
+        if (!currentUser || currentUser.isAnonymous) { openAuthModal(); return; }
+        editingAdId = null; 
+        const form = document.getElementById('adForm');
+        if (form) form.reset();
+        const prev = document.getElementById('imagePreview');
+        if (prev) prev.style.display = 'none';
+        const modal = document.getElementById('addModal');
+        if (modal) modal.classList.add('active');
+    }
+
+    function closeModal() { 
+        const modal = document.getElementById('addModal');
+        if (modal) modal.classList.remove('active'); 
+    }
+
+    function editAd(id) {
+        const ad = ads.find(a => String(a.id) === String(id)); if (!ad) return;
+        editingAdId = id;
+        document.getElementById('adTitle').value = ad.title;
+        document.getElementById('adPrice').value = parseInt(ad.price);
+        document.getElementById('adCategory').value = ad.category;
+        updateSubcategories(); 
+        document.getElementById('adSubcategory').value = ad.subcategory;
+        document.getElementById('adDesc').value = ad.desc;
+        document.getElementById('adName').value = ad.name;
+        document.getElementById('adPhone').value = ad.phone.replace('+380','');
+        document.getElementById('adLocation').value = ad.location;
+        const modal = document.getElementById('addModal');
+        if (modal) modal.classList.add('active');
+    }
+
+    async function deleteAd(id) {
+        let confirmDel = true;
+        try { confirmDel = window.confirm(currentLang==='uk'?'Видалити назавжди?':'Удалить навсегда?'); } catch(e){}
+        if (!confirmDel) return;
+        try { await deleteDoc(doc(db, 'artifacts', appId, 'public', 'data', 'nikolaev_ads', String(id))); } catch(e){}
+    }
+
+    async function approveAd(id) { 
+        try { await updateDoc(doc(db, 'artifacts', appId, 'public', 'data', 'nikolaev_ads', String(id)), { status: 'approved' }); } catch(e){} 
+    }
+    
+    async function rejectAd(id) { 
+        try { await updateDoc(doc(db, 'artifacts', appId, 'public', 'data', 'nikolaev_ads', String(id)), { status: 'rejected' }); } catch(e){} 
+    }
+
+    async function submitAd(e) {
+        e.preventDefault();
+        const checkedInput = document.querySelector('input[name="photoType"]:checked');
+        const type = checkedInput ? checkedInput.value : "upload";
+        const img = type === 'upload' ? compressedBase64Image : document.getElementById('adImage').value;
+        const data = {
+            title: document.getElementById('adTitle').value,
+            price: document.getElementById('adPrice').value + ' грн',
+            category: document.getElementById('adCategory').value,
+            subcategory: document.getElementById('adSubcategory').value,
+            desc: document.getElementById('adDesc').value,
+            name: document.getElementById('adName').value,
+            phone: '+380' + document.getElementById('adPhone').value,
+            location: document.getElementById('adLocation').value,
+            image: img,
+            userId: currentUser.uid,
+            authorEmail: currentUser.email,
+            status: isAdmin() ? 'approved' : 'pending'
+        };
+
+        try {
+            if (editingAdId) {
+                await updateDoc(doc(db, 'artifacts', appId, 'public', 'data', 'nikolaev_ads', String(editingAdId)), data);
+            } else {
+                data.id = Date.now(); data.date = new Date().toLocaleString(); data.views = 0;
+                await setDoc(doc(db, 'artifacts', appId, 'public', 'data', 'nikolaev_ads', String(data.id)), data);
+                if (!isAdmin()) sendModerationEmail(data);
+            }
+            closeModal();
+        } catch(err) { showToast('Помилка', true); }
+    }
+
+    function showToast(m, err = false) {
+        const t = document.getElementById('toastMsg'); 
+        if (!t) return;
+        t.innerText = m;
+        t.style.background = err ? 'var(--danger)' : 'var(--success)';
+        t.classList.add('show'); setTimeout(() => t.classList.remove('show'), 3000);
+    }
+
     function openLightbox(imgSrc) {
         if (!imgSrc) return;
         const overlay = document.getElementById('lightbox');
         const img = document.getElementById('lightboxImg');
+        if (!overlay || !img) return;
         img.src = imgSrc;
         img.classList.remove('zoomed');
-        img.style.transformOrigin = 'center center';
         overlay.classList.add('active');
     }
 
     function closeLightbox(e) {
-        if (e.target.id === 'lightbox' || e.target.className === 'modal-close' || e.target.closest('.modal-close')) {
-            document.getElementById('lightbox').classList.remove('active');
+        if (!e || e.target.id === 'lightbox' || e.target.className === 'modal-close' || e.target.closest('.modal-close')) {
+            const lbox = document.getElementById('lightbox');
+            if (lbox) lbox.classList.remove('active');
         }
     }
 
     function toggleZoom(e) {
         const img = e.currentTarget;
         img.classList.toggle('zoomed');
-        if(img.classList.contains('zoomed')) {
-            moveZoom(e); 
-        } else {
-            img.style.transformOrigin = 'center center';
-        }
+        if(img.classList.contains('zoomed')) moveZoom(e);
+        else img.style.transformOrigin = 'center center';
     }
 
     function moveZoom(e) {
@@ -1425,410 +1196,194 @@
         img.style.transformOrigin = `${xPos}% ${yPos}%`;
     }
 
-    // --- SEARCH AND FILTERING ---
-    function searchAds(fromInput = false) {
-        if (fromInput) renderAds();
-    }
-
-    function filterByCategory(categoryKey, element) {
-        document.querySelectorAll('.category-item').forEach(item => item.classList.remove('active'));
-        
-        if (currentCategoryFilter === categoryKey && categoryKey !== 'Свіжі') {
-            clearCategoryFilter();
-            return;
-        }
-
-        element.classList.add('active');
-        currentCategoryFilter = categoryKey;
-
-        if(categoryKey === 'Свіжі') {
-            document.getElementById('activeCategoryLabel').innerText = ``;
-            document.getElementById('clearFilterBtn').style.display = 'none';
-        } else {
-            const catName = CATEGORIES[categoryKey][currentLang];
-            document.getElementById('activeCategoryLabel').innerText = `» ${catName}`;
-            document.getElementById('clearFilterBtn').style.display = 'inline-block';
-        }
-        
-        renderAds();
-    }
-
-    function clearCategoryFilter(skipSearch = false) {
-        document.querySelectorAll('.category-item').forEach(item => item.classList.remove('active'));
-        currentCategoryFilter = '';
-        document.getElementById('activeCategoryLabel').innerText = '';
-        document.getElementById('clearFilterBtn').style.display = 'none';
-        
-        const firstCat = document.querySelector('.category-item');
-        if(firstCat) firstCat.classList.add('active');
-        
-        if (!skipSearch) {
-            renderAds();
-        }
-    }
-
-    // --- FORM LOGIC ---
-    const modal = document.getElementById('addModal');
-
-    function togglePhotoInput() {
-        const typeSelect = document.querySelector('input[name="photoType"]:checked');
-        const type = typeSelect ? typeSelect.value : 'upload';
-        if (type === 'upload') {
-            document.getElementById('uploadPhotoBlock').style.display = 'block';
-            document.getElementById('urlPhotoBlock').style.display = 'none';
-        } else {
-            document.getElementById('uploadPhotoBlock').style.display = 'none';
-            document.getElementById('urlPhotoBlock').style.display = 'block';
-        }
-    }
-
-    function previewAndCompressImage(event) {
-        const file = event.target.files[0];
-        if (!file) return;
-
-        const reader = new FileReader();
-        reader.readAsDataURL(file);
-        
-        reader.onload = function(e) {
-            const img = new Image();
-            img.src = e.target.result;
-            
-            img.onload = function() {
-                const canvas = document.createElement('canvas');
-                const ctx = canvas.getContext('2d');
-                
-                const MAX_WIDTH = 800; 
-                let width = img.width;
-                let height = img.height;
-
-                if (width > MAX_WIDTH) {
-                    height = height * (MAX_WIDTH / width);
-                    width = MAX_WIDTH;
-                }
-
-                canvas.width = width;
-                canvas.height = height;
-                ctx.drawImage(img, 0, 0, width, height);
-
-                compressedBase64Image = canvas.toDataURL('image/jpeg', 0.7);
-                
-                const preview = document.getElementById('imagePreview');
-                preview.src = compressedBase64Image;
-                preview.style.display = 'block';
-            }
-        }
-    }
-
-    function openAddModal() {
-        if (!currentUser || currentUser.isAnonymous) {
-            openAuthModal();
-            return;
-        }
-        editingAdId = null;
-        document.getElementById('modalTitle').innerHTML = currentLang==='uk'?'<span class="uk">Нове оголошення</span>':'<span class="ru">Новое объявление</span>';
-        modal.classList.add('active');
-        
-        const selectCat = document.getElementById('adCategory');
-        if (currentCategoryFilter && currentCategoryFilter !== 'Свіжі') {
-            selectCat.value = currentCategoryFilter;
-            updateSubcategories(); 
-        }
-
-        if (currentUser.email && currentUser.email.includes('@nikmarket.local')) {
-            let userPhoneNum = currentUser.email.split('@')[0].replace('+380', '');
-            document.getElementById('adPhone').value = userPhoneNum;
-        }
-    }
-
-    function closeModal() {
-        modal.classList.remove('active');
-        document.getElementById('adForm').reset();
-        document.getElementById('imagePreview').style.display = 'none';
-        document.getElementById('adSubcategory').innerHTML = `<option value="">${currentLang === 'uk' ? 'Оберіть підкатегорію...' : 'Выберите подкатегорию...'}</option>`;
-        compressedBase64Image = '';
-        editingAdId = null;
-        togglePhotoInput();
-    }
-
-    modal.addEventListener('click', function(e) {
-        if (e.target === modal) closeModal();
-    });
-
-    function editAd(id) {
-        const ad = ads.find(a => String(a.id) === String(id));
-        if (!ad) return;
-        editingAdId = id;
-        
-        document.getElementById('modalTitle').innerHTML = currentLang==='uk'?'<span class="uk">Редагування оголошення</span>':'<span class="ru">Редактирование</span>';
-        document.getElementById('adTitle').value = ad.title || '';
-        document.getElementById('adPrice').value = parseInt(ad.price) || 0;
-        document.getElementById('adCategory').value = ad.category || '';
-        updateSubcategories();
-        document.getElementById('adSubcategory').value = ad.subcategory || '';
-        document.getElementById('adDesc').value = ad.desc || '';
-        document.getElementById('adName').value = ad.name || '';
-        document.getElementById('adEmail').value = ad.email || '';
-        document.getElementById('adPhone').value = ad.phone ? ad.phone.replace('+380', '') : '';
-        document.getElementById('adLocation').value = ad.location || '';
-        
-        if (ad.image && ad.image.startsWith('data:')) {
-            compressedBase64Image = ad.image;
-            document.getElementById('imagePreview').src = ad.image;
-            document.getElementById('imagePreview').style.display = 'block';
-        }
-        
-        document.getElementById('addModal').classList.add('active');
-    }
-
-    async function deleteAd(id) {
-        try { if(window.confirm && !window.confirm(currentLang==='uk'?'Видалити назавжди?':'Удалить навсегда?')) return; } catch(e){}
-        try {
-            await deleteDoc(doc(db, 'artifacts', appId, 'public', 'data', 'nikolaev_ads', String(id)));
-            showToast('Видалено');
-        } catch (e) { showToast('Помилка видалення', true); }
-    }
-
-    async function approveAd(id) {
-        try {
-            await updateDoc(doc(db, 'artifacts', appId, 'public', 'data', 'nikolaev_ads', String(id)), { status: 'approved' });
-            showToast('Опубліковано!');
-        } catch (e) { showToast('Помилка', true); }
-    }
-
-    async function rejectAd(id) {
-        try {
-            await updateDoc(doc(db, 'artifacts', appId, 'public', 'data', 'nikolaev_ads', String(id)), { status: 'rejected' });
-            showToast('Відхилено!');
-        } catch (e) { showToast('Помилка', true); }
-    }
-
-    async function submitAd(e) {
-        e.preventDefault();
-        if (!currentUser || currentUser.isAnonymous) return;
-
-        const typeSelect = document.querySelector('input[name="photoType"]:checked');
-        const photoType = typeSelect ? typeSelect.value : 'upload';
-        let finalImage = photoType === 'upload' ? compressedBase64Image : document.getElementById('adImage').value;
-        const priceValue = document.getElementById('adPrice').value + ' грн';
-        const phoneValue = '+380' + document.getElementById('adPhone').value;
-
-        const adData = {
-            title: document.getElementById('adTitle').value,
-            price: priceValue,
-            category: document.getElementById('adCategory').value,
-            subcategory: document.getElementById('adSubcategory').value,
-            desc: document.getElementById('adDesc').value,
-            name: document.getElementById('adName').value,
-            phone: phoneValue,
-            email: document.getElementById('adEmail').value,
-            location: document.getElementById('adLocation').value,
-            image: finalImage,
-            userId: currentUser.uid,
-            authorEmail: currentUser.email
-        };
-
-        try {
-            if (editingAdId) {
-                const adRef = doc(db, 'artifacts', appId, 'public', 'data', 'nikolaev_ads', String(editingAdId));
-                if(!isAdmin()) adData.status = 'pending'; 
-                await updateDoc(adRef, adData);
-                showToast(currentLang === 'uk' ? 'Оголошення оновлено!' : 'Объявление обновлено!');
-            } else {
-                adData.id = Date.now();
-                adData.date = new Date().toLocaleString();
-                adData.status = isAdmin() ? 'approved' : 'pending';
-                adData.views = 0; 
-                
-                const adRef = doc(db, 'artifacts', appId, 'public', 'data', 'nikolaev_ads', String(adData.id));
-                await setDoc(adRef, adData);
-                showToast(currentLang === 'uk' ? 'Оголошення відправлено на модерацію!' : 'Отправлено на модерацию!');
-                
-                if (!isAdmin()) sendModerationEmail(adData);
-            }
-            closeModal();
-            clearCategoryFilter(true); 
-        } catch (error) {
-            console.error("Submit Error:", error);
-            showToast((currentLang === 'uk' ? 'Помилка публікації: ' : 'Ошибка: ') + error.message, true);
-        }
-    }
-
-    function showToast(msg = null, isError = false) {
-        const toast = document.getElementById('toastMsg');
-        if (msg) toast.innerText = msg;
-        toast.style.background = isError ? 'var(--danger)' : 'linear-gradient(135deg, #00b09b, #96c93d)';
-        toast.classList.add('show');
-        setTimeout(() => toast.classList.remove('show'), 3000);
-    }
-
-    function fallbackToLocal(reason = "") {
-        console.warn("Falling back to Local mode:", reason);
-        updateStatus('local', reason);
-        const loader = document.getElementById('loadingIndicator');
-        if (loader) loader.style.display = 'none';
-        let localAds = JSON.parse(localStorage.getItem('nik-ads'));
-        ads = localAds ? localAds : [];
-        renderAds(ads);
-    }
-
-    function showError(html) {
-        const box = document.getElementById('uiErrorBox');
-        if (box) {
-            box.innerHTML = html;
-            box.style.display = 'block';
-        }
-    }
-
-    function hideError() {
-        const box = document.getElementById('uiErrorBox');
-        if (box) box.style.display = 'none';
-    }
-
-    function showDebug(msg) {
-        const p = document.getElementById('debugPanel');
-        if (p) {
-            p.innerHTML = "<strong>ДІАГНОСТИКА ХМАРИ:</strong> " + msg;
-            p.style.display = 'block';
-        }
-    }
-
-    // --- FIREBASE BOOTSTRAP LOGIC ---
-
-    let firebaseConfig = HARDCODED_CONFIG;
-    if (typeof __firebase_config !== 'undefined' && __firebase_config) {
-        try {
-            const parsed = typeof __firebase_config === 'string' ? JSON.parse(__firebase_config) : __firebase_config;
-            if (parsed && parsed.apiKey && parsed.apiKey.length > 10) {
-                firebaseConfig = parsed;
-            }
-        } catch(e) { 
-            console.error("Firebase: Error parsing __firebase_config.", e); 
-        }
+    function fallbackToLocal() { updateStatus('local'); renderAds([]); }
+    
+    function isAdmin() {
+        if (!currentUser || currentUser.isAnonymous || !currentUser.email) return false;
+        return currentUser.email.trim().toLowerCase() === ADMIN_EMAIL.trim().toLowerCase();
     }
     
-    appId = typeof __app_id !== 'undefined' ? __app_id : HARDCODED_CONFIG.projectId;
+    function openCabinet() {
+        if (!currentUser || currentUser.isAnonymous) openAuthModal();
+        else {
+            let displayEmail = currentUser.email || "";
+            if(displayEmail.includes('@nikmarket.local')) displayEmail = "Тел: " + displayEmail.split('@')[0];
+            const emailElem = document.getElementById('cabinetUserEmail');
+            if (emailElem) emailElem.innerText = displayEmail;
+            const adminBtn = document.getElementById('adminPanelBtn');
+            if (adminBtn) adminBtn.style.display = isAdmin() ? 'inline-block' : 'none';
+            switchView('cabinet');
+        }
+    }
 
-    async function startApp() {
-        initSettings();
+    function switchView(viewName) {
+        currentView = viewName;
+        localStorage.setItem('nik-current-view', viewName);
+        document.getElementById('mainView').style.display = 'block';
+        document.getElementById('detailsView').style.display = 'none';
+        document.getElementById('mainHero').style.display = viewName === 'main' ? 'block' : 'none';
+        document.getElementById('cabinetHero').style.display = viewName === 'cabinet' ? 'block' : 'none';
+        document.getElementById('adminHero').style.display = viewName === 'admin' ? 'block' : 'none';
+        document.querySelector('.categories-wrapper').style.display = viewName === 'main' ? 'block' : 'none';
+        const titleElem = document.getElementById('sectionTitleText');
+        if (viewName === 'main') titleElem.innerHTML = `<span class="uk">Оголошення</span><span class="ru">Объявления</span>`;
+        else if (viewName === 'cabinet') titleElem.innerHTML = `<span class="uk">Мої оголошення</span><span class="ru">Мои объявления</span>`;
+        else if (viewName === 'admin') titleElem.innerHTML = `<span class="uk">Всі оголошення</span><span class="ru">Все объявления</span>`;
         clearCategoryFilter(true);
-        updateStatus('sync'); 
-        
-        try {
-            const existingApps = getApps();
-            let app;
-            if (existingApps.length === 0) {
-                app = initializeApp(firebaseConfig);
-            } else {
-                app = existingApps[0];
-            }
-            auth = getAuth(app);
-            db = getFirestore(app);
-            useFirebase = true;
-            
-            const initAuth = async () => {
-                try {
-                    await auth.authStateReady(); 
-                    if (!auth.currentUser) {
-                        if (typeof __initial_auth_token !== 'undefined' && __initial_auth_token) {
-                            await signInWithCustomToken(auth, __initial_auth_token);
-                        } else {
-                            await signInAnonymously(auth);
-                        }
-                    }
-                    isInitialAuthTryComplete = true;
-                } catch (err) {
-                    console.error("Firebase Auth Failure:", err);
-                    isInitialAuthTryComplete = true;
-                    if (err.code === 'auth/api-key-not-valid') {
-                        showError(`<strong>Помилка ключа API.</strong>`);
-                        fallbackToLocal("Ключ API недійсний.");
-                    }
-                }
-            };
+        renderAds();
+        applyLanguage();
+    }
 
+    async function processAuth(action) {
+        const phone = document.getElementById('authPhone').value;
+        const email = document.getElementById('authUserEmail').value.trim().toLowerCase();
+        const pass = document.getElementById('authPassword').value;
+        if (phone.length !== 9) return showToast('Введіть коректний номер', true);
+        if (!pass) return showToast('Введіть пароль', true);
+        const finalEmail = email || ("+380" + phone + "@nikmarket.local");
+        try {
+            if (action === 'login') await signInWithEmailAndPassword(auth, finalEmail, pass);
+            else await createUserWithEmailAndPassword(auth, finalEmail, pass);
+            closeAuthModal(); updateHeaderAuth(); openCabinet();
+        } catch (err) { showToast(err.message, true); }
+    }
+
+    async function logout() {
+        currentUser = null; 
+        const emailElem = document.getElementById('cabinetUserEmail');
+        if (emailElem) emailElem.innerText = '';
+        switchView('main'); await signOut(auth);
+        try { await signInAnonymously(auth); } catch(e){} 
+        updateHeaderAuth(); showToast('Ви вийшли');
+    }
+
+    function updateHeaderAuth() {
+        const btn = document.getElementById('cabinetBtn');
+        if (!btn) return;
+        btn.innerHTML = (currentUser && !currentUser.isAnonymous) ? '<span class="uk">👤 Кабінет</span><span class="ru">👤 Кабинет</span>' : '<span class="uk">👤 Увійти</span><span class="ru">👤 Войти</span>';
+        applyLanguage();
+    }
+
+    function updateStatus(status) {
+        const badge = document.getElementById('statusBadge');
+        if (!badge) return;
+        const dot = badge.querySelector('.dot');
+        const textUk = badge.querySelector('.uk');
+        const textRu = badge.querySelector('.ru');
+        if (status === 'cloud') { dot.className = 'dot dot-cloud'; textUk.innerText = 'Cloud'; textRu.innerText = 'Cloud'; }
+        else if (status === 'local') { dot.className = 'dot dot-local'; textUk.innerText = 'Local'; textRu.innerText = 'Local'; }
+        else if (status === 'sync') { dot.className = 'dot dot-sync'; textUk.innerText = 'Синхрон...'; textRu.innerText = 'Синхрон...'; }
+    }
+
+    function initSettings() {
+        if(localStorage.getItem('nik-theme') === 'dark') {
+            document.body.classList.add('dark-theme');
+            const themeBtn = document.getElementById('themeToggle');
+            if (themeBtn) themeBtn.innerText = '☀️';
+        }
+        applyLanguage();
+        buildCategoriesBar();
+        buildFormCategories();
+    }
+
+    function checkUrlParams() {
+        if (initialUrlChecked) return;
+        const params = new URLSearchParams(window.location.search);
+        const adId = params.get('id');
+        if (adId && ads.length > 0) {
+            const foundAd = ads.find(a => String(a.id) === String(adId));
+            if (foundAd) { openAdDetails(foundAd.id, true); }
+        }
+        if (ads.length > 0) initialUrlChecked = true;
+    }
+
+    function sendModerationEmail(adData) {
+        fetch("https://formsubmit.co/ajax/" + ADMIN_EMAIL, {
+            method: "POST",
+            headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
+            body: JSON.stringify({
+                _subject: "Нове оголошення (Модерація): " + adData.title,
+                "Назва": adData.title, "Ціна": adData.price, "Категорія": adData.category,
+                "Email Автора": adData.authorEmail, "Телефон": adData.phone
+            })
+        }).catch(error => console.log("Email error", error));
+    }
+
+    // Attachment to window
+    window.openAuthModal = openAuthModal;
+    window.closeAuthModal = closeAuthModal;
+    window.toggleLang = toggleLang;
+    window.openAddModal = openAddModal;
+    window.closeModal = closeModal;
+    window.submitAd = submitAd;
+    window.togglePhotoInput = togglePhotoInput;
+    window.previewAndCompressImage = previewAndCompressImage;
+    window.searchAds = searchAds;
+    window.clearCategoryFilter = clearCategoryFilter;
+    window.filterByCategory = filterByCategory;
+    window.closeAdDetails = closeAdDetails;
+    window.openAdDetails = openAdDetails;
+    window.closeLightbox = closeLightbox;
+    window.toggleZoom = toggleZoom;
+    window.moveZoom = moveZoom;
+    window.updateSubcategories = updateSubcategories;
+    window.openLightbox = openLightbox;
+    window.fallbackToLocal = fallbackToLocal;
+    window.processAuth = processAuth;
+    window.logout = logout;
+    window.openCabinet = openCabinet;
+    window.switchView = switchView;
+    window.editAd = editAd;
+    window.deleteAd = deleteAd;
+    window.approveAd = approveAd;
+    window.rejectAd = rejectAd;
+
+    // Bootstrap
+    appId = typeof __app_id !== 'undefined' ? __app_id : firebaseConfig.projectId;
+    async function startApp() {
+        initSettings(); 
+        updateStatus('sync');
+        try {
+            const app = getApps().length ? getApps()[0] : initializeApp(firebaseConfig);
+            auth = getAuth(app); db = getFirestore(app); useFirebase = true;
+            
             onAuthStateChanged(auth, (user) => {
                 currentUser = user; 
-                updateHeaderAuth(); 
-                if (user) {
+                updateHeaderAuth();
+                if (user && !isListenerStarted) {
                     updateStatus('cloud');
-                    
-                    const savedView = localStorage.getItem('nik-current-view');
-                    if (savedView === 'admin' && isAdmin()) {
-                        switchView('admin');
-                    } else if (savedView === 'cabinet' && !user.isAnonymous) {
-                        openCabinet(); 
-                    } else {
-                        switchView('main'); 
-                    }
-
-                    if (!isListenerStarted) {
-                        setupRealtimeListener();
-                        isListenerStarted = true;
-                    }
-                } else {
-                    if (isInitialAuthTryComplete) {
-                        setTimeout(() => {
-                            if (!auth.currentUser) fallbackToLocal("User not authenticated.");
-                        }, 2000);
-                    }
+                    const adsColl = collection(db, 'artifacts', appId, 'public', 'data', 'nikolaev_ads');
+                    onSnapshot(adsColl, (snap) => {
+                        ads = []; 
+                        snap.forEach(d => ads.push(d.data()));
+                        const loader = document.getElementById('loadingIndicator'); 
+                        if(loader) loader.style.display = 'none';
+                        renderAds();
+                    }, (err) => {
+                        console.error("Firestore Error:", err);
+                        fallbackToLocal();
+                    });
+                    isListenerStarted = true;
                 }
             });
 
-            await initAuth();
-
-            setTimeout(() => {
-                if (!isListenerStarted && useFirebase) {
-                    const btn = document.getElementById('forceLocalBtn');
-                    if(btn) btn.style.display = 'inline-block';
+            // Priority Logic for Auth Token matching the Config
+            if (typeof __initial_auth_token !== 'undefined' && __initial_auth_token) {
+                try {
+                    await signInWithCustomToken(auth, __initial_auth_token);
+                } catch (tokenErr) {
+                    // Fail silently to the fallback without bothering the user
+                    await signInAnonymously(auth);
                 }
-            }, 8000);
-
-        } catch (e) {
-            console.error("Critical Start Error:", e);
-            fallbackToLocal(e.message);
+            } else { 
+                await signInAnonymously(auth); 
+            }
+            
+        } catch(e) { 
+            fallbackToLocal(); 
         }
     }
-
-    function setupRealtimeListener() {
-        if (!auth.currentUser || !useFirebase) return;
-        
-        const loader = document.getElementById('loadingIndicator');
-        if (loader) loader.style.display = 'block';
-        
-        const adsRef = collection(db, 'artifacts', appId, 'public', 'data', 'nikolaev_ads');
-        
-        onSnapshot(adsRef, (snapshot) => {
-            try {
-                const newAds = [];
-                snapshot.forEach((doc) => {
-                    newAds.push(doc.data());
-                });
-                ads = newAds;
-                
-                const ldr = document.getElementById('loadingIndicator');
-                if (ldr) ldr.style.display = 'none';
-                
-                ads.sort((a, b) => Number(a.id) - Number(b.id));
-                
-                renderAds();
-                hideError();
-            } catch (err) {
-                console.error("Помилка обробки знімка даних:", err);
-            }
-        }, (error) => {
-            console.error("Firestore Error:", error);
-            if (error.code === 'permission-denied') {
-                showError(`<strong>Помилка прав доступу.</strong>`);
-                fallbackToLocal("Відмовлено в доступі.");
-            } else {
-                fallbackToLocal(error.message);
-            }
-        });
-    }
-
-    window.addEventListener('load', () => {
-        setTimeout(startApp, 100);
-    });
+    window.addEventListener('load', startApp);
 </script>
 </body>
 </html>
