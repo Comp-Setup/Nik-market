@@ -632,7 +632,7 @@
             icon: "📱", uk: "Електроніка", ru: "Электроника", 
             sub: { 
                 uk: ["Смартфони та телефони", "Ноутбуки та ультрабуки", "ПК та системні блоки", "Планшети та електронні книги", "Комплектуючі та деталі", "Монітори та проектори", "Периферія (миші, клавіатури)", "Телевізори та плазми", "Аудіотехніка та акустика", "Фото- та відеотехніка", "Ігрові приставки та консолі", "Смарт-годинники та фітнес-браслети", "Побутова техніка для кухні", "Побутова техніка для дому", "Кліматичне обладнання (Кондиціонери)", "Аксесуари до электроніки"], 
-                ru: ["Смартфоны и телефоны", "Ноутбуки и ультрабуки", "ПК и системные блоки", "Планшеты и электронные книги", "Комплектующие и детали", "Мониторы и проекты", "Периферия (мыши, клавиатуры)", "Телевизоры и плазмы", "Аудиотехника и акустика", "Фото- и видеотехника", "Игровые приставки и консоли", "Смарт-часы и фитнес-браслеты", "Бытовая техника для кухни", "Бытовая техника для дома", "Климатическое оборудование (Кондиционеры)", "Аксессуары к электронике"] 
+                ru: ["Смартфоны и телефоны", "Ноутбуки и ультрабуки", "ПК и системные блоки", "Планшеты и электронные книги", "Комплектующие и детали", "Мониторы и проекты", "Периферия (мыши, клавиатуры)", "Телевизоры и плазмы", "Аудиосистема и акустика", "Фото- и видеотехника", "Игровые приставки и консоли", "Смарт-часы и фитнес-браслеты", "Бытовая техника для кухни", "Бытовая техника для дома", "Климатическое оборудование (Кондиционеры)", "Аксессуары к электронике"] 
             } 
         },
         "Нерухомість": { 
@@ -746,13 +746,14 @@
             if (textUk) textUk.innerText = 'Local';
             if (textRu) textRu.innerText = 'Local';
             if (errorMsg) {
-                badge.title = errorMsg;
-                console.warn("Status Local:", errorMsg);
+                badge.title = "Причина: " + errorMsg;
+                console.warn("Status Local Reason:", errorMsg);
             }
-        } else {
+        } else if (status === 'sync') {
             dot.className = 'dot dot-sync';
-            if (textUk) textUk.innerText = 'Підключення...';
+            if (textUk) textUk.innerText = 'Синхронізація...';
             if (textRu) textRu.innerText = 'Подключение...';
+            badge.title = "Спроба з'єднання з Firebase";
         }
     }
 
@@ -1147,7 +1148,7 @@
             showToast();
             clearCategoryFilter(); 
         } catch (error) {
-            console.error(error);
+            console.error("Submit Error:", error);
             alert(currentLang === 'uk' ? 'Помилка публікації. ' + error.message : 'Ошибка публикации. ' + error.message);
         }
     }
@@ -1159,7 +1160,7 @@
     }
 
     function fallbackToLocal(reason = "") {
-        console.warn("Fallback to Local mode:", reason);
+        console.warn("Falling back to Local mode:", reason);
         updateStatus('local', reason);
         document.getElementById('loadingIndicator').style.display = 'none';
         let localAds = JSON.parse(localStorage.getItem('nik-ads'));
@@ -1172,60 +1173,64 @@
 
     // --- FIREBASE INITIALIZATION LOGIC ---
     async function startApp() {
-        console.log("Starting Firebase Init...");
+        updateStatus('sync'); // Початковий статус спроби з'єднання
+        
         try {
             const configData = typeof __firebase_config !== 'undefined' ? __firebase_config : null;
-            console.log("Firebase Config raw data present:", !!configData);
             
             if (configData) {
                 let firebaseConfig;
                 try {
                     firebaseConfig = typeof configData === 'string' ? JSON.parse(configData) : configData;
                 } catch(e) {
-                    fallbackToLocal("Config JSON Parse error: " + e.message);
+                    fallbackToLocal("Помилка парсингу JSON конфігурації.");
                     return;
                 }
                 
-                if (firebaseConfig && firebaseConfig.apiKey && firebaseConfig.apiKey !== "") {
-                    console.log("Initializing Firebase App...");
-                    const app = initializeApp(firebaseConfig);
-                    auth = getAuth(app);
-                    db = getFirestore(app);
-                    appId = typeof __app_id !== 'undefined' ? __app_id : 'default-app-id';
-                    useFirebase = true;
-                    
-                    try {
-                        console.log("Attempting Auth...");
-                        if (typeof __initial_auth_token !== 'undefined' && __initial_auth_token && __initial_auth_token !== "") {
-                            await signInWithCustomToken(auth, __initial_auth_token);
-                        } else {
-                            await signInAnonymously(auth);
-                        }
-                    } catch (authError) {
-                        console.error("Auth Error:", authError);
-                        fallbackToLocal("Auth Failed: " + authError.message + ". Перевірте, чи увімкнено 'Anonymous' в консолі Firebase.");
-                        return;
-                    }
-
-                    onAuthStateChanged(auth, (user) => {
-                        currentUser = user;
-                        if (user) {
-                            console.log("Auth Success, UID:", user.uid);
-                            updateStatus('cloud');
-                            setupRealtimeListener();
-                        } else {
-                            fallbackToLocal("Session lost.");
-                        }
-                    });
-                } else {
-                    fallbackToLocal("Firebase Config is empty or invalid.");
+                // Перевірка, чи не порожній API Key (це основна причина Local без помилки)
+                if (!firebaseConfig || !firebaseConfig.apiKey || firebaseConfig.apiKey === "") {
+                    fallbackToLocal("API Key відсутній у налаштуваннях Canvas.");
+                    return;
                 }
+
+                console.log("Firebase App Initializing...");
+                const app = initializeApp(firebaseConfig);
+                auth = getAuth(app);
+                db = getFirestore(app);
+                appId = typeof __app_id !== 'undefined' ? __app_id : 'default-app-id';
+                useFirebase = true;
+                
+                // Налаштування слухача авторизації ПЕРЕД входом
+                onAuthStateChanged(auth, (user) => {
+                    currentUser = user;
+                    if (user) {
+                        updateStatus('cloud');
+                        setupRealtimeListener();
+                    } else {
+                        // Якщо ми тут, а вхід не вдається - Local
+                        if (useFirebase && !auth.currentUser) {
+                           // Спробуємо почекати трохи, можливо вхід у процесі
+                        }
+                    }
+                });
+
+                // Виконання входу
+                try {
+                    if (typeof __initial_auth_token !== 'undefined' && __initial_auth_token && __initial_auth_token !== "") {
+                        await signInWithCustomToken(auth, __initial_auth_token);
+                    } else {
+                        await signInAnonymously(auth);
+                    }
+                } catch (authError) {
+                    fallbackToLocal("Помилка Auth: " + authError.message);
+                    return;
+                }
+
             } else {
-                fallbackToLocal("Firebase environment variables not found (__firebase_config).");
+                fallbackToLocal("Налаштування __firebase_config не знайдені в Canvas.");
             }
         } catch (e) {
-            console.error("Critical Init Error:", e);
-            fallbackToLocal("Initialization failed: " + e.message);
+            fallbackToLocal("Критична помилка ініціалізації: " + e.message);
         }
     }
 
@@ -1235,10 +1240,7 @@
         document.getElementById('loadingIndicator').style.display = 'block';
         const adsRef = collection(db, 'artifacts', appId, 'public', 'data', 'nikolaev_ads');
         
-        console.log("Setting up Firestore listener for path:", adsRef.path);
-        
         onSnapshot(adsRef, (snapshot) => {
-            console.log("Snapshot received, docs count:", snapshot.size);
             ads = [];
             snapshot.forEach((doc) => {
                 ads.push(doc.data());
@@ -1248,15 +1250,16 @@
             ads.sort((a, b) => a.id - b.id);
             searchAds(false);
         }, (error) => {
-            console.error("Firestore onSnapshot error:", error);
+            console.error("Firestore Error:", error);
             if (error.code === 'permission-denied') {
-                fallbackToLocal("Permission Denied (403). Перевірте правила (Rules) в Firebase Firestore.");
+                fallbackToLocal("Відмовлено в доступі (Rules). Перевірте налаштування.");
             } else {
-                fallbackToLocal("DB Error: " + error.message);
+                fallbackToLocal("Помилка БД: " + error.message);
             }
         });
     }
 
+    // Запуск додатку
     startApp();
 
 </script>
