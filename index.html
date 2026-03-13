@@ -643,6 +643,7 @@
     let currentCategoryFilter = '';
     let compressedBase64Image = '';
     let isListenerStarted = false;
+    let isInitialAuthTryComplete = false;
 
     const CATEGORIES = {
         "Свіжі": { icon: "🔥", uk: "Свіжі оголошення", ru: "Свежие объявления", sub: { uk:[], ru:[] } },
@@ -699,7 +700,7 @@
             icon: "🪴", uk: "Дім і Сад", ru: "Дом и Сад", 
             sub: { 
                 uk: ["Меблі для вітальні", "Меблі для спальні", "Кухонні меблі", "Садові та вуличні меблі", "Предмети інтер'єру та декор", "Кімнатні рослини", "Посуд та кухонне приладдя", "Садово-городній інвентар", "Насіння та саджанці", "Будівельні матеріали", "Оздоблювальні матеріали", "Інструменти (Електро та ручні)", "Сантехніка", "Освітлення", "Господарський інвентар / Побутова хімія"], 
-                ru: ["Мебель для гостиной", "Мебель для спальни", "Кухонная мебель", "Садовая и уличная мебель", "Предметы интерьера и декор", "Комнатные растения", "Посуда и кухонные принадлежности", "Садово-огородный инвентарь", "Семена и саженцы", "Строительные материалы", "Отделочные материалы", "Инструменты (Эклектро и ручные)", "Сантехника", "Освещение", "Хозяйственный инвентарь / Бытовая химия"] 
+                ru: ["Мебель для гостиной", "Мебель для спальни", "Кухонная мебель", "Садовая и уличная мебель", "Предметы интерьера и декор", "Комнатные растения", "Посуда и кухонные принадлежности", "Садово-городний инвентарь", "Семена и саженцы", "Строительные материалы", "Отделочные материалы", "Инструменты (Эклектро и ручные)", "Сантехника", "Освещение", "Хозяйственный инвентарь / Бытовая химия"] 
             } 
         },
         "Бізнес та Послуги": { 
@@ -1222,6 +1223,8 @@
                     const canvasConfig = typeof __firebase_config === 'string' ? JSON.parse(__firebase_config) : __firebase_config;
                     if (canvasConfig && canvasConfig.apiKey) firebaseConfig = canvasConfig;
                 } catch(e) {}
+            } else {
+                console.log("Firebase config not found in env, using hardcoded fallback.");
             }
             
             const app = initializeApp(firebaseConfig);
@@ -1237,13 +1240,13 @@
                     } else {
                         await signInAnonymously(auth);
                     }
+                    isInitialAuthTryComplete = true;
                 } catch (err) {
                     console.error("Auth init failed:", err);
+                    isInitialAuthTryComplete = true;
                     fallbackToLocal(err.message);
                 }
             };
-
-            await initAuth();
 
             // Только после попытки авторизации подписываемся на изменения состояния
             onAuthStateChanged(auth, (user) => {
@@ -1255,9 +1258,15 @@
                         isListenerStarted = true;
                     }
                 } else {
-                    fallbackToLocal("User not authenticated");
+                    // Исправление: ждем, пока initAuth завершится, прежде чем паниковать о Local
+                    if (isInitialAuthTryComplete) {
+                        fallbackToLocal("User not authenticated");
+                    }
                 }
             });
+
+            await initAuth();
+
         } catch (e) {
             console.error("Critical Start Error:", e);
             fallbackToLocal(e.message);
@@ -1291,7 +1300,7 @@
             if (error.code === 'permission-denied') {
                 showError(`
                     <strong>Ошибка доступа (Permission Denied).</strong><br>
-                    1. Убедитесь, что Anonymous Auth включен.<br>
+                    1. Убедитесь, что Anonymous Auth включен в консоли Firebase.<br>
                     2. Проверьте appId артефакта.<br>
                     3. Запросы должны быть строго после авторизации.
                 `);
