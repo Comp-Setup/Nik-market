@@ -368,7 +368,7 @@
         .toast {
             position: fixed; bottom: 20px; right: 20px; background: linear-gradient(135deg, #00b09b, #96c93d);
             color: white; padding: 15px 25px; border-radius: 10px; font-weight: bold;
-            box-shadow: 0 10px 20px rgba(0,0,0,0.2); transform: translateX(120%); transition: 0.4s; z-index: 2000;
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2); transform: translateX(120%); transition: 0.4s; z-index: 2000;
         }
         .toast.show { transform: translateX(0); }
         
@@ -665,7 +665,7 @@
             icon: "🏠", uk: "Нерухомість", ru: "Недвижимость", 
             sub: { 
                 uk: ["Оренда квартир (довгострокова)", "Оренда квартир (подобово)", "Продаж квартир", "Оренда будинків та котеджів", "Продаж будинків та дач", "Продаж землі та ділянок", "Оренда кімнат", "Продаж кімнат", "Оренда комерційної нерухомості", "Продаж комерційної нерухомості", "Оренда гаражів та паркінгів", "Продаж гаражів", "Нерухомість за кордоном"], 
-                ru: ["Аренда квартир (долгосрочная)", "Аренда квартир (посуточно)", "Продажа квартир", "Аренда домов и коттеджей", "Продажа домов и дач", "Продажа земли и участков", "Аренда комнат", "Продажа комнат", "Аренда коммерческой недвижимости", "Продажа коммерческой недвижимости", "Аренда гаражей и паркингов", "Продажа гаражей", "Недвижимость за рубежом"] 
+                ru: ["Aренда квартир (долгосрочная)", "Аренда квартир (посуточно)", "Продажа квартир", "Аренда домов и коттеджей", "Продажа домов и дач", "Продажа земли и участков", "Аренда комнат", "Продажа комнат", "Аренда коммерческой недвижимости", "Продажа коммерческой недвижимости", "Аренда гаражей и паркингов", "Продажа гаражей", "Недвижимость за рубежом"] 
             } 
         },
         "Транспорт": { 
@@ -1115,15 +1115,26 @@
             });
 
             // Виконуємо вхід
-            if (typeof __initial_auth_token !== 'undefined' && __initial_auth_token) {
-                await signInWithCustomToken(auth, __initial_auth_token);
-            } else {
-                await signInAnonymously(auth);
+            try {
+                if (typeof __initial_auth_token !== 'undefined' && __initial_auth_token) {
+                    await signInWithCustomToken(auth, __initial_auth_token);
+                } else {
+                    await signInAnonymously(auth);
+                }
+            } catch (authErr) {
+                console.error("Auth Error:", authErr);
+                if (authErr.message.includes("400")) {
+                    showDebug(`ПОМИЛКА 400: Доступ до хмари відхилено. <br><br><strong>РІШЕННЯ:</strong> <br>1. Зайдіть у Firebase Console -> Authentication -> Sign-in method. <br>2. Увімкніть (Enable) метод <strong>Anonymous</strong>.`);
+                } else {
+                    showDebug("Помилка входу: " + authErr.message);
+                }
+                fallbackToLocal();
+                return;
             }
 
             // Таймер для переходу в локальний режим, якщо хмара не відповіла
             setTimeout(() => { 
-                if (!isListenerStarted) {
+                if (!isListenerStarted && useFirebase) {
                     document.getElementById('forceLocalBtn').style.display = 'block';
                     showDebug("Тривале очікування Firestore. Перевірте, чи ви натиснули кнопку <strong>PUBLISH</strong> (Опублікувати) в розділі Rules консолі Firebase.");
                 } 
