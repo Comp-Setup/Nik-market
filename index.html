@@ -92,6 +92,7 @@
             border: 1px solid var(--border); 
             min-width: 90px;
             justify-content: center;
+            cursor: help;
         }
         .conn-status .dot { width: 8px; height: 8px; border-radius: 50%; display: inline-block; }
         .dot-cloud { background: #00c853; box-shadow: 0 0 6px #00c853; }
@@ -739,14 +740,14 @@
             dot.className = 'dot dot-cloud';
             if (textUk) textUk.innerText = 'Cloud';
             if (textRu) textRu.innerText = 'Cloud';
-            badge.title = "";
+            badge.title = "Підключено до хмари";
         } else if (status === 'local') {
             dot.className = 'dot dot-local';
             if (textUk) textUk.innerText = 'Local';
             if (textRu) textRu.innerText = 'Local';
             if (errorMsg) {
                 badge.title = errorMsg;
-                console.error("Firebase Connection Error:", errorMsg);
+                console.warn("Status Local:", errorMsg);
             }
         } else {
             dot.className = 'dot dot-sync';
@@ -1158,6 +1159,7 @@
     }
 
     function fallbackToLocal(reason = "") {
+        console.warn("Fallback to Local mode:", reason);
         updateStatus('local', reason);
         document.getElementById('loadingIndicator').style.display = 'none';
         let localAds = JSON.parse(localStorage.getItem('nik-ads'));
@@ -1170,55 +1172,59 @@
 
     // --- FIREBASE INITIALIZATION LOGIC ---
     async function startApp() {
+        console.log("Starting Firebase Init...");
         try {
             const configData = typeof __firebase_config !== 'undefined' ? __firebase_config : null;
+            console.log("Firebase Config raw data present:", !!configData);
             
             if (configData) {
                 let firebaseConfig;
                 try {
-                    // Handle both object and string JSON formats
                     firebaseConfig = typeof configData === 'string' ? JSON.parse(configData) : configData;
                 } catch(e) {
-                    fallbackToLocal("Config JSON Parse error");
+                    fallbackToLocal("Config JSON Parse error: " + e.message);
                     return;
                 }
                 
-                if (firebaseConfig && firebaseConfig.apiKey) {
+                if (firebaseConfig && firebaseConfig.apiKey && firebaseConfig.apiKey !== "") {
+                    console.log("Initializing Firebase App...");
                     const app = initializeApp(firebaseConfig);
                     auth = getAuth(app);
                     db = getFirestore(app);
                     appId = typeof __app_id !== 'undefined' ? __app_id : 'default-app-id';
                     useFirebase = true;
                     
-                    // Auth FIRST (RULE 3)
                     try {
-                        if (typeof __initial_auth_token !== 'undefined' && __initial_auth_token) {
+                        console.log("Attempting Auth...");
+                        if (typeof __initial_auth_token !== 'undefined' && __initial_auth_token && __initial_auth_token !== "") {
                             await signInWithCustomToken(auth, __initial_auth_token);
                         } else {
                             await signInAnonymously(auth);
                         }
                     } catch (authError) {
-                        fallbackToLocal("Auth Error: " + authError.message + ". Check if Anonymous Auth is enabled in Firebase Console.");
+                        console.error("Auth Error:", authError);
+                        fallbackToLocal("Auth Failed: " + authError.message + ". Перевірте, чи увімкнено 'Anonymous' в консолі Firebase.");
                         return;
                     }
 
-                    // Auth State Monitor
                     onAuthStateChanged(auth, (user) => {
                         currentUser = user;
                         if (user) {
+                            console.log("Auth Success, UID:", user.uid);
                             updateStatus('cloud');
                             setupRealtimeListener();
                         } else {
-                            updateStatus('local', "No authenticated user session.");
+                            fallbackToLocal("Session lost.");
                         }
                     });
                 } else {
-                    fallbackToLocal("Firebase Config or API Key missing.");
+                    fallbackToLocal("Firebase Config is empty or invalid.");
                 }
             } else {
-                fallbackToLocal("Environment Config (__firebase_config) not found.");
+                fallbackToLocal("Firebase environment variables not found (__firebase_config).");
             }
         } catch (e) {
+            console.error("Critical Init Error:", e);
             fallbackToLocal("Initialization failed: " + e.message);
         }
     }
@@ -1227,12 +1233,12 @@
         if (!currentUser || !useFirebase) return;
         
         document.getElementById('loadingIndicator').style.display = 'block';
-
-        // Path (RULE 1)
         const adsRef = collection(db, 'artifacts', appId, 'public', 'data', 'nikolaev_ads');
         
-        // Simple Query (RULE 2)
+        console.log("Setting up Firestore listener for path:", adsRef.path);
+        
         onSnapshot(adsRef, (snapshot) => {
+            console.log("Snapshot received, docs count:", snapshot.size);
             ads = [];
             snapshot.forEach((doc) => {
                 ads.push(doc.data());
@@ -1243,16 +1249,14 @@
             searchAds(false);
         }, (error) => {
             console.error("Firestore onSnapshot error:", error);
-            // Permissions issue or wrong path?
             if (error.code === 'permission-denied') {
-                fallbackToLocal("Permission Denied. Check Firestore Rules.");
+                fallbackToLocal("Permission Denied (403). Перевірте правила (Rules) в Firebase Firestore.");
             } else {
-                fallbackToLocal("DB Sync error: " + error.message);
+                fallbackToLocal("DB Error: " + error.message);
             }
         });
     }
 
-    // Start execution
     startApp();
 
 </script>
