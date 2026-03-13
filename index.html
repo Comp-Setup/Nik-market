@@ -390,8 +390,20 @@
             padding: 40px;
             color: var(--primary);
             font-weight: bold;
-            display: none;
             grid-column: 1/-1;
+        }
+
+        /* Error box UI */
+        .error-msg {
+            display: none;
+            background: #ffebee;
+            color: #c62828;
+            padding: 15px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+            font-size: 13px;
+            border-left: 5px solid #c62828;
+            line-height: 1.5;
         }
 
         @media (max-width: 768px) {
@@ -448,6 +460,9 @@
     </div>
 
     <div class="container">
+        <!-- Error box for UI feedback -->
+        <div id="uiErrorBox" class="error-msg"></div>
+
         <div class="section-title">
             <div style="display: flex; align-items: center; flex-wrap: wrap;">
                 <h3>
@@ -593,6 +608,17 @@
     import { getAuth, signInAnonymously, signInWithCustomToken, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
     import { getFirestore, collection, onSnapshot, setDoc, doc } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
 
+    // --- НАЛАШТУВАННЯ ДЛЯ GITHUB ---
+    // Вставте сюди дані зі своєї консолі Firebase (Settings -> Your apps)
+    const HARDCODED_CONFIG = {
+        apiKey: "", 
+        authDomain: "",
+        projectId: "",
+        storageBucket: "",
+        messagingSenderId: "",
+        appId: ""
+    };
+
     // --- 1. ПРИВ'ЯЗКА ФУНКЦІЙ ДО WINDOW (ГАРАНТУЄ РОБОТУ КНОПОК) ---
     window.toggleLang = toggleLang;
     window.openModal = openModal;
@@ -617,6 +643,7 @@
     let db, auth, appId;
     let currentCategoryFilter = '';
     let compressedBase64Image = '';
+    let isListenerStarted = false;
 
     // --- ДАНІ КАТЕГОРІЙ ТА ПІДКАТЕГОРІЙ ---
     const CATEGORIES = {
@@ -1135,6 +1162,7 @@
 
         try {
             if (useFirebase && currentUser) {
+                // Шлях згідно з правилами: artifacts/{appId}/public/data/nikolaev_ads/ID
                 const adRef = doc(db, 'artifacts', appId, 'public', 'data', 'nikolaev_ads', newAd.id.toString());
                 await setDoc(adRef, newAd);
             } else {
@@ -1168,69 +1196,71 @@
         renderAds();
     }
 
-    initSettings();
-    clearCategoryFilter(true);
+    function showError(html) {
+        const box = document.getElementById('uiErrorBox');
+        if (box) {
+            box.innerHTML = html;
+            box.style.display = 'block';
+        }
+    }
+
+    function hideError() {
+        const box = document.getElementById('uiErrorBox');
+        if (box) box.style.display = 'none';
+    }
 
     // --- FIREBASE INITIALIZATION LOGIC ---
     async function startApp() {
-        updateStatus('sync'); // Початковий статус спроби з'єднання
+        initSettings();
+        clearCategoryFilter(true);
+        updateStatus('sync'); 
         
         try {
-            const configData = typeof __firebase_config !== 'undefined' ? __firebase_config : null;
-            
-            if (configData) {
-                let firebaseConfig;
+            // Пріоритет на HARDCODED_CONFIG для GitHub, потім Canvas змінні
+            let firebaseConfig = HARDCODED_CONFIG.apiKey ? HARDCODED_CONFIG : null;
+            if (!firebaseConfig && typeof __firebase_config !== 'undefined' && __firebase_config) {
                 try {
-                    firebaseConfig = typeof configData === 'string' ? JSON.parse(configData) : configData;
+                    firebaseConfig = typeof __firebase_config === 'string' ? JSON.parse(__firebase_config) : __firebase_config;
                 } catch(e) {
-                    fallbackToLocal("Помилка парсингу JSON конфігурації.");
+                    fallbackToLocal("Помилка парсингу конфігурації.");
                     return;
                 }
-                
-                // Перевірка, чи не порожній API Key (це основна причина Local без помилки)
-                if (!firebaseConfig || !firebaseConfig.apiKey || firebaseConfig.apiKey === "") {
-                    fallbackToLocal("API Key відсутній у налаштуваннях Canvas.");
-                    return;
-                }
-
-                console.log("Firebase App Initializing...");
+            }
+            
+            if (firebaseConfig && firebaseConfig.apiKey) {
                 const app = initializeApp(firebaseConfig);
                 auth = getAuth(app);
                 db = getFirestore(app);
-                appId = typeof __app_id !== 'undefined' ? __app_id : 'default-app-id';
+                appId = typeof __app_id !== 'undefined' ? __app_id : 'nik-market';
                 useFirebase = true;
                 
-                // Налаштування слухача авторизації ПЕРЕД входом
-                onAuthStateChanged(auth, (user) => {
-                    currentUser = user;
+                // Налаштування слухача стану авторизації (RULE 3)
+                onAuthStateChanged(auth, async (user) => {
                     if (user) {
+                        currentUser = user;
                         updateStatus('cloud');
-                        setupRealtimeListener();
+                        if (!isListenerStarted) {
+                            setupRealtimeListener();
+                            isListenerStarted = true;
+                        }
                     } else {
-                        // Якщо ми тут, а вхід не вдається - Local
-                        if (useFirebase && !auth.currentUser) {
-                           // Спробуємо почекати трохи, можливо вхід у процесі
+                        // Якщо не авторизовано - пробуємо увійти
+                        try {
+                            if (typeof __initial_auth_token !== 'undefined' && __initial_auth_token) {
+                                await signInWithCustomToken(auth, __initial_auth_token);
+                            } else {
+                                await signInAnonymously(auth);
+                            }
+                        } catch (err) {
+                            fallbackToLocal("Auth Error: " + err.message);
                         }
                     }
                 });
-
-                // Виконання входу
-                try {
-                    if (typeof __initial_auth_token !== 'undefined' && __initial_auth_token && __initial_auth_token !== "") {
-                        await signInWithCustomToken(auth, __initial_auth_token);
-                    } else {
-                        await signInAnonymously(auth);
-                    }
-                } catch (authError) {
-                    fallbackToLocal("Помилка Auth: " + authError.message);
-                    return;
-                }
-
             } else {
-                fallbackToLocal("Налаштування __firebase_config не знайдені в Canvas.");
+                fallbackToLocal("Конфігурація Firebase відсутня.");
             }
         } catch (e) {
-            fallbackToLocal("Критична помилка ініціалізації: " + e.message);
+            fallbackToLocal("Помилка запуску: " + e.message);
         }
     }
 
@@ -1249,17 +1279,23 @@
             document.getElementById('loadingIndicator').style.display = 'none';
             ads.sort((a, b) => a.id - b.id);
             searchAds(false);
+            hideError();
         }, (error) => {
             console.error("Firestore Error:", error);
             if (error.code === 'permission-denied') {
-                fallbackToLocal("Відмовлено в доступі (Rules). Перевірте налаштування.");
+                showError(`
+                    <strong>Помилка доступу (Permission Denied).</strong><br>
+                    1. Увімкніть <strong>Anonymous Auth</strong> у Firebase Console.<br>
+                    2. Додайте домен <strong>comp-setup.github.io</strong> в Authorized Domains.<br>
+                    3. Перевірте правила (Rules): шлях має дозволяти читання <code>/artifacts/${appId}/public/data/nikolaev_ads</code>.
+                `);
+                fallbackToLocal("Відмовлено в доступі.");
             } else {
                 fallbackToLocal("Помилка БД: " + error.message);
             }
         });
     }
 
-    // Запуск додатку
     startApp();
 
 </script>
