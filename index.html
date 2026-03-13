@@ -67,6 +67,8 @@
             align-items: center;
         }
 
+        .logo-box { display: flex; align-items: center; gap: 15px; }
+
         .logo {
             font-size: 24px;
             font-weight: 800;
@@ -76,6 +78,12 @@
             text-decoration: none;
             cursor: pointer;
         }
+
+        /* Статус підключення */
+        .conn-status { font-size: 10px; padding: 4px 10px; border-radius: 12px; display: flex; align-items: center; gap: 6px; font-weight: bold; background: var(--bg); border: 1px solid var(--border); }
+        .conn-status .dot { width: 8px; height: 8px; border-radius: 50%; display: inline-block; }
+        .dot-cloud { background: #00c853; box-shadow: 0 0 6px #00c853; }
+        .dot-local { background: #ff3d00; box-shadow: 0 0 6px #ff3d00; }
 
         .header-actions {
             display: flex;
@@ -378,7 +386,13 @@
 
 <header>
     <div class="nav-container">
-        <a class="logo" onclick="closeAdDetails()">NIK-MARKET</a>
+        <div class="logo-box">
+            <a class="logo" onclick="closeAdDetails()">NIK-MARKET</a>
+            <div id="statusBadge" class="conn-status">
+                <span class="dot dot-local"></span>
+                <span class="uk">Local</span><span class="ru">Local</span>
+            </div>
+        </div>
         <div class="header-actions">
             <button class="btn-icon" id="langToggle" onclick="toggleLang()" title="Змінити мову / Сменить язык">RU</button>
             <button class="btn-icon" id="themeToggle" title="Змінити тему / Сменить тему">🌙</button>
@@ -597,8 +611,8 @@
         "Електроніка": { 
             icon: "📱", uk: "Електроніка", ru: "Электроника", 
             sub: { 
-                uk: ["Смартфони та телефони", "Ноутбуки та ультрабуки", "ПК та системні блоки", "Планшети та електронні книги", "Комплектуючі та деталі", "Монітори та проектори", "Периферія (миші, клавіатури)", "Телевізори та плазми", "Аудіотехніка та акустика", "Фото- та відеотехніка", "Ігрові приставки та консолі", "Смарт-годинники та фітнес-браслети", "Побутова техніка для кухні", "Побутова техніка для дому", "Кліматичне обладнання (Кондиціонери)", "Аксесуари до електроніки"], 
-                ru: ["Смартфоны и телефоны", "Ноутбуки и ультрабуки", "ПК и системные блоки", "Планшеты и электронные книги", "Комплектующие и детали", "Мониторы и прожекторы", "Периферия (мыши, клавиатуры)", "Телевизоры и плазмы", "Аудиотехника и акустика", "Фото- и видеотехника", "Игровые приставки и консоли", "Смарт-часы и фитнес-браслеты", "Бытовая техника для кухни", "Бытовая техника для дома", "Климатическое оборудование (Кондиционеры)", "Аксессуары к электронике"] 
+                uk: ["Смартфони та телефони", "Ноутбуки та ультрабуки", "ПК та системні блоки", "Планшети та електронні книги", "Комплектуючі та деталі", "Монітори та проектори", "Периферія (миші, клавіатури)", "Телевізори та плазми", "Аудіотехніка та акустика", "Фото- та відеотехніка", "Ігрові приставки та консолі", "Смарт-годинники та фітнес-браслети", "Побутова техніка для кухні", "Побутова техніка для дому", "Кліматичне обладнання (Кондиціонери)", "Аксесуари до электроніки"], 
+                ru: ["Смартфоны и телефоны", "Ноутбуки и ультрабуки", "ПК и системные блоки", "Планшеты и электронные книги", "Комплектующие и детали", "Мониторы и проекторы", "Периферия (мыши, клавиатуры)", "Телевизоры и плазмы", "Аудиотехника и акустика", "Фото- и видеотехника", "Игровые приставки и консоли", "Смарт-часы и фитнес-браслеты", "Бытовая техника для кухни", "Бытовая техника для дома", "Климатическое оборудование (Кондиционеры)", "Аксессуары к электронике"] 
             } 
         },
         "Нерухомість": { 
@@ -618,7 +632,7 @@
         "Запчастини": { 
             icon: "⚙️", uk: "Запчастини", ru: "Запчасти", 
             sub: { 
-                uk: ["Автозапчастини", "Запчастини для мототехніки", "Запчастини для спецтехніки", "Шини та диски", "Акумулятори автомобільні", "Автозвук та електроніка", "Кузовні деталі", "Двигуни та компоненти", "Оптика та світло", "Салон та інтер'єр", "Тюнінг та аксесуари", "Автохімія та масла", "GPS-навігатори та відеореєстратори", "Інструменти для СТО"], 
+                uk: ["Автозапчастини", "Запчастини для мототехніки", "Запчастини для спецтехніки", "Шини та диски", "Акумулятори автомобільні", "Автозвук та электроніка", "Кузовні деталі", "Двигуни та компоненти", "Оптика та світло", "Салон та інтер'єр", "Тюнінг та аксесуари", "Автохімія та масла", "GPS-навігатори та відеореєстратори", "Інструменти для СТО"], 
                 ru: ["Автозапчасти", "Запчасти для мототехники", "Запчасти для спецтехники", "Шины и диски", "Аккумуляторы автомобильные", "Автозвук и электроника", "Кузовные детали", "Двигатели и компоненты", "Оптика и свет", "Салон и интерьер", "Тюнинг и аксессуары", "Автохимия и масла", "GPS-навигаторы и видеорегистраторы", "Инструменты для СТО"] 
             } 
         },
@@ -626,7 +640,7 @@
             icon: "💼", uk: "Робота", ru: "Работа", 
             sub: { 
                 uk: ["Роздрібна торгівля / Продажі", "Логістика / Склад / Доставка", "Будівництво / Архітектура", "IT / Телекомунікації", "Без досвіду / Студенти", "Ресторанний бізнес / Кулінарія", "Готельно-туристичний бізнес", "Виробництво / Робітничі спеціальності", "Охорона / Безпека", "Медицина / Фармація", "Освіта / Наука", "Краса / Фітнес / Спорт", "Бухгалтерія / Фінанси", "Маркетинг / Реклама / PR", "HR / Управління персоналом", "Віддалена робота / Фріланс"], 
-                ru: ["Розничная торговля / Продажи", "Логистика / Склад / Доставка", "Строительство / Архитектура", "IT / Телекоммуникации", "Без опыта / Студенты", "Ресторанный бизнес / Кулинария", "Гостинично-туристический бизнес", "Производство / Рабочие специальности", "Охрана / Безопасность", "Медицина / Фармация", "Образование / Наука", "Красота / Фитнес / Спорт", "Бухгалтерия / Финансы", "Маркетинг / Реклама / PR", "HR / Управление персоналом", "Удаленная работа / Фриланс"] 
+                ru: ["Розничная торговля / Продажи", "Логистика / Склад / Доставка", "Строительство / Архитектура", "IT / Телекоммуникации", "Без опыта / Студенты", "Ресторанный бизнес / Кулинария", "Гостиничный бизнес / Кулинария", "Производство / Рабочие специальности", "Охрана / Безопасность", "Медицина / Фармация", "Образование / Наука", "Красота / Фитнес / Спорт", "Бухгалтерия / Финансы", "Маркетинг / Реклама / PR", "HR / Управление персоналом", "Удаленная работа / Фриланс"] 
             } 
         },
         "Тварини": { 
@@ -693,6 +707,23 @@
         applyLanguage();
         buildCategoriesBar();
         buildFormCategories();
+    }
+
+    function updateStatus(isCloud) {
+        const badge = document.getElementById('statusBadge');
+        if (!badge) return;
+        const dot = badge.querySelector('.dot');
+        const textUk = badge.querySelector('.uk');
+        const textRu = badge.querySelector('.ru');
+        if (isCloud) {
+            dot.className = 'dot dot-cloud';
+            if (textUk) textUk.innerText = 'Cloud';
+            if (textRu) textRu.innerText = 'Cloud';
+        } else {
+            dot.className = 'dot dot-local';
+            if (textUk) textUk.innerText = 'Local';
+            if (textRu) textRu.innerText = 'Local';
+        }
     }
 
     function toggleLang() {
@@ -977,7 +1008,8 @@
     const modal = document.getElementById('addModal');
 
     function togglePhotoInput() {
-        const type = document.querySelector('input[name="photoType"]:checked').value;
+        const typeSelect = document.querySelector('input[name="photoType"]:checked');
+        const type = typeSelect ? typeSelect.value : 'upload';
         if (type === 'upload') {
             document.getElementById('uploadPhotoBlock').style.display = 'block';
             document.getElementById('urlPhotoBlock').style.display = 'none';
@@ -1050,7 +1082,8 @@
     async function submitAd(e) {
         e.preventDefault();
 
-        const photoType = document.querySelector('input[name="photoType"]:checked').value;
+        const typeSelect = document.querySelector('input[name="photoType"]:checked');
+        const photoType = typeSelect ? typeSelect.value : 'upload';
         let finalImage = photoType === 'upload' ? compressedBase64Image : document.getElementById('adImage').value;
         const priceValue = document.getElementById('adPrice').value + ' грн';
 
@@ -1071,11 +1104,9 @@
 
         try {
             if (useFirebase && currentUser) {
-                // Серверне збереження (Firebase)
                 const adRef = doc(db, 'artifacts', appId, 'public', 'data', 'nikolaev_ads', newAd.id.toString());
                 await setDoc(adRef, newAd);
             } else {
-                // Локальне збереження (якщо сервер недоступний)
                 ads.push(newAd);
                 if(ads.length > 50) ads.shift(); 
                 localStorage.setItem('nik-ads', JSON.stringify(ads));
@@ -1098,14 +1129,13 @@
     }
 
     function fallbackToLocal() {
-        console.warn("Підключення до сервера відсутнє. Використовується безпечна локальна пам'ять.");
+        updateStatus(false);
         document.getElementById('loadingIndicator').style.display = 'none';
         let localAds = JSON.parse(localStorage.getItem('nik-ads'));
         ads = localAds ? localAds : [];
         renderAds();
     }
 
-    // --- 4. БЕЗПЕЧНА ІНІЦІАЛІЗАЦІЯ БАЗИ ДАНИХ FIREBASE ---
     initSettings();
     clearCategoryFilter(true);
 
@@ -1134,7 +1164,10 @@
                 onAuthStateChanged(auth, (user) => {
                     currentUser = user;
                     if (user) {
+                        updateStatus(true);
                         setupRealtimeListener();
+                    } else {
+                        updateStatus(false);
                     }
                 });
             } else {
@@ -1144,7 +1177,7 @@
             fallbackToLocal();
         }
     } catch (e) {
-        console.error("Помилка ініціалізації Firebase:", e);
+        console.error("Firebase init error:", e);
         fallbackToLocal();
     }
 
@@ -1164,8 +1197,7 @@
             ads.sort((a, b) => a.id - b.id);
             searchAds(false);
         }, (error) => {
-            console.error("Error fetching ads from DB: ", error);
-            document.getElementById('loadingIndicator').innerText = "Помилка завантаження бази даних :(";
+            console.error("DB snap error:", error);
             fallbackToLocal();
         });
     }
