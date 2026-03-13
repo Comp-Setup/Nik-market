@@ -795,7 +795,9 @@
     let isListenerStarted = false;
     let isInitialAuthTryComplete = false;
     let initialUrlChecked = false; // Flag for checking direct links
-    let currentView = 'main'; // 'main', 'cabinet', 'admin'
+    
+    // Запам'ятовуємо останню відкриту вкладку (Щоб не викидало при оновленні)
+    let currentView = localStorage.getItem('nik-current-view') || 'main'; // 'main', 'cabinet', 'admin'
     let editingAdId = null;
 
     const CATEGORIES = {
@@ -938,6 +940,13 @@
     // --- РОУТИНГ ВИГЛЯДІВ (Головна / Кабінет / Адмін) ---
     function switchView(viewName) {
         currentView = viewName;
+        localStorage.setItem('nik-current-view', viewName); // Зберігаємо вкладку при оновленні сторінки
+        
+        // ВАЖЛИВО: Замість closeAdDetails(true) просто перемикаємо видимість контейнерів,
+        // щоб уникнути помилки "Maximum call stack size exceeded" (нескінченної рекурсії)
+        document.getElementById('mainView').style.display = 'block';
+        document.getElementById('detailsView').style.display = 'none';
+        
         document.getElementById('mainHero').style.display = viewName === 'main' ? 'block' : 'none';
         document.getElementById('cabinetHero').style.display = viewName === 'cabinet' ? 'block' : 'none';
         document.getElementById('adminHero').style.display = viewName === 'admin' ? 'block' : 'none';
@@ -953,14 +962,15 @@
             titleElem.innerHTML = `<span class="uk">Всі оголошення бази</span><span class="ru">Все объявления базы</span>`;
         }
         
-        closeAdDetails(true);
         clearCategoryFilter(true);
         renderAds();
         applyLanguage();
     }
 
     function isAdmin() {
-        return currentUser && currentUser.email === ADMIN_EMAIL.toLowerCase();
+        if (!currentUser || currentUser.isAnonymous || !currentUser.email) return false;
+        // Надійна перевірка ігноруючи регістр і пробіли
+        return currentUser.email.trim().toLowerCase() === ADMIN_EMAIL.trim().toLowerCase();
     }
 
     function openCabinet() {
@@ -1161,12 +1171,20 @@
         if (currentView === 'main') {
             filtered = filtered.filter(ad => ad.status === 'approved' || !ad.status); 
         } else if (currentView === 'cabinet') {
-            filtered = filtered.filter(ad => ad.userId === currentUser.uid);
+            // Безпечна перевірка: щоб уникнути помилок якщо uid немає
+            if (currentUser && !currentUser.isAnonymous) {
+                filtered = filtered.filter(ad => ad.userId === currentUser.uid);
+            } else {
+                filtered = []; // Не показуємо нічого, якщо юзер не авторизований
+            }
         } else if (currentView === 'admin') {
+            // Безпечне сортування: нічого не видаляємо, просто сортуємо (нові/очікуючі зверху)
             filtered = [...filtered].sort((a, b) => {
-                if (a.status === 'pending' && b.status !== 'pending') return -1;
-                if (a.status !== 'pending' && b.status === 'pending') return 1;
-                return b.id - a.id; 
+                const statusA = a.status || 'approved'; 
+                const statusB = b.status || 'approved';
+                if (statusA === 'pending' && statusB !== 'pending') return -1;
+                if (statusA !== 'pending' && statusB === 'pending') return 1;
+                return (b.id || 0) - (a.id || 0); 
             });
         }
 
@@ -1185,7 +1203,10 @@
         }
 
         if (filtered.length === 0 && (!loader || loader.style.display === 'none')) {
-            container.innerHTML += `<p style="grid-column: 1/-1; text-align:center; color: var(--text-muted); padding: 50px;">${currentLang === 'uk' ? 'Оголошень не знайдено.' : 'Объявлений не найдено.'}</p>`;
+            container.innerHTML += `<p style="grid-column: 1/-1; text-align:center; color: var(--text-muted); padding: 50px;">
+                ${currentLang === 'uk' ? 'Оголошень не знайдено.' : 'Объявлений не найдено.'}
+                <br><span style="font-size: 11px; opacity: 0.5;">(База даних: ${appId})</span>
+            </p>`;
         }
 
         adsCount.innerText = `${filtered.length} ${currentLang === 'uk' ? 'оголошень' : 'объявлений'}`;
@@ -1206,13 +1227,13 @@
 
             // Статуси
             let statusHTML = '';
-            if (currentUser && (ad.userId === currentUser.uid || isAdmin())) {
+            if (currentUser && !currentUser.isAnonymous && (ad.userId === currentUser.uid || isAdmin())) {
                 if (ad.status === 'pending') statusHTML = `<div class="status-badge status-pending">Очікує модерації</div>`;
                 else if (ad.status === 'rejected') statusHTML = `<div class="status-badge status-rejected">Відхилено</div>`;
                 else statusHTML = `<div class="status-badge status-approved">Опубліковано</div>`;
             }
 
-            // Кнопки дій (редагувати, видалити, схвалити)
+            // БЕЗПЕКА: Кнопки з'являються ТІЛЬКИ для авторизованих власників або адміна
             let actionsHTML = '';
             if (currentUser && !currentUser.isAnonymous && (ad.userId === currentUser.uid || isAdmin())) {
                 actionsHTML += `<div class="card-actions" onclick="event.preventDefault(); event.stopPropagation();">`;
@@ -1285,7 +1306,7 @@
         const clickAction = hasImage ? `onclick="openLightbox('${ad.image}')"` : '';
         const cursorStyle = hasImage ? 'cursor: zoom-in;' : 'cursor: default;';
 
-        // Додаємо кнопки керування прямо в середину оголошення
+        // БЕЗПЕКА: Додаємо кнопки керування ТІЛЬКИ для авторизованих власників або адміна
         let actionsHTML = '';
         if (currentUser && !currentUser.isAnonymous && (ad.userId === currentUser.uid || isAdmin())) {
             actionsHTML = `<div style="margin-top: 20px; display: flex; gap: 10px; border-top: 1px solid var(--border); padding-top: 20px; flex-wrap: wrap;">`;
@@ -1334,8 +1355,7 @@
     }
 
     function closeAdDetails(skipPushState = false) {
-        document.getElementById('detailsView').style.display = 'none';
-        switchView(currentView); // Повертаємось на ту вкладку, звідки прийшли (Головна/Кабінет)
+        switchView(currentView); // Перемикає відображення на головний вигляд або кабінет/адмінку
         window.scrollTo(0, 0);
 
         document.title = 'Оголошення м. Миколаїв | Міні-дошка оголошень';
@@ -1715,6 +1735,17 @@
                     currentUser = user;
                     updateHeaderAuth();
                     updateStatus('cloud');
+                    
+                    // БЕЗПЕЧНЕ ВІДНОВЛЕННЯ ВКЛАДКИ (після оновлення сторінки)
+                    const savedView = localStorage.getItem('nik-current-view');
+                    if (savedView === 'admin' && isAdmin()) {
+                        switchView('admin');
+                    } else if (savedView === 'cabinet' && !user.isAnonymous) {
+                        switchView('cabinet');
+                    } else {
+                        switchView('main'); // Безпечно повертаємо на головну, якщо нема прав
+                    }
+
                     if (!isListenerStarted) {
                         setupRealtimeListener();
                         isListenerStarted = true;
